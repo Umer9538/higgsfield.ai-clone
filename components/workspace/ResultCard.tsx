@@ -71,6 +71,7 @@ function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
         src={src}
         poster={poster}
         muted={muted}
+        preload="metadata"
         loop
         playsInline
         className="aspect-video w-full"

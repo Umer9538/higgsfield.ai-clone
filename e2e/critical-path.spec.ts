@@ -70,9 +70,13 @@ test("video workspace runs a generation and reveals a playable result", async ({
   await expect(video).toBeVisible();
   await expect(page.getByRole("button", { name: "Download" })).toBeVisible();
 
-  // The result is a real file that the browser could decode
-  const ready = await video.evaluate((el: HTMLVideoElement) => el.readyState >= 1);
-  expect(ready).toBe(true);
+  // The result is a real file the browser could decode. Polled, because over a
+  // real network metadata arrives after the element is already visible.
+  await expect
+    .poll(async () => video.evaluate((el: HTMLVideoElement) => el.readyState), {
+      timeout: 20_000,
+    })
+    .toBeGreaterThanOrEqual(1);
 
   // Reset returns to the idle pane
   await page.getByRole("button", { name: "New generation" }).click();
