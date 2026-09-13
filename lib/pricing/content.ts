@@ -8,7 +8,7 @@ export type PlanId = "basic" | "pro" | "max";
 export interface FeatureRow {
   label: string;
   included: boolean;
-  badges?: { label: string; tone: "lime" | "pink" | "neutral" }[];
+  badges?: { label: string; tone: "lime" | "pink" | "neutral" | "green" }[];
   note?: string;
 }
 
@@ -76,6 +76,7 @@ export const PLANS: Plan[] = [
       { label: "Access to selected models & features", included: true },
       { label: "Early access to advanced AI features", included: false },
       { label: "Access to unlimited marketplace", included: false },
+      { label: "Lowest cost per credit", included: false },
     ],
   },
   {
@@ -141,6 +142,7 @@ export const PLANS: Plan[] = [
       { label: "Access to all models & features", included: true },
       { label: "Early access to advanced AI features", included: true },
       { label: "Access to unlimited marketplace", included: true },
+      { label: "Lowest cost per credit", included: false },
     ],
   },
   {
@@ -210,6 +212,101 @@ export const PLANS: Plan[] = [
       { label: "Access to all models & features", included: true },
       { label: "Early access to advanced AI features", included: true },
       { label: "Access to unlimited marketplace", included: true },
+      {
+        label: "Lowest cost per credit",
+        included: true,
+        badges: [{ label: "70% CHEAPER", tone: "green" }],
+      },
+    ],
+  },
+];
+
+export const PLAN_FOOTNOTES = {
+  links: ["How do Higgsfield plans work?", "What are Unlimited models?"],
+  disclaimers: [
+    "Unlimited models and Free Generations on plans are accessible only via higgsfield.ai and are not accessible via MCP/CLI, Canvas or Supercomputer.",
+    "Prices exclude VAT and local taxes, calculated at checkout. Unlimited usage may be subject to dynamic speed adjustments during high-traffic periods.",
+    "Access to new models and advanced features may be done on a rolling basis and not available to all users at launch.",
+  ],
+};
+
+export interface ComparisonRow {
+  label: string;
+  note?: string;
+  values: [string | boolean, string | boolean, string | boolean];
+}
+
+export interface ComparisonGroup {
+  title: string;
+  rows: ComparisonRow[];
+}
+
+/** Column order is Basic, Pro, Max throughout. */
+export const COMPARISON: ComparisonGroup[] = [
+  {
+    title: "Video",
+    rows: [
+      {
+        label: "Concurrent Jobs",
+        values: ["2 concurrent jobs", "3 concurrent jobs", "8 concurrent jobs"],
+      },
+      {
+        label: "Seedance 2.0 720p",
+        note: "\u224822 credits/5s",
+        values: [false, "320 videos", "960 videos"],
+      },
+      {
+        label: "Seedance 2.0 1080p",
+        note: "\u224845 credits/5s",
+        values: [false, "160 videos", "480 videos"],
+      },
+      {
+        label: "Seedance 2.0 4K",
+        note: "\u224885 credits/5s",
+        values: [false, "85 videos", "188 videos"],
+      },
+      {
+        label: "Seedance 2.5",
+        note: "Available from Pro plan",
+        values: [false, true, true],
+      },
+      { label: "Kling 3.0", note: "\u224814 credits/8s", values: [false, true, true] },
+    ],
+  },
+  {
+    title: "Image",
+    rows: [
+      {
+        label: "Concurrent Jobs",
+        values: ["2 concurrent jobs", "6 concurrent jobs", "12 concurrent jobs"],
+      },
+      {
+        label: "Nano Banana Pro",
+        note: "\u22482 credits each",
+        values: ["60 images", "450 images", "2,700 images"],
+      },
+      { label: "Nano Banana 2", note: "7-day unlimited on Pro and Max", values: [false, true, true] },
+      { label: "GPT Image 2", note: "4K, near-perfect text", values: [true, true, true] },
+      { label: "Soul ID Character", values: [false, true, true] },
+    ],
+  },
+  {
+    title: "Audio",
+    rows: [
+      { label: "Text to Speech", note: "Seed Audio 1.0", values: [true, true, true] },
+      { label: "Voice Change", values: [false, true, true] },
+      { label: "Multi-speaker scenes", values: [false, false, true] },
+    ],
+  },
+  {
+    title: "Platform",
+    rows: [
+      { label: "Supercomputer", values: [true, true, true] },
+      { label: "MCP & CLI", values: ["Basic", "Full", "Full"] },
+      { label: "Early access to advanced AI features", values: [false, true, true] },
+      { label: "Access to unlimited marketplace", values: [false, true, true] },
+      { label: "Commercial usage rights", values: [true, true, true] },
+      { label: "Priority support", values: [false, false, true] },
     ],
   },
 ];

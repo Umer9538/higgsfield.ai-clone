@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
-import { PLANS } from "@/lib/pricing/content";
+import { ArrowUpRight } from "lucide-react";
+import { PLANS, PLAN_FOOTNOTES } from "@/lib/pricing/content";
 import { BillingToggle, type Billing } from "./BillingToggle";
 import { PlanCard } from "./PlanCard";
 
@@ -68,11 +69,34 @@ export function PlanGrid() {
           </button>
         </div>
       ) : (
-        <div role="list" aria-label="Plans" className="mt-6 grid gap-4 lg:grid-cols-3">
-          {PLANS.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} billing={billing} />
-          ))}
-        </div>
+        <>
+          <div role="list" aria-label="Plans" className="mt-6 grid gap-4 lg:grid-cols-3">
+            {PLANS.map((plan) => (
+              <PlanCard key={plan.id} plan={plan} billing={billing} />
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap justify-center gap-6">
+            {PLAN_FOOTNOTES.links.map((link) => (
+              <a
+                key={link}
+                href="#"
+                className="flex items-center gap-1 text-xs text-hf-muted transition-colors hover:text-white"
+              >
+                {link}
+                <ArrowUpRight className="size-3" aria-hidden strokeWidth={1.75} />
+              </a>
+            ))}
+          </div>
+
+          <div className="mx-auto mt-5 max-w-3xl space-y-1.5 text-center">
+            {PLAN_FOOTNOTES.disclaimers.map((line) => (
+              <p key={line} className="text-[11px] leading-relaxed text-hf-dim">
+                {line}
+              </p>
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

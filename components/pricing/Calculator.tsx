@@ -43,7 +43,10 @@ export function Calculator() {
 
   return (
     <section id="calculator" className="mt-16 scroll-mt-20">
-      <p className="text-sm text-hf-muted">{CALCULATOR.intro}</p>
+      <h2 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
+        Find the best plan for you
+      </h2>
+      <p className="mt-2 text-sm text-hf-muted">{CALCULATOR.intro}</p>
 
       <div className="mt-4 grid gap-4 rounded-2xl border border-hf-border bg-hf-surface p-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] sm:p-6">
         {/* Steps */}

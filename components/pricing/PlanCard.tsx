@@ -31,6 +31,7 @@ const BADGE_TONE = {
   lime: "bg-hf-lime/15 text-hf-lime",
   pink: "bg-hf-pink text-white",
   neutral: "bg-hf-surface-4 text-hf-muted",
+  green: "bg-[#1a4d1a] text-[#6ee76e]",
 };
 
 function Row({ row, dimmed }: { row: FeatureRow; dimmed?: boolean }) {

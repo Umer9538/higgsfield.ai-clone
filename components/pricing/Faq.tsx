@@ -8,17 +8,8 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="mt-20">
-      <div className="flex justify-center">
-        <button
-          type="button"
-          className="rounded-lg border border-hf-border bg-hf-surface px-4 py-2 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
-        >
-          Compare Features
-        </button>
-      </div>
-
-      <h2 className="mt-10 text-center font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
+    <section className="mt-16">
+      <h2 className="text-center font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
         Frequently Asked Questions
       </h2>
 

@@ -133,3 +133,26 @@ test("calculator recommends a bigger plan as usage grows", async ({ page }) => {
 
   await expect(page.getByText("We recommend Max plan")).toBeVisible();
 });
+
+test("compare features matrix expands to reveal all groups", async ({ page }) => {
+  await page.goto("/pricing");
+
+  await expect(page.getByRole("heading", { name: "Compare features" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Find the best plan for you" })).toBeVisible();
+
+  // Collapsed: Video group only
+  await expect(page.getByRole("columnheader", { name: "Video" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Platform" })).toBeHidden();
+
+  const toggle = page.getByRole("button", { name: "Compare Features" });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
+
+  // Expanded: every group present
+  await expect(page.getByRole("columnheader", { name: "Image" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Audio" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Platform" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Hide comparison" }).click();
+  await expect(page.getByRole("columnheader", { name: "Platform" })).toBeHidden();
+});
