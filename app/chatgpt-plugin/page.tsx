@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <AppHeader variant="marketing" activeNav="chatgpt-plugin" />
+      <AppHeader activeNav="chatgpt-plugin" />
       <PluginPage />
       <SiteFooter />
     </>

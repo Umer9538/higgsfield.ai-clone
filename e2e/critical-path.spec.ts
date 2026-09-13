@@ -220,3 +220,60 @@ test("genjutsu and effects use the panel shell; studios use the dock", async ({ 
   await expect(page.locator("aside")).toHaveCount(0);
   await expect(page.getByPlaceholder(/Describe your scene/)).toBeVisible();
 });
+
+const LIME = "rgb(209, 254, 23)";
+
+test("header is the signed-in app shell on every public page", async ({ page }) => {
+  for (const route of ["/", "/pricing", "/ai/video", "/mcp", "/supercomputer"]) {
+    await page.goto(route);
+
+    // Scoped to the header: the footer also links to Pricing.
+    const header = page.getByRole("banner");
+
+    await expect(header.getByRole("button", { name: "Search" })).toBeVisible();
+    await expect(header.getByRole("link", { name: /Pricing/ })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Enterprise" })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Assets" })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Notifications" })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Account" })).toBeVisible();
+
+    // The real mark, not a text wordmark
+    await expect(header.getByRole("img", { name: "Higgsfield" })).toBeVisible();
+  }
+});
+
+test("no auth wall: every page is reachable with no sign-in controls", async ({ page }) => {
+  for (const route of ["/", "/pricing", "/ai/video", "/ai/genjutsu", "/mcp", "/supercomputer"]) {
+    const response = await page.goto(route);
+    expect(response?.status(), `${route} should return 200`).toBe(200);
+
+    // Nothing in the page may gate access behind an account
+    await expect(page.getByRole("button", { name: "Sign up" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Log in" })).toHaveCount(0);
+
+    // Page content actually rendered rather than redirecting to a login
+    expect(page.url()).toContain(route === "/" ? "/" : route);
+  }
+});
+
+test("lime renders as #d1fe17 on the active link, New badge and Generate", async ({ page }) => {
+  await page.goto("/ai/genjutsu");
+
+  const active = page
+    .getByRole("navigation", { name: "Main" })
+    .getByRole("link", { name: /^Genjutsu/ });
+  await expect(active).toHaveCSS("color", LIME);
+
+  // New badge: solid lime background, black text
+  const newBadge = page
+    .getByRole("navigation", { name: "Main" })
+    .getByText("New", { exact: true })
+    .first();
+  await expect(newBadge).toHaveCSS("background-color", LIME);
+  await expect(newBadge).toHaveCSS("color", "rgb(0, 0, 0)");
+
+  // Primary action: solid lime background, black text
+  const generate = page.getByRole("button", { name: /^Generate/ });
+  await expect(generate).toHaveCSS("background-color", LIME);
+  await expect(generate).toHaveCSS("color", "rgb(0, 0, 0)");
+});

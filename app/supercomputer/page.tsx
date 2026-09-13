@@ -14,7 +14,7 @@ const FILTERS = ["All", "Marketing", "Explainer videos", "Apps", "Games"];
 export default function SupercomputerPage() {
   return (
     <>
-      <AppHeader variant="marketing" activeNav="supercomputer" />
+      <AppHeader activeNav="supercomputer" />
 
       <main className="mx-auto max-w-5xl px-4 py-16">
         <h1 className="text-center font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">

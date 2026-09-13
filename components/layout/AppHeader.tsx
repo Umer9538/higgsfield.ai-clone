@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Bell, Search } from "lucide-react";
+import { Bell, Diamond, Search, Sparkles } from "lucide-react";
+import { Logo } from "./Logo";
 
 type Badge = "New" | "Free";
 
@@ -46,18 +47,16 @@ function NavBadge({ tone }: { tone: Badge }) {
   );
 }
 
-export function AppHeader({
-  activeNav,
-  variant = "app",
-}: {
-  activeNav?: string;
-  variant?: "app" | "marketing";
-}) {
+export function AppHeader({ activeNav }: { activeNav?: string }) {
   return (
     <header className="sticky top-0 z-50 h-header border-b border-hf-border bg-hf-black/95 backdrop-blur">
       <div className="flex h-header items-center gap-4 px-4">
-        <Link href="/" aria-label="Higgsfield home" className="shrink-0">
-          <span className="font-display text-lg font-bold tracking-tight text-white">hf</span>
+        <Link
+          href="/"
+          aria-label="Higgsfield home"
+          className="shrink-0 text-white transition-opacity hover:opacity-80"
+        >
+          <Logo />
         </Link>
 
         <nav
@@ -103,43 +102,57 @@ export function AppHeader({
         </nav>
 
         <div className="flex shrink-0 items-center gap-3">
-          <button type="button" aria-label="Search" className="text-hf-muted hover:text-white">
+          <button
+            type="button"
+            aria-label="Search"
+            className="text-hf-muted transition-colors hover:text-white"
+          >
             <Search className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
 
           <Link
             href="/pricing"
             aria-current={activeNav === "pricing" ? "page" : undefined}
-            className="relative hidden items-center gap-1.5 rounded-full border border-hf-border px-3 py-1.5 text-sm text-white transition-colors hover:border-hf-lime/50 sm:flex"
+            className="relative hidden items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-hf-lime/50 sm:flex"
           >
+            <Diamond className="size-3.5" aria-hidden strokeWidth={1.75} />
             Pricing
-            <span className="rounded bg-hf-pink px-1.5 py-0.5 text-[10px] font-semibold text-white">
+            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded bg-hf-pink px-1.5 py-0.5 text-[10px] leading-none font-bold whitespace-nowrap text-white">
               54% OFF
             </span>
           </Link>
 
-          {variant === "marketing" ? (
-            <>
-              <span className="hidden text-sm text-hf-muted sm:inline">Log in</span>
-              <button
-                type="button"
-                className="rounded-full bg-hf-lime px-4 py-1.5 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
-              >
-                Sign up
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                aria-label="Notifications"
-                className="hidden text-hf-muted hover:text-white sm:block"
-              >
-                <Bell className="size-4" aria-hidden strokeWidth={1.75} />
-              </button>
-              <span className="size-7 rounded-full ring-2 ring-hf-lime" aria-hidden />
-            </>
-          )}
+          <button
+            type="button"
+            className="hidden items-center gap-1.5 text-sm text-hf-muted transition-colors hover:text-white lg:flex"
+          >
+            <Sparkles className="size-3.5" aria-hidden strokeWidth={1.75} />
+            Enterprise
+          </button>
+
+          <button
+            type="button"
+            className="hidden items-center gap-1.5 text-sm text-hf-muted transition-colors hover:text-white lg:flex"
+          >
+            <span className="size-4 rounded bg-hf-lime/70" aria-hidden />
+            Assets
+          </button>
+
+          <span className="hidden h-5 w-px bg-hf-border sm:block" aria-hidden />
+
+          <button
+            type="button"
+            aria-label="Notifications"
+            className="hidden text-hf-muted transition-colors hover:text-white sm:block"
+          >
+            <Bell className="size-4" aria-hidden strokeWidth={1.75} />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Account"
+            className="size-7 shrink-0 rounded-full bg-hf-surface-4 ring-2 ring-hf-lime"
+          />
         </div>
       </div>
     </header>
