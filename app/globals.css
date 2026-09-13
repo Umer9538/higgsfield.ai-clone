@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens measured from the live higgsfield.ai stylesheets.
+ * See docs/higgsfield-reference.md for provenance.
+ */
+@theme {
+  /* Signature accent. The site's whole identity sits on this colour. */
+  --color-hf-lime: #d1fe17;
+  --color-hf-lime-deep: #9de500;
+  --color-hf-lime-muted: #829b19;
+
+  /* Surface ramp, darkest to lightest */
+  --color-hf-black: #000000;
+  --color-hf-surface: #0f1113;
+  --color-hf-surface-2: #131517;
+  --color-hf-surface-3: #1c1e20;
+  --color-hf-surface-4: #23262a;
+  --color-hf-border: #292b2c;
+
+  /* Text */
+  --color-hf-text: #ffffff;
+  --color-hf-muted: #a8a8a8;
+  --color-hf-dim: #828282;
+
+  /* Status / badges */
+  --color-hf-pink: #ff005b;
+  --color-hf-magenta: #ed1572;
+  --color-hf-amber: #fabc00;
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+
+  /* Header is 4rem on mobile, 5rem from md up */
+  --spacing-header: 4rem;
+}
+
+html,
+body {
+  background-color: var(--color-hf-black);
+  color: var(--color-hf-text);
+}

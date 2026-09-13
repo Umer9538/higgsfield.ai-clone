@@ -13,3 +13,8 @@ test-results/
 
 # local model-resolution cache, not part of the log
 .claude/.last-model
+
+# next / vercel
+.next/
+.vercel
+next-env.d.ts
