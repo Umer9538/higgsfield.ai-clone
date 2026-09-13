@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+dist/
+.env
+.env.local
+.DS_Store
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# .agent-logs/ is NOT ignored - it is part of the submission and ships publicly.
