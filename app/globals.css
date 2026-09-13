@@ -40,3 +40,18 @@ body {
   background-color: var(--color-hf-black);
   color: var(--color-hf-text);
 }
+
+/*
+ * The live site ships 37 prefers-reduced-motion rules alongside autoplaying
+ * media. Honour the same preference globally rather than per component.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

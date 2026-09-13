@@ -38,7 +38,13 @@ function Badge({ tone, children }: { tone: "New" | "Free"; children: React.React
   );
 }
 
-export function AppHeader({ activeId }: { activeId?: SurfaceId }) {
+export function AppHeader({
+  activeId,
+  variant = "app",
+}: {
+  activeId?: SurfaceId;
+  variant?: "app" | "marketing";
+}) {
   return (
     <header className="sticky top-0 z-50 h-header border-b border-hf-border bg-hf-black/95 backdrop-blur">
       <div className="flex h-header items-center gap-4 px-4">
@@ -86,10 +92,29 @@ export function AppHeader({ activeId }: { activeId?: SurfaceId }) {
           <button type="button" aria-label="Search" className="text-hf-muted hover:text-white">
             <Search className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
-          <button type="button" aria-label="Notifications" className="hidden text-hf-muted hover:text-white sm:block">
-            <Bell className="size-4" aria-hidden strokeWidth={1.75} />
-          </button>
-          <span className="size-7 rounded-full ring-2 ring-hf-lime" />
+
+          {variant === "marketing" ? (
+            <>
+              <span className="hidden text-sm text-hf-muted sm:inline">Log in</span>
+              <button
+                type="button"
+                className="rounded-full bg-hf-lime px-4 py-1.5 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              >
+                Sign up
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                aria-label="Notifications"
+                className="hidden text-hf-muted hover:text-white sm:block"
+              >
+                <Bell className="size-4" aria-hidden strokeWidth={1.75} />
+              </button>
+              <span className="size-7 rounded-full ring-2 ring-hf-lime" />
+            </>
+          )}
         </div>
       </div>
     </header>
