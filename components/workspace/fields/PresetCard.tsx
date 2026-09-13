@@ -1,10 +1,18 @@
+import Image from "next/image";
 import { Pencil } from "lucide-react";
 
-export function PresetCard({ label, sublabel }: { label: string; sublabel: string }) {
+export function PresetCard({
+  label,
+  sublabel,
+  image,
+}: {
+  label: string;
+  sublabel: string;
+  image: string;
+}) {
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-hf-border">
-      {/* Placeholder for the preset thumbnail until real media is wired in */}
-      <div className="absolute inset-0 bg-gradient-to-br from-hf-surface-4 via-hf-surface-3 to-hf-black" />
+      <Image src={image} alt="" fill sizes="390px" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
 
       <button

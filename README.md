@@ -25,6 +25,8 @@ Deployment skeleton is live. Product UI is in progress.
 | `docs/higgsfield-reference.md` | Reference spec. Part 1 measured from the live stylesheets, Part 2 from the recon screenshots |
 | `recon/` | 52 screenshots of the real product, 13 flows, taken signed in |
 | `.agent-logs/` | Verbatim prompt + response record for every session |
+| `e2e/` | Playwright smoke tests over the critical path |
+| `public/media/` | Open-licence stock, mirrored locally — see `CREDITS.md` |
 | `CAPTURE-TEST.md` | Proof the capture hooks fire automatically |
 
 ## Design tokens
@@ -42,4 +44,11 @@ npm run dev     # http://localhost:3000
 npm run build   # production build
 npx tsc --noEmit
 npx eslint .
+npm test         # Playwright smoke tests
 ```
+
+## Testing
+
+Smoke coverage of the critical path only, by design: the homepage renders, imagery
+actually decodes, a generation run completes and produces a playable result, Audio
+stays disabled, and Image uses the docked bar rather than the side panel.

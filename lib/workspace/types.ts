@@ -35,7 +35,7 @@ export interface Option {
 
 export type Field =
   /** Preset thumbnail with a lime label, e.g. GENERAL / Seedance 2.5 */
-  | { kind: "preset"; id: string; label: string; sublabel: string }
+  | { kind: "preset"; id: string; label: string; sublabel: string; image: string }
   | { kind: "segmented"; id: string; options: Option[]; defaultValue: string }
   | { kind: "dropzone"; id: string; title: string; subtitle?: string; accepts: IconName[] }
   /** Side-by-side upload tiles, as in Motion Control */
@@ -78,6 +78,14 @@ export type Content =
   | { kind: "library"; headline: string; highlight?: string; sub: string; sectionTitle: string; count: number }
   | { kind: "hero"; headline: string; highlight?: string; sub: string; tiles?: number };
 
+export interface GenerationResult {
+  kind: "video" | "image";
+  src: string;
+  poster?: string;
+  /** Shown as chips under the result, e.g. Model / Seedance 2.5 */
+  meta: { label: string; value: string }[];
+}
+
 export interface GenerateAction {
   cost: number;
   /** Struck-through original price, as the real site shows on discount */
@@ -102,4 +110,6 @@ export interface Surface {
   };
   generate: GenerateAction;
   content: Content;
+  /** Mock output revealed after a generation run. Omitted where Generate is disabled. */
+  result?: GenerationResult;
 }

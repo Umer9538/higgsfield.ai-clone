@@ -8,7 +8,7 @@ export const edit: Surface = {
   layout: "panel",
   tabGroup: VIDEO_TABS,
   fields: [
-    { kind: "preset", id: "preset", label: "GENERAL", sublabel: "Seedance 2.5 Edit" },
+    { kind: "preset", id: "preset", image: "/media/presets/2.jpg", label: "GENERAL", sublabel: "Seedance 2.5 Edit" },
     {
       kind: "segmented",
       id: "mode",
@@ -58,6 +58,16 @@ export const edit: Surface = {
       { title: "Background swap", caption: "Replace the world while the subject stays put" },
       { title: "Colour grade", caption: "Push the palette toward a film stock" },
       { title: "Season shift", caption: "Turn summer into deep winter in one pass" },
+    ],
+  },
+  result: {
+    kind: "video",
+    src: "/media/results/result-2.mp4",
+    poster: "/media/results/poster.jpg",
+    meta: [
+      { label: "Model", value: "Seedance 2.5 Edit" },
+      { label: "Resolution", value: "1080p" },
+      { label: "Bitrate", value: "High" },
     ],
   },
 };

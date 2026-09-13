@@ -1,6 +1,8 @@
 import type { Surface } from "@/lib/workspace/types";
 import { ControlPanel } from "./ControlPanel";
-import { ContentPane, ContentTabs } from "./ContentPane";
+import { ContentTabs } from "./ContentPane";
+import { WorkspaceContent } from "./WorkspaceContent";
+import { GenerationProvider } from "./generation";
 import { DockBar } from "./DockBar";
 import { WorkspaceProvider } from "./state";
 
@@ -14,25 +16,29 @@ export function Workspace({ surface }: { surface: Surface }) {
   if (surface.layout === "dock") {
     return (
       <WorkspaceProvider fields={surface.fields}>
-        <div className="flex min-h-[calc(100dvh-var(--spacing-header))] flex-col">
-          <div className="flex flex-1 items-center justify-center px-4 py-12">
-            <ContentPane content={surface.content} />
+        <GenerationProvider kind={surface.result?.kind ?? "image"}>
+          <div className="flex min-h-[calc(100dvh-var(--spacing-header))] flex-col">
+            <div className="flex flex-1 items-center justify-center px-4 py-12">
+              <WorkspaceContent surface={surface} />
+            </div>
+            <DockBar surface={surface} />
           </div>
-          <DockBar surface={surface} />
-        </div>
+        </GenerationProvider>
       </WorkspaceProvider>
     );
   }
 
   return (
     <WorkspaceProvider fields={surface.fields}>
-      <div className="flex flex-col lg:flex-row">
-        <ControlPanel surface={surface} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:h-[calc(100dvh-var(--spacing-header))] lg:p-8">
-          <ContentTabs />
-          <ContentPane content={surface.content} />
-        </main>
-      </div>
+      <GenerationProvider kind={surface.result?.kind ?? "video"}>
+        <div className="flex flex-col lg:flex-row">
+          <ControlPanel surface={surface} />
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:h-[calc(100dvh-var(--spacing-header))] lg:p-8">
+            <ContentTabs />
+            <WorkspaceContent surface={surface} />
+          </main>
+        </div>
+      </GenerationProvider>
     </WorkspaceProvider>
   );
 }

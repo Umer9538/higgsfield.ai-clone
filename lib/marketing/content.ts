@@ -17,31 +17,37 @@ export interface HeroCard {
   id: string;
   title: string;
   description: string;
+  image: string;
 }
 
 export const HERO_CARDS: HeroCard[] = [
   {
     id: "motion-designer",
+    image: "/media/hero/1.jpg",
     title: "Higgsfield AI Motion Designer",
     description: "ChatGPT can now do motion design in After Effects.",
   },
   {
     id: "effects",
+    image: "/media/hero/2.jpg",
     title: "Higgsfield Effects",
     description: "Viral video presets now in ChatGPT, with free generations",
   },
   {
     id: "genjutsu",
+    image: "/media/hero/3.jpg",
     title: "Higgsfield Genjutsu",
     description: "One upload in. Endless new visions out.",
   },
   {
     id: "sunburst",
+    image: "/media/hero/4.jpg",
     title: "GPT Image 2.5 Sunburst",
     description: "Sharper edits with more natural light and texture",
   },
   {
     id: "astra",
+    image: "/media/hero/5.jpg",
     title: "Higgsfield × GPT-6 Astra",
     description:
       "Turn a single prompt into a playable 3D game. Story, mechanics, and every asset included",
@@ -90,21 +96,21 @@ export const EFFECTS = {
   cta: "Start generating",
   footerCta: "View all presets",
   presets: [
-    "Floating fall",
-    "High flip",
-    "Burning man",
-    "Studio slide",
-    "Incline",
-    "Act natural",
-    "Eyes in",
-    "Street colossus",
-    "Melting",
-    "Wild ride",
-    "Cutout",
-    "World morphing",
-    "Smash and grab",
-    "Selfception",
-    "Lacewalker",
+    { name: "Floating fall", image: "/media/effects/1.jpg" },
+    { name: "High flip", image: "/media/effects/2.jpg" },
+    { name: "Burning man", image: "/media/effects/3.jpg" },
+    { name: "Studio slide", image: "/media/effects/4.jpg" },
+    { name: "Incline", image: "/media/effects/5.jpg" },
+    { name: "Act natural", image: "/media/effects/6.jpg" },
+    { name: "Eyes in", image: "/media/effects/7.jpg" },
+    { name: "Street colossus", image: "/media/effects/8.jpg" },
+    { name: "Melting", image: "/media/effects/9.jpg" },
+    { name: "Wild ride", image: "/media/effects/10.jpg" },
+    { name: "Cutout", image: "/media/effects/11.jpg" },
+    { name: "World morphing", image: "/media/effects/12.jpg" },
+    { name: "Smash and grab", image: "/media/effects/13.jpg" },
+    { name: "Selfception", image: "/media/effects/14.jpg" },
+    { name: "Lacewalker", image: "/media/effects/15.jpg" },
   ],
 };
 

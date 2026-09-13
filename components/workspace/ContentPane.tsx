@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { BookOpen, ChevronLeft, ChevronRight, Folder } from "lucide-react";
 import type { Content } from "@/lib/workspace/types";
 
@@ -15,12 +16,12 @@ function Headline({ text, highlight }: { text: string; highlight?: string }) {
   );
 }
 
-/** Placeholder media block. Real assets get mirrored in later. */
-function Tile({ className = "" }: { className?: string }) {
+/** Media tile. Assets are mirrored into public/media so nothing hotlinks at runtime. */
+function Tile({ src, className = "", sizes = "33vw" }: { src: string; className?: string; sizes?: string }) {
   return (
-    <div
-      className={`rounded-xl border border-hf-border bg-gradient-to-br from-hf-surface-4 via-hf-surface-3 to-hf-black ${className}`}
-    />
+    <div className={`relative overflow-hidden rounded-xl border border-hf-border bg-hf-surface-3 ${className}`}>
+      <Image src={src} alt="" fill sizes={sizes} className="object-cover" />
+    </div>
   );
 }
 
@@ -34,9 +35,9 @@ export function ContentPane({ content }: { content: Content }) {
         </p>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-3">
-          {content.steps.map((step) => (
+          {content.steps.map((step, index) => (
             <div key={step.title}>
-              <Tile className="aspect-[4/3] w-full" />
+              <Tile src={`/media/steps/${index + 1}.jpg`} className="aspect-[4/3] w-full" />
               <p className="mt-3 font-display text-sm font-bold tracking-tight text-white uppercase">
                 {step.title}
               </p>
@@ -58,7 +59,7 @@ export function ContentPane({ content }: { content: Content }) {
   if (content.kind === "carousel") {
     return (
       <div className="mx-auto max-w-3xl text-center">
-        <Tile className="aspect-video w-full" />
+        <Tile src="/media/presets/1.jpg" className="aspect-video w-full" sizes="768px" />
         <h1 className="mt-6 font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
           {content.headline}
         </h1>
@@ -78,10 +79,18 @@ export function ContentPane({ content }: { content: Content }) {
               <span
                 key={slide.title}
                 title={slide.title}
-                className={`size-11 shrink-0 rounded-full border bg-gradient-to-br from-hf-surface-4 to-hf-black ${
+                className={`relative size-11 shrink-0 overflow-hidden rounded-full border ${
                   index === 0 ? "border-hf-lime" : "border-hf-border"
                 }`}
-              />
+              >
+                <Image
+                  src={`/media/library/${(index % 5) + 1}.jpg`}
+                  alt=""
+                  fill
+                  sizes="44px"
+                  className="object-cover"
+                />
+              </span>
             ))}
           </div>
 
@@ -109,7 +118,12 @@ export function ContentPane({ content }: { content: Content }) {
           <p className="text-sm font-medium text-white">{content.sectionTitle}</p>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {Array.from({ length: content.count }).map((_, index) => (
-              <Tile key={index} className="aspect-[9/16] w-full" />
+              <Tile
+                key={index}
+                src={`/media/library/${(index % 5) + 1}.jpg`}
+                className="aspect-[9/16] w-full"
+                sizes="(max-width: 640px) 50vw, 20vw"
+              />
             ))}
           </div>
         </div>
@@ -121,7 +135,12 @@ export function ContentPane({ content }: { content: Content }) {
     <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
       <div className="flex items-end justify-center gap-2">
         {Array.from({ length: content.tiles ?? 4 }).map((_, index) => (
-          <Tile key={index} className="h-24 w-20 sm:h-32 sm:w-26" />
+          <Tile
+            key={index}
+            src={`/media/tiles/${(index % 4) + 1}.jpg`}
+            className="h-24 w-20 sm:h-32 sm:w-26"
+            sizes="120px"
+          />
         ))}
       </div>
       <div className="mt-7">

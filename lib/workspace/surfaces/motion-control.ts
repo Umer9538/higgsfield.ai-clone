@@ -8,7 +8,7 @@ export const motionControl: Surface = {
   layout: "panel",
   tabGroup: VIDEO_TABS,
   fields: [
-    { kind: "preset", id: "preset", label: "MOTION CONTROL", sublabel: "Control motion with video references" },
+    { kind: "preset", id: "preset", image: "/media/presets/3.jpg", label: "MOTION CONTROL", sublabel: "Control motion with video references" },
     {
       kind: "dropzoneRow",
       id: "inputs",
@@ -40,5 +40,14 @@ export const motionControl: Surface = {
     sub: "Copy motion from any video and place your character into the same movement",
     sectionTitle: "Start by copying motion from library",
     count: 5,
+  },
+  result: {
+    kind: "video",
+    src: "/media/results/result.mp4",
+    poster: "/media/results/poster.jpg",
+    meta: [
+      { label: "Model", value: "Kling 3.0 Motion Control" },
+      { label: "Quality", value: "720p" },
+    ],
   },
 };

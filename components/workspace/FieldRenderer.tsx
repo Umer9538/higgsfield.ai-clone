@@ -10,7 +10,7 @@ import { ToggleRow } from "./fields/ToggleRow";
 export function FieldRenderer({ field }: { field: Field }) {
   switch (field.kind) {
     case "preset":
-      return <PresetCard label={field.label} sublabel={field.sublabel} />;
+      return <PresetCard label={field.label} sublabel={field.sublabel} image={field.image} />;
     case "segmented":
       return <Segmented id={field.id} options={field.options} defaultValue={field.defaultValue} />;
     case "dropzone":

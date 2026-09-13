@@ -30,4 +30,13 @@ export const image: Surface = {
     sub: "Describe a scene, character, mood, or style — and watch it come to life",
     tiles: 4,
   },
+  result: {
+    kind: "image",
+    src: "/media/results/image.jpg",
+    meta: [
+      { label: "Model", value: "GPT Image 2" },
+      { label: "Quality", value: "High" },
+      { label: "Resolution", value: "2K" },
+    ],
+  },
 };

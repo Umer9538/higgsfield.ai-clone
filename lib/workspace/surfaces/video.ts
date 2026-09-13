@@ -13,7 +13,7 @@ export const video: Surface = {
   layout: "panel",
   tabGroup: VIDEO_TABS,
   fields: [
-    { kind: "preset", id: "preset", label: "GENERAL", sublabel: "Seedance 2.5" },
+    { kind: "preset", id: "preset", image: "/media/presets/1.jpg", label: "GENERAL", sublabel: "Seedance 2.5" },
     {
       kind: "segmented",
       id: "mode",
@@ -64,5 +64,16 @@ export const video: Surface = {
       { title: "Get video", caption: "Click generate to create your final animated video!" },
     ],
     footer: { title: "Don't know where to start?", sub: "Go to the Academy and start your journey" },
+  },
+  result: {
+    kind: "video",
+    src: "/media/results/result.mp4",
+    poster: "/media/results/poster.jpg",
+    meta: [
+      { label: "Model", value: "Seedance 2.5" },
+      { label: "Duration", value: "5s" },
+      { label: "Resolution", value: "1080p" },
+      { label: "Ratio", value: "16:9" },
+    ],
   },
 };
