@@ -8,7 +8,17 @@
  *   - "dock":  centred content + bottom-docked prompt bar (Image)
  */
 
-export type SurfaceId = "video" | "image" | "audio" | "edit" | "motion-control";
+export type SurfaceId =
+  | "video"
+  | "image"
+  | "audio"
+  | "edit"
+  | "motion-control"
+  | "genjutsu"
+  | "effects"
+  | "cinema-studio"
+  | "marketing-studio"
+  | "3d-jutsu";
 
 export type IconName =
   | "image"
@@ -25,7 +35,15 @@ export type IconName =
   | "plus"
   | "pencil"
   | "model"
-  | "frame";
+  | "frame"
+  | "character"
+  | "location"
+  | "product"
+  | "camera"
+  | "palette"
+  | "lighting"
+  | "film"
+  | "chatgpt";
 
 export interface Option {
   value: string;
@@ -64,7 +82,11 @@ export type Field =
       segmented?: Option[];
       description?: string;
     }
-  | { kind: "accordion"; id: string; label: string; icon?: IconName };
+  | { kind: "accordion"; id: string; label: string; icon?: IconName }
+  /** Label with a switch on the right, e.g. Genjutsu's optional Prompt */
+  | { kind: "promptToggle"; id: string; label: string; defaultOn: boolean; badge?: string }
+  /** Row that reads as an outbound link, e.g. "Try in ChatGPT" */
+  | { kind: "linkRow"; id: string; label: string; icon?: IconName };
 
 export type Content =
   | {
@@ -88,6 +110,8 @@ export interface GenerationResult {
 
 export interface GenerateAction {
   cost: number;
+  /** Replaces the cost chip, e.g. "1 FREE LEFT" */
+  badge?: string;
   /** Struck-through original price, as the real site shows on discount */
   originalCost?: number;
   /** Disabled until required inputs are filled */
@@ -107,6 +131,12 @@ export interface Surface {
     placeholder: string;
     pills: { icon: IconName; label: string }[];
     stepper?: string;
+    /** Setting tiles above the composer, as in Cinema Studio */
+    setup?: { label: string; value: string; icon: IconName }[];
+    /** Mode rail beside the composer, e.g. Image / Video */
+    rail?: { label: string; icon: IconName }[];
+    /** Extra add-slots beside the composer, e.g. AVATAR / PRODUCT */
+    slots?: string[];
   };
   generate: GenerateAction;
   content: Content;

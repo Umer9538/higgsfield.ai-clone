@@ -11,7 +11,7 @@ export function GenerateButton({
   action: GenerateAction;
   className?: string;
 }) {
-  const { cost, originalCost, disabled } = action;
+  const { cost, originalCost, disabled, badge } = action;
   const { status, start } = useGeneration();
   const busy = status === "running";
   const inactive = disabled || busy;
@@ -29,7 +29,12 @@ export function GenerateButton({
       } ${className}`}
     >
       {busy ? "Generating…" : "Generate"}
-      {busy ? null : (
+      {busy ? null : badge ? (
+        <span className="flex items-center gap-1.5 rounded bg-black/20 px-1.5 py-0.5 text-[11px] font-bold">
+          <Sparkles className="size-3" aria-hidden strokeWidth={2.5} />
+          {badge}
+        </span>
+      ) : (
         <span className="flex items-center gap-1.5 text-sm font-medium">
           <Sparkles className="size-4" aria-hidden strokeWidth={2} />
           {originalCost ? <s className="opacity-50">{originalCost}</s> : null}

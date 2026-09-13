@@ -1,4 +1,5 @@
 import {
+  Aperture,
   AtSign,
   AudioLines,
   BarChart3,
@@ -9,9 +10,16 @@ import {
   Music,
   Pencil,
   Plus,
+  Clapperboard,
+  Lightbulb,
+  MapPin,
+  MessageSquare,
+  Package,
+  Palette,
   Proportions,
   SlidersHorizontal,
   Sparkles,
+  UserRound,
   Video,
   Volume2,
   type LucideIcon,
@@ -34,6 +42,14 @@ const ICONS: Record<IconName, LucideIcon> = {
   pencil: Pencil,
   model: BarChart3,
   frame: Frame,
+  character: UserRound,
+  location: MapPin,
+  product: Package,
+  camera: Aperture,
+  palette: Palette,
+  lighting: Lightbulb,
+  film: Clapperboard,
+  chatgpt: MessageSquare,
 };
 
 export function Icon({ name, className }: { name: IconName; className?: string }) {

@@ -4,7 +4,7 @@ import { SectionHeading } from "./ProductRail";
 
 export function EffectsGrid() {
   return (
-    <section aria-label={EFFECTS.heading} className="px-4 pt-14">
+    <section id="effects" aria-label={EFFECTS.heading} className="scroll-mt-20 px-4 pt-14">
       <SectionHeading title={EFFECTS.heading} sub={EFFECTS.sub} cta={EFFECTS.cta} />
 
       <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3">

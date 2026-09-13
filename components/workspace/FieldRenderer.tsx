@@ -5,6 +5,7 @@ import { Dropzone, DropzoneRow } from "./fields/Dropzone";
 import { PromptField } from "./fields/PromptField";
 import { Accordion, PillRow, SelectRow, Stepper, ValueRow } from "./fields/Rows";
 import { ToggleRow } from "./fields/ToggleRow";
+import { LinkRow, PromptToggle } from "./fields/PromptToggle";
 
 /** Maps one config field onto its renderer. Adding a field type starts here. */
 export function FieldRenderer({ field }: { field: Field }) {
@@ -48,5 +49,21 @@ export function FieldRenderer({ field }: { field: Field }) {
       );
     case "accordion":
       return <Accordion label={field.label} icon={field.icon} />;
+    case "promptToggle":
+      return (
+        <PromptToggle
+          id={field.id}
+          label={field.label}
+          defaultOn={field.defaultOn}
+          badge={field.badge}
+        />
+      );
+    case "linkRow":
+      return <LinkRow label={field.label} icon={field.icon} />;
+    default: {
+      // Exhaustiveness guard: adding a field kind without a renderer fails the build
+      const exhaustive: never = field;
+      return exhaustive;
+    }
   }
 }

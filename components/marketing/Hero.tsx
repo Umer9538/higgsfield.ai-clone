@@ -3,7 +3,7 @@ import { HERO_CARDS } from "@/lib/marketing/content";
 
 export function Hero() {
   return (
-    <section aria-label="Featured releases" className="px-4 pt-5">
+    <section id="featured" aria-label="Featured releases" className="scroll-mt-20 px-4 pt-5">
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {HERO_CARDS.map((card) => (
           <li key={card.id}>

@@ -1,48 +1,56 @@
 import Link from "next/link";
 import { Bell, Search } from "lucide-react";
-import { SURFACES } from "@/lib/workspace";
-import type { SurfaceId } from "@/lib/workspace/types";
 
-type NavItem =
-  | { kind: "surface"; id: SurfaceId }
-  | { kind: "static"; label: string; badge?: "New" | "Free" }
-  | { kind: "divider" };
+type Badge = "New" | "Free";
 
-/** Mirrors the real app nav. Only the generate surfaces are wired up so far. */
+interface NavItem {
+  key: string;
+  label: string;
+  href?: string;
+  badge?: Badge;
+  /** Renders a separator before this item */
+  dividerBefore?: boolean;
+}
+
+/**
+ * Mirrors the live app nav exactly, in order. Items without an href are
+ * surfaces that have not been built yet and render as inert text.
+ */
 const NAV: NavItem[] = [
-  { kind: "static", label: "Explore" },
-  { kind: "surface", id: "image" },
-  { kind: "surface", id: "video" },
-  { kind: "surface", id: "audio" },
-  { kind: "static", label: "MCP" },
-  { kind: "divider" },
-  { kind: "static", label: "ChatGPT Plugin", badge: "New" },
-  { kind: "static", label: "Genjutsu", badge: "Free" },
-  { kind: "static", label: "Effects", badge: "Free" },
-  { kind: "static", label: "Cinema Studio" },
-  { kind: "static", label: "Marketing Studio" },
-  { kind: "static", label: "Supercomputer" },
-  { kind: "static", label: "3D Jutsu", badge: "New" },
-  { kind: "surface", id: "edit" },
+  { key: "explore", label: "Explore", href: "/" },
+  { key: "image", label: "Image", href: "/ai/image" },
+  { key: "video", label: "Video", href: "/ai/video" },
+  { key: "audio", label: "Audio", href: "/ai/audio" },
+  { key: "mcp", label: "MCP", href: "/mcp" },
+  { key: "chatgpt-plugin", label: "ChatGPT Plugin", href: "/chatgpt-plugin", badge: "New", dividerBefore: true },
+  { key: "genjutsu", label: "Genjutsu", href: "/ai/genjutsu", badge: "Free" },
+  { key: "effects", label: "Effects", href: "/ai/effects", badge: "Free" },
+  { key: "cinema-studio", label: "Cinema Studio", href: "/ai/cinema-studio" },
+  { key: "marketing-studio", label: "Marketing Studio", href: "/ai/marketing-studio" },
+  { key: "supercomputer", label: "Supercomputer", href: "/supercomputer" },
+  { key: "3d-jutsu", label: "3D Jutsu", href: "/ai/3d-jutsu", badge: "New" },
+  { key: "edit", label: "Edit", href: "/ai/edit" },
+  { key: "academy", label: "Academy" },
 ];
 
-function Badge({ tone, children }: { tone: "New" | "Free"; children: React.ReactNode }) {
+/** Both badge styles are lime; New is a solid chip, Free a tinted one. */
+function NavBadge({ tone }: { tone: Badge }) {
   return (
     <span
       className={`rounded px-1.5 py-0.5 text-[10px] leading-none font-semibold ${
         tone === "New" ? "bg-hf-lime text-black" : "bg-hf-lime/15 text-hf-lime"
       }`}
     >
-      {children}
+      {tone}
     </span>
   );
 }
 
 export function AppHeader({
-  activeId,
+  activeNav,
   variant = "app",
 }: {
-  activeId?: SurfaceId;
+  activeNav?: string;
   variant?: "app" | "marketing";
 }) {
   return (
@@ -52,37 +60,43 @@ export function AppHeader({
           <span className="font-display text-lg font-bold tracking-tight text-white">hf</span>
         </Link>
 
-        <nav className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {NAV.map((item, index) => {
-            if (item.kind === "divider") {
-              return <span key={`divider-${index}`} className="h-4 w-px shrink-0 bg-hf-border" />;
-            }
+        <nav
+          aria-label="Main"
+          className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {NAV.map((item) => {
+            const active = item.key === activeNav;
+            const content = (
+              <>
+                <span>{item.label}</span>
+                {item.badge ? <NavBadge tone={item.badge} /> : null}
+              </>
+            );
 
-            if (item.kind === "surface") {
-              const surface = SURFACES[item.id];
-              const active = item.id === activeId;
+            if (!item.href) {
               return (
-                <Link
-                  key={item.id}
-                  href={`/ai/${item.id}`}
-                  aria-current={active ? "page" : undefined}
-                  className={`shrink-0 transition-colors ${
-                    active ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
-                  }`}
+                <span
+                  key={item.key}
+                  title="Not built yet"
+                  className="flex shrink-0 items-center gap-1.5 text-hf-dim"
                 >
-                  {surface.navLabel}
-                </Link>
+                  {content}
+                </span>
               );
             }
 
             return (
-              <span
-                key={item.label}
-                title="Not built yet"
-                className="flex shrink-0 items-center gap-1.5 text-hf-dim"
-              >
-                {item.label}
-                {item.badge ? <Badge tone={item.badge}>{item.badge}</Badge> : null}
+              <span key={item.key} className="flex shrink-0 items-center gap-4">
+                {item.dividerBefore ? <span className="h-4 w-px bg-hf-border" aria-hidden /> : null}
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex shrink-0 items-center gap-1.5 transition-colors ${
+                    active ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+                  }`}
+                >
+                  {content}
+                </Link>
               </span>
             );
           })}
@@ -95,6 +109,7 @@ export function AppHeader({
 
           <Link
             href="/pricing"
+            aria-current={activeNav === "pricing" ? "page" : undefined}
             className="relative hidden items-center gap-1.5 rounded-full border border-hf-border px-3 py-1.5 text-sm text-white transition-colors hover:border-hf-lime/50 sm:flex"
           >
             Pricing
@@ -122,7 +137,7 @@ export function AppHeader({
               >
                 <Bell className="size-4" aria-hidden strokeWidth={1.75} />
               </button>
-              <span className="size-7 rounded-full ring-2 ring-hf-lime" />
+              <span className="size-7 rounded-full ring-2 ring-hf-lime" aria-hidden />
             </>
           )}
         </div>

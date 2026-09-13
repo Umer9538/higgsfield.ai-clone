@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <PromoBar />
-      <AppHeader variant="marketing" />
+      <AppHeader variant="marketing" activeNav="explore" />
       <main className="mx-auto max-w-[1800px] pb-4">
         <Hero />
         <ProductRail />

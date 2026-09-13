@@ -22,6 +22,7 @@ function initialValues(fields: Field[]): Record<string, FieldValue> {
       if (field.segmented?.[0]) seed[`${field.id}:mode`] = field.segmented[0].value;
     }
     if (field.kind === "prompt") seed[field.id] = "";
+    if (field.kind === "promptToggle") seed[field.id] = field.defaultOn;
   }
   return seed;
 }

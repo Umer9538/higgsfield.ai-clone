@@ -35,6 +35,10 @@
   --spacing-header: 4rem;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   background-color: var(--color-hf-black);

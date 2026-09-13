@@ -9,7 +9,7 @@ const BADGE_TONES: Record<"top" | "new" | "free", string> = {
 
 export function ProductRail() {
   return (
-    <section aria-label="Products" className="px-4 pt-10">
+    <section id="products" aria-label="Products" className="scroll-mt-20 px-4 pt-10">
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Promo panel */}
         <div className="relative flex min-h-64 flex-col justify-between overflow-hidden rounded-2xl border border-hf-border p-6 sm:p-8">

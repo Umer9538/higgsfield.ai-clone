@@ -156,3 +156,67 @@ test("compare features matrix expands to reveal all groups", async ({ page }) =>
   await page.getByRole("button", { name: "Hide comparison" }).click();
   await expect(page.getByRole("columnheader", { name: "Platform" })).toBeHidden();
 });
+
+test("header nav exposes every studio item with the right label and badge", async ({ page }) => {
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Main" });
+
+  for (const label of [
+    "Explore",
+    "Image",
+    "Video",
+    "Audio",
+    "MCP",
+    "ChatGPT Plugin",
+    "Genjutsu",
+    "Effects",
+    "Cinema Studio",
+    "Marketing Studio",
+    "Supercomputer",
+    "3D Jutsu",
+    "Edit",
+  ]) {
+    await expect(nav.getByText(label, { exact: true })).toBeVisible();
+  }
+
+  // Badges: New on ChatGPT Plugin and 3D Jutsu, Free on Genjutsu and Effects
+  await expect(nav.getByText("New", { exact: true })).toHaveCount(2);
+  await expect(nav.getByText("Free", { exact: true })).toHaveCount(2);
+});
+
+test("every studio route resolves and marks itself active", async ({ page }) => {
+  const routes: [string, string][] = [
+    ["/ai/genjutsu", "Genjutsu"],
+    ["/ai/effects", "Effects"],
+    ["/ai/cinema-studio", "Cinema Studio"],
+    ["/ai/marketing-studio", "Marketing Studio"],
+    ["/ai/3d-jutsu", "3D Jutsu"],
+    ["/mcp", "MCP"],
+    ["/chatgpt-plugin", "ChatGPT Plugin"],
+    ["/supercomputer", "Supercomputer"],
+  ];
+
+  for (const [route, label] of routes) {
+    const response = await page.goto(route);
+    expect(response?.status(), `${route} should return 200`).toBe(200);
+
+    const active = page.getByRole("navigation", { name: "Main" }).getByRole("link", {
+      name: new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+    });
+    await expect(active.first()).toHaveAttribute("aria-current", "page");
+  }
+});
+
+test("genjutsu and effects use the panel shell; studios use the dock", async ({ page }) => {
+  await page.goto("/ai/genjutsu");
+  await expect(page.locator("aside")).toHaveCount(1);
+  await expect(page.getByRole("switch", { name: "Prompt" })).toBeVisible();
+
+  await page.goto("/ai/effects");
+  await expect(page.getByRole("switch", { name: "Use free gens" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /1 FREE LEFT/ })).toBeVisible();
+
+  await page.goto("/ai/cinema-studio");
+  await expect(page.locator("aside")).toHaveCount(0);
+  await expect(page.getByPlaceholder(/Describe your scene/)).toBeVisible();
+});

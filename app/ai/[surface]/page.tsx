@@ -30,7 +30,7 @@ export default async function SurfacePage({
 
   return (
     <>
-      <AppHeader activeId={surface.id} />
+      <AppHeader activeNav={surface.id} />
       <Workspace surface={surface} />
     </>
   );

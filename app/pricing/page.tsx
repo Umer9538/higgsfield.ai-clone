@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <>
-      <AppHeader variant="marketing" />
+      <AppHeader variant="marketing" activeNav="pricing" />
       <main id="top" className="mx-auto max-w-6xl px-4 pt-6 pb-16">
         <PricingPromo />
         <PlanGrid />
