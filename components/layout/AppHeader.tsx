@@ -93,6 +93,16 @@ export function AppHeader({
             <Search className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
 
+          <Link
+            href="/pricing"
+            className="relative hidden items-center gap-1.5 rounded-full border border-hf-border px-3 py-1.5 text-sm text-white transition-colors hover:border-hf-lime/50 sm:flex"
+          >
+            Pricing
+            <span className="rounded bg-hf-pink px-1.5 py-0.5 text-[10px] font-semibold text-white">
+              54% OFF
+            </span>
+          </Link>
+
           {variant === "marketing" ? (
             <>
               <span className="hidden text-sm text-hf-muted sm:inline">Log in</span>

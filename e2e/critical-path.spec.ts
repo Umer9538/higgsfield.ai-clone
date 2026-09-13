@@ -93,3 +93,43 @@ test("image surface uses the docked prompt bar, not the side panel", async ({ pa
   await expect(page.getByPlaceholder("Describe the scene you imagine")).toBeVisible();
   await expect(page.locator("aside")).toHaveCount(0);
 });
+
+test("pricing page renders plans, toggles billing, and expands an FAQ", async ({ page }) => {
+  await page.goto("/pricing");
+
+  // Promo countdown
+  await expect(page.getByText("Personal promo expires in...")).toBeVisible();
+
+  // Three plans, annual by default. Scoped to the plan list, because the
+  // calculator also renders a recommended-plan card with the same headings.
+  const plans = page.getByRole("list", { name: "Plans" });
+  await expect(plans.getByRole("heading", { name: "Basic", exact: true })).toBeVisible();
+  await expect(plans.getByRole("heading", { name: "Pro", exact: true })).toBeVisible();
+  await expect(plans.getByRole("heading", { name: "Max", exact: true })).toBeVisible();
+  await expect(plans.getByText("$20", { exact: true })).toBeVisible();
+  await expect(plans.getByText("$45", { exact: true })).toBeVisible();
+
+  // Switching to monthly raises the headline prices
+  await page.getByRole("switch", { name: "Bill annually" }).first().click();
+  await expect(plans.getByText("$29", { exact: true })).toBeVisible();
+  await expect(plans.getByText("$79", { exact: true })).toBeVisible();
+
+  // FAQ accordion opens
+  const question = page.getByRole("button", { name: "How do credits work?" });
+  await expect(question).toHaveAttribute("aria-expanded", "false");
+  await question.click();
+  await expect(question).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByText(/Credits are spent each time you generate/)).toBeVisible();
+});
+
+test("calculator recommends a bigger plan as usage grows", async ({ page }) => {
+  await page.goto("/pricing");
+
+  await expect(page.getByText("We recommend Pro plan")).toBeVisible();
+
+  // Push video volume to the top of the range; usage should outgrow Pro
+  const videos = page.getByLabel("Kling 3.0 videos");
+  await videos.fill("200");
+
+  await expect(page.getByText("We recommend Max plan")).toBeVisible();
+});
