@@ -10,3 +10,6 @@ playwright-report/
 test-results/
 
 # .agent-logs/ is NOT ignored - it is part of the submission and ships publicly.
+
+# local model-resolution cache, not part of the log
+.claude/.last-model

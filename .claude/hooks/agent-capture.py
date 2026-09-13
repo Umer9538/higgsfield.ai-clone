@@ -17,6 +17,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 
 TOOL = "claude-code"
@@ -81,16 +82,18 @@ def author() -> str:
         return "unknown"
 
 
-def resolve_model(data: dict) -> str:
-    """Model name is not on the hook payload; read the most recent one off the transcript."""
-    path = data.get("transcript_path")
+MODEL_CACHE = ".claude/.last-model"
+
+
+def _scan_transcript(path: str) -> str:
+    """Most recent model named in the transcript, or empty string."""
     if not path or not os.path.exists(path):
-        return "unknown"
+        return ""
     try:
         with open(path, "r", encoding="utf-8", errors="replace") as fh:
             lines = fh.readlines()
     except Exception:
-        return "unknown"
+        return ""
     for line in reversed(lines):
         try:
             obj = json.loads(line)
@@ -99,6 +102,40 @@ def resolve_model(data: dict) -> str:
         model = (obj.get("message") or {}).get("model")
         if model:
             return model
+    return ""
+
+
+def _cache_path() -> str:
+    root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    return os.path.join(root, MODEL_CACHE)
+
+
+def resolve_model(data: dict, retries: int = 1) -> str:
+    """
+    The hook payload carries no model name, so it comes off the transcript.
+    A brand-new session has no assistant record yet and the transcript is written
+    asynchronously, so retry briefly, then fall back to the last model seen.
+    """
+    path = data.get("transcript_path")
+    for attempt in range(retries):
+        model = _scan_transcript(path)
+        if model:
+            try:
+                os.makedirs(os.path.dirname(_cache_path()), exist_ok=True)
+                with open(_cache_path(), "w", encoding="utf-8") as fh:
+                    fh.write(model)
+            except Exception:
+                pass
+            return model
+        if attempt + 1 < retries:
+            time.sleep(0.4)
+    try:
+        with open(_cache_path(), "r", encoding="utf-8") as fh:
+            cached = fh.read().strip()
+            if cached:
+                return cached
+    except Exception:
+        pass
     return "unknown"
 
 
@@ -162,7 +199,7 @@ def main() -> int:
 
     path = session_file(log_dir, session_id)
     ts = utc_now()
-    model = resolve_model(data)
+    model = resolve_model(data, retries=6 if kind == "RESPONSE" else 2)
 
     prior = ""
     if os.path.exists(path):
