@@ -27,6 +27,7 @@ export const cinemaStudio: Surface = {
       { icon: "volume", label: "On" },
     ],
     stepper: "1/4",
+    modeModels: { Image: "Cinema Studio Image", Video: "Cinema Studio 4.0" },
   },
   generate: { cost: 45, originalCost: 80 },
   content: {

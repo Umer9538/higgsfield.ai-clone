@@ -139,6 +139,8 @@ export interface Surface {
     rail?: { label: string; icon: IconName }[];
     /** Extra add-slots beside the composer, e.g. AVATAR / PRODUCT */
     slots?: string[];
+    /** Model the composer switches to for each rail mode */
+    modeModels?: Record<string, string>;
   };
   generate: GenerateAction;
   content: Content;

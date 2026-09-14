@@ -63,6 +63,8 @@ export function ExploreFeed() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState(SORTS[0].id);
   const [tag, setTag] = useState<string | null>(null);
+  // Set by a rail's "View all" pill: focuses the feed on one model.
+  const [focused, setFocused] = useState<string | null>(null);
 
   const rails = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -86,8 +88,9 @@ export function ExploreFeed() {
                 : b.likes - a.likes || a.id.localeCompare(b.id),
           ),
       }))
-      .filter((rail) => rail.items.length > 0);
-  }, [category, query, sort]);
+      .filter((rail) => rail.items.length > 0)
+      .filter((rail) => focused === null || rail.id === focused);
+  }, [category, query, sort, focused]);
 
   const total = rails.reduce((sum, rail) => sum + rail.items.length, 0);
 
@@ -176,9 +179,21 @@ export function ExploreFeed() {
         </ul>
       </div>
 
-      <p aria-live="polite" className="mt-4 text-xs text-hf-dim">
-        {total} generations
-      </p>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <p aria-live="polite" className="text-xs text-hf-dim">
+          {total} generations
+          {focused ? ` in ${RAILS.find((rail) => rail.id === focused)?.title}` : ""}
+        </p>
+        {focused ? (
+          <button
+            type="button"
+            onClick={() => setFocused(null)}
+            className="flex min-h-11 items-center gap-1.5 rounded-full border border-hf-lime/50 px-3 text-xs text-hf-lime transition-colors hover:bg-hf-lime/10 md:min-h-0 md:py-1.5"
+          >
+            Back to all models
+          </button>
+        ) : null}
+      </div>
 
       {rails.length === 0 ? (
         <p className="mt-10 rounded-2xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
@@ -212,10 +227,10 @@ export function ExploreFeed() {
 
             {/* Masonry clamped to a whole number of rows so the grid terminates
                 deliberately instead of slicing a card mid-frame. */}
-            <div className={`relative mt-4 ${rail.items.length > 6 ? "pb-7" : ""}`}>
+            <div className={`relative mt-4 ${rail.items.length > 6 && focused === null ? "pb-7" : ""}`}>
               <div
                 className={`grid auto-rows-[12px] grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 ${
-                  rail.items.length > 6 ? "max-h-[32rem] overflow-hidden" : ""
+                  rail.items.length > 6 && focused === null ? "max-h-[32rem] overflow-hidden" : ""
                 }`}
               >
                 {rail.items.map((item) => (
@@ -223,7 +238,7 @@ export function ExploreFeed() {
                 ))}
               </div>
 
-              {rail.items.length > 6 ? (
+              {rail.items.length > 6 && focused === null ? (
                 <>
                   {/* Taper into the page background. Non-interactive so the
                       Remix buttons underneath stay clickable. */}
@@ -234,14 +249,18 @@ export function ExploreFeed() {
                   />
 
                   <div className="absolute inset-x-0 bottom-0 flex justify-center">
-                    <a
-                      href="#"
+                    <button
+                      type="button"
                       data-rail-cta
+                      onClick={() => {
+                        setFocused(rail.id);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
                       className="flex min-h-11 items-center gap-1.5 rounded-full bg-hf-lime px-5 text-sm font-semibold text-black shadow-lg transition-colors hover:bg-hf-lime-deep"
                     >
                       View all {rail.title}
                       <ArrowUpRight className="size-4" aria-hidden strokeWidth={2.5} />
-                    </a>
+                    </button>
                   </div>
                 </>
               ) : null}

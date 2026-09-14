@@ -19,6 +19,7 @@ export const marketingStudio: Surface = {
       { icon: "ratio", label: "3:4" },
     ],
     stepper: "1/4",
+    modeModels: { Image: "Marketing Studio Image", Video: "Marketing Studio Video" },
   },
   generate: { cost: 4 },
   content: {

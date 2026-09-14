@@ -7,18 +7,40 @@ import { useToast } from "@/components/ui/Toast";
 const CLIENTS = ["ChatGPT", "Claude", "Grok Bot", "Cursor", "Claude Code", "OpenClaw", "Hermes"];
 const TRANSPORTS = ["MCP", "CLI"];
 
-const STEPS = [
-  {
-    title: "Add Higgsfield plugin to ChatGPT",
-    body: "Find Higgsfield in the Plugins Directory or click the button below. Then click Add and sign in",
-    cta: "Add Higgsfield plugin",
-  },
-  {
-    title: "Connect and start creating",
-    body: "After signing in, ask ChatGPT to generate an image or video",
-    cta: "Start creating",
-  },
-];
+/** Step content is a function of the selected client and transport. */
+function stepsFor(client: string, transport: string) {
+  if (transport === "CLI") {
+    return [
+      {
+        title: `Install the CLI for ${client}`,
+        body: "Install globally, then authenticate once. The CLI keeps its own credentials, so it works in CI and headless shells.",
+        code: ["npm i -g @higgsfield/cli", "higgsfield login"],
+        cta: "Copy install command",
+      },
+      {
+        title: "Generate from the terminal",
+        body: `Point ${client} at the CLI, or call it directly from a script. Outputs land in your asset library.`,
+        code: ['higgsfield generate video \\', '  --model seedance-2.5 \\', '  --prompt "neon alley, rain slick"'],
+        cta: "Copy generate command",
+      },
+    ];
+  }
+
+  return [
+    {
+      title: `Add Higgsfield plugin to ${client}`,
+      body: `Open ${client}, go to Settings \u2192 Connectors, and add a custom connector pointing at the Higgsfield MCP server.`,
+      code: ["https://bridge.higgsfield.ai/mcp"],
+      cta: "Add Higgsfield plugin",
+    },
+    {
+      title: "Connect and start creating",
+      body: `After signing in, ask ${client} to generate an image or video and it will call the Higgsfield tools directly.`,
+      code: null,
+      cta: "Start creating",
+    },
+  ];
+}
 
 const HOW_IT_WORKS = [
   { title: "Connect once", body: "Authorise Higgsfield in your client of choice. The connection persists across sessions." },
@@ -31,6 +53,7 @@ export function PluginPage() {
   const [client, setClient] = useState(CLIENTS[0]);
   const [transport, setTransport] = useState(TRANSPORTS[0]);
   const { toast } = useToast();
+  const steps = stepsFor(client, transport);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-14">
@@ -102,22 +125,34 @@ export function PluginPage() {
         </div>
 
         <div className="grid gap-px bg-hf-border sm:grid-cols-2">
-          {STEPS.map((step, index) => (
+          {steps.map((step, index) => (
             <div key={step.title} className="flex flex-col justify-between bg-hf-surface p-6">
               <div>
                 <span className="flex size-6 items-center justify-center rounded-full bg-hf-surface-4 text-xs text-hf-muted">
                   {index + 1}
                 </span>
-                <h2 className="mt-4 text-base font-medium text-white">
-                  {index === 0 ? `Add Higgsfield plugin to ${client}` : step.title}
-                </h2>
+                <h2 className="mt-4 text-base font-medium text-white">{step.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-hf-muted">{step.body}</p>
+
+                {step.code ? (
+                  <pre
+                    data-step-code
+                    className="mt-4 overflow-x-auto rounded-lg border border-hf-border bg-hf-black px-3 py-2.5 font-mono text-[11px] leading-relaxed text-hf-lime"
+                  >
+                    {step.code.join("\n")}
+                  </pre>
+                ) : null}
               </div>
               <button
                 type="button"
-                onClick={() =>
-                  toast(index === 0 ? `Higgsfield plugin added to ${client}` : "Opening your workspace")
-                }
+                onClick={() => {
+                  if (step.code) {
+                    void navigator.clipboard.writeText(step.code.join("\n")).catch(() => {});
+                    toast(`Copied for ${client}`);
+                  } else {
+                    toast("Opening your workspace", "info");
+                  }
+                }}
                 className="mt-8 flex w-fit items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
               >
                 {step.cta}

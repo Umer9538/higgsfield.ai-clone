@@ -30,3 +30,11 @@ export function nextPillValue(current: string): string {
   if (!cycle) return current;
   return cycle[(cycle.indexOf(current) + 1) % cycle.length];
 }
+
+/** Choices offered by the Cinema Studio setup tiles. */
+export const SETUP_OPTIONS: Record<string, string[]> = {
+  "Film setup": ["Auto", "Cinematic", "Documentary", "Music video", "Commercial"],
+  Camera: ["Auto", "35mm", "50mm", "85mm", "Anamorphic"],
+  "Color palette": ["Auto", "Warm Vintage", "Orange Teal", "Monochrome", "Pastel"],
+  Lighting: ["Auto", "Studio Soft Light", "Golden Hour", "Neon Night", "High Key"],
+};

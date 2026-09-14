@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
-import { nextPillValue } from "@/lib/workspace/options";
+import { SETUP_OPTIONS, nextPillValue } from "@/lib/workspace/options";
 import { useToast } from "@/components/ui/Toast";
 import { Icon } from "./Icon";
 import { GenerateButton } from "./GenerateButton";
@@ -18,6 +18,10 @@ export function DockBar({ surface }: { surface: Surface }) {
   const [pillValues, setPillValues] = useState(() => dock?.pills.map((p) => p.label) ?? []);
   const [count, setCount] = useState(() => Number(dock?.stepper?.split("/")[0] ?? 1));
   const [filled, setFilled] = useState<string[]>([]);
+  const [setupValues, setSetupValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries((dock?.setup ?? []).map((item) => [item.label, item.value])),
+  );
+  const [openSetup, setOpenSetup] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
   const { toast } = useToast();
 
@@ -31,20 +35,61 @@ export function DockBar({ surface }: { surface: Surface }) {
       {setup ? (
         <div className="mx-auto mb-2.5 hidden max-w-4xl flex-wrap gap-2 rounded-2xl border border-hf-border bg-hf-surface-2 p-2 sm:flex">
           {setup.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => toast(`${item.label} settings opened`, "info")}
-              className="flex flex-1 items-center gap-2 rounded-xl bg-hf-surface-3 px-3 py-2 text-left transition-colors hover:bg-hf-surface-4"
-            >
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-hf-surface-4 text-hf-muted">
-                <Icon name={item.icon} className="size-3.5" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[10px] text-hf-dim">{item.label}</span>
-                <span className="block truncate text-xs font-medium text-white">{item.value}</span>
-              </span>
-            </button>
+            <div key={item.label} className="relative flex-1">
+              <button
+                type="button"
+                aria-expanded={openSetup === item.label}
+                aria-haspopup={SETUP_OPTIONS[item.label] ? "listbox" : undefined}
+                onClick={() => {
+                  if (!SETUP_OPTIONS[item.label]) {
+                    toast(`${item.label} picker opened`, "info");
+                    return;
+                  }
+                  setOpenSetup((prev) => (prev === item.label ? null : item.label));
+                }}
+                className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition-colors ${
+                  setupValues[item.label] && setupValues[item.label] !== "Auto"
+                    ? "bg-hf-lime/10 ring-1 ring-hf-lime/40 ring-inset"
+                    : "bg-hf-surface-3 hover:bg-hf-surface-4"
+                }`}
+              >
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-hf-surface-4 text-hf-muted">
+                  <Icon name={item.icon} className="size-3.5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[10px] text-hf-dim">{item.label}</span>
+                  <span className="block truncate text-xs font-medium text-white">
+                    {setupValues[item.label] ?? item.value}
+                  </span>
+                </span>
+              </button>
+
+              {openSetup === item.label && SETUP_OPTIONS[item.label] ? (
+                <ul
+                  role="listbox"
+                  aria-label={item.label}
+                  className="absolute bottom-full left-0 z-40 mb-2 w-48 overflow-hidden rounded-xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
+                >
+                  {SETUP_OPTIONS[item.label].map((option) => (
+                    <li key={option}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={setupValues[item.label] === option}
+                        onClick={() => {
+                          setSetupValues((prev) => ({ ...prev, [item.label]: option }));
+                          setOpenSetup(null);
+                          toast(`${item.label}: ${option}`);
+                        }}
+                        className="flex min-h-11 w-full items-center px-3 text-left text-xs text-white transition-colors hover:bg-hf-surface-4"
+                      >
+                        {option}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
           ))}
         </div>
       ) : null}
@@ -58,7 +103,19 @@ export function DockBar({ surface }: { surface: Surface }) {
                 key={item.label}
                 type="button"
                 aria-pressed={mode === item.label}
-                onClick={() => setMode(item.label)}
+                onClick={() => {
+                  setMode(item.label);
+                  const nextModel = dock.modeModels?.[item.label];
+                  if (nextModel) {
+                    const modelIndex = pills.findIndex((pill) => pill.icon === "model");
+                    if (modelIndex >= 0) {
+                      setPillValues((prev) =>
+                        prev.map((value, i) => (i === modelIndex ? nextModel : value)),
+                      );
+                    }
+                    toast(`Switched to ${item.label.toLowerCase()} — ${nextModel}`);
+                  }
+                }}
                 className={`flex flex-1 flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-[11px] transition-colors sm:w-16 sm:flex-none ${
                   mode === item.label ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
                 }`}

@@ -944,3 +944,85 @@ test("plugin cards open details and the MCP connector switches", async ({ page }
   await expect(connector).toHaveAttribute("aria-checked", "true");
   await expect(page.getByText("Connected", { exact: true })).toBeVisible();
 });
+
+test("explore 'View all' focuses the feed on that model", async ({ page }) => {
+  await page.goto("/explore");
+
+  const count = page.getByText(/\d+ generations/);
+  const before = Number((await count.textContent())!.match(/\d+/)![0]);
+  await expect(page.getByRole("heading", { name: "Seedance 2.5" })).toBeVisible();
+
+  // Focus one rail
+  await page.getByRole("button", { name: /View all Seedance 2\.5/ }).click();
+
+  await expect(count).toContainText("in Seedance 2.5");
+  const after = Number((await count.textContent())!.match(/\d+/)![0]);
+  expect(after).toBeLessThan(before);
+
+  // Other rails are gone, and the clamp is lifted so everything is visible
+  await expect(page.getByRole("heading", { name: "Visual Effects" })).toHaveCount(0);
+  await expect(page.locator("[data-rail-cta]")).toHaveCount(0);
+  await expect(page.locator("[data-rail-fade]")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Back to all models" }).click();
+  await expect(page.getByRole("heading", { name: "Visual Effects" })).toBeVisible();
+  expect(Number((await count.textContent())!.match(/\d+/)![0])).toBe(before);
+});
+
+test("MCP page: CLI toggle and platform tabs rewrite the steps", async ({ page }) => {
+  // The transport toggle and platform tabs live on the MCP / ChatGPT Plugin
+  // page; /plugins is the integrations directory.
+  await page.goto("/mcp");
+
+  // MCP is the default: connector instructions and the bridge URL
+  await expect(page.getByRole("heading", { name: /Add Higgsfield plugin to ChatGPT/ })).toBeVisible();
+  await expect(page.locator("[data-step-code]").first()).toContainText("bridge.higgsfield.ai/mcp");
+
+  // Switching platform rewrites both steps
+  await page.getByRole("tab", { name: "Claude Code" }).click();
+  await expect(page.getByRole("heading", { name: /Add Higgsfield plugin to Claude Code/ })).toBeVisible();
+  await expect(page.getByText(/ask Claude Code to generate/)).toBeVisible();
+
+  // Switching transport swaps to shell setup
+  await page.getByRole("tab", { name: "CLI" }).click();
+  await expect(page.getByRole("heading", { name: /Install the CLI for Claude Code/ })).toBeVisible();
+  const code = page.locator("[data-step-code]").first();
+  await expect(code).toContainText("npm i -g @higgsfield/cli");
+  await expect(code).toContainText("higgsfield login");
+  await expect(page.locator("[data-step-code]").nth(1)).toContainText("higgsfield generate video");
+
+  // And back
+  await page.getByRole("tab", { name: "MCP" }).click();
+  await expect(page.locator("[data-step-code]").first()).toContainText("bridge.higgsfield.ai/mcp");
+});
+
+test("cinema studio: parameter popovers and the image/video mode switcher", async ({ page }) => {
+  await page.goto("/ai/cinema-studio");
+
+  // Parameter pills open a real listbox and apply the choice
+  const camera = page.getByRole("button", { name: /^Camera/ });
+  await camera.click();
+  const options = page.getByRole("listbox", { name: "Camera" });
+  await expect(options).toBeVisible();
+  await options.getByRole("option", { name: "Anamorphic" }).click();
+  await expect(camera).toContainText("Anamorphic");
+  await expect(page.locator("[data-toast]").last()).toContainText("Camera: Anamorphic");
+
+  const lighting = page.getByRole("button", { name: /^Lighting/ });
+  await lighting.click();
+  await page.getByRole("listbox", { name: "Lighting" }).getByRole("option", { name: "Golden Hour" }).click();
+  await expect(lighting).toContainText("Golden Hour");
+
+  // Mode switcher changes the composer's model
+  // The pill keeps its control name and reports the current value
+  const modelPill = page.getByRole("button", { name: /^Cinema Studio 4\.0 setting/ });
+  await expect(modelPill).toHaveAttribute("aria-label", /currently Cinema Studio 4\.0/);
+
+  await page.getByRole("button", { name: "Image", exact: true }).click();
+  await expect(modelPill).toHaveAttribute("aria-label", /currently Cinema Studio Image/);
+  await expect(modelPill).toContainText("Cinema Studio Image");
+  await expect(page.locator("[data-toast]").last()).toContainText("Switched to image");
+
+  await page.getByRole("button", { name: "Video", exact: true }).click();
+  await expect(modelPill).toHaveAttribute("aria-label", /currently Cinema Studio 4\.0/);
+});
