@@ -276,12 +276,18 @@ export function ExploreFeed() {
         <ul className="mx-auto mt-6 flex max-w-4xl flex-wrap justify-center gap-2">
           {FEATURE_TAGS.map((item) => (
             <li key={item}>
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() => {
+                  setFocused(null);
+                  setCategory("All");
+                  setQuery(item);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
                 className="inline-flex min-h-11 items-center rounded-lg bg-hf-surface-3 px-3 py-2 text-sm text-white transition-colors hover:bg-hf-surface-4 hover:text-hf-lime md:min-h-0"
               >
                 {item}
-              </a>
+              </button>
             </li>
           ))}
         </ul>

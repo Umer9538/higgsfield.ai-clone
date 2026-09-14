@@ -165,7 +165,12 @@ export function PluginPage() {
 
       <p className="mt-5 flex flex-wrap items-center justify-center gap-4 text-xs text-hf-muted">
         If you are using Claude Code or Codex, it&apos;s better to use the CLI
-        <a href="#" className="flex items-center gap-1.5 transition-colors hover:text-white">
+        <a
+          href="https://github.com/higgsfield-ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex min-h-11 items-center gap-1.5 transition-colors hover:text-white md:min-h-0"
+        >
           <Code2 className="size-3.5" aria-hidden strokeWidth={1.75} />
           GitHub
         </a>

@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { ActionButton } from "@/components/ui/ActionButton";
+import { SmartLink } from "@/components/ui/SmartLink";
+import { routeFor } from "@/lib/routes";
 
 export function PageHeading({
   eyebrow,
@@ -37,9 +39,11 @@ export function RailHeading({ title, link }: { title: string; link?: string }) {
         {title}
       </h2>
       {link ? (
-        <a href="#" className="shrink-0 text-xs text-hf-muted transition-colors hover:text-hf-lime">
-          {link}
-        </a>
+        <SmartLink
+          label={link}
+          href={routeFor(link)}
+          className="inline-flex min-h-11 shrink-0 items-center text-xs text-hf-muted transition-colors hover:text-hf-lime md:min-h-0"
+        />
       ) : null}
     </div>
   );

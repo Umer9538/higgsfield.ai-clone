@@ -18,35 +18,41 @@ export interface HeroCard {
   title: string;
   description: string;
   image: string;
+  href: string;
 }
 
 export const HERO_CARDS: HeroCard[] = [
   {
     id: "motion-designer",
+    href: "/ai/marketing-studio",
     image: "/media/hero/1.jpg",
     title: "Higgsfield AI Motion Designer",
     description: "ChatGPT can now do motion design in After Effects.",
   },
   {
     id: "effects",
+    href: "/ai/effects",
     image: "/media/hero/2.jpg",
     title: "Higgsfield Effects",
     description: "Viral video presets now in ChatGPT, with free generations",
   },
   {
     id: "genjutsu",
+    href: "/ai/genjutsu",
     image: "/media/hero/3.jpg",
     title: "Higgsfield Genjutsu",
     description: "One upload in. Endless new visions out.",
   },
   {
     id: "sunburst",
+    href: "/ai/image",
     image: "/media/hero/4.jpg",
     title: "GPT Image 2.5 Sunburst",
     description: "Sharper edits with more natural light and texture",
   },
   {
     id: "astra",
+    href: "/ai/3d-jutsu",
     image: "/media/hero/5.jpg",
     title: "Higgsfield × GPT-6 Astra",
     description:
@@ -66,6 +72,7 @@ export interface ProductTile {
   id: string;
   title: string;
   description: string;
+  href: string;
   badge?: { label: string; tone: "top" | "new" | "free" };
   kind?: string;
 }
@@ -73,21 +80,23 @@ export interface ProductTile {
 export const PRODUCT_TILES: ProductTile[] = [
   {
     id: "seedance",
+    href: "/ai/video",
     title: "Seedance 2.5",
     description: "The most advanced video model",
     badge: { label: "Top", tone: "top" },
     kind: "Video",
   },
-  { id: "nano-banana", title: "Nano Banana Pro", description: "Generate high-quality visuals", kind: "Image" },
+  { id: "nano-banana", href: "/ai/image", title: "Nano Banana Pro", description: "Generate high-quality visuals", kind: "Image" },
   {
     id: "genjutsu",
+    href: "/ai/genjutsu",
     title: "Higgsfield Genjutsu",
     description: "One video, many versions",
     badge: { label: "Free", tone: "free" },
   },
-  { id: "mcp", title: "MCP & CLI", description: "Turn Claude into a creative engine" },
-  { id: "cinema", title: "Cinema Studio 4.0", description: "Create cinematic scenes effortlessly" },
-  { id: "supercomputer", title: "Supercomputer", description: "Agent powered by GPT-6 Astra" },
+  { id: "mcp", href: "/mcp", title: "MCP & CLI", description: "Turn Claude into a creative engine" },
+  { id: "cinema", href: "/ai/cinema-studio", title: "Cinema Studio 4.0", description: "Create cinematic scenes effortlessly" },
+  { id: "supercomputer", href: "/supercomputer", title: "Supercomputer", description: "Agent powered by GPT-6 Astra" },
 ];
 
 export const EFFECTS = {

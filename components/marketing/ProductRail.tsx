@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { PRODUCT_TILES, PROMO_PANEL } from "@/lib/marketing/content";
 
@@ -40,8 +41,8 @@ export function ProductRail() {
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {PRODUCT_TILES.map((tile) => (
             <li key={tile.id}>
-              <a
-                href="#"
+              <Link
+                href={tile.href}
                 className="flex h-full flex-col justify-between gap-4 rounded-2xl border border-hf-border bg-hf-surface p-4 transition-colors hover:border-hf-lime/40 hover:bg-hf-surface-3"
               >
                 <div className="flex items-start justify-between gap-2">
@@ -65,7 +66,7 @@ export function ProductRail() {
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-hf-muted">{tile.description}</p>
                 </div>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -92,13 +93,13 @@ export function SectionHeading({
         <p className="mt-2 max-w-xl text-sm text-hf-muted">{sub}</p>
       </div>
       {cta ? (
-        <a
-          href="#"
-          className="flex shrink-0 items-center gap-1.5 rounded-full border border-hf-border px-4 py-2 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+        <Link
+          href="/ai/effects"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-hf-border px-4 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
         >
           {cta}
           <ArrowRight className="size-4" aria-hidden strokeWidth={1.75} />
-        </a>
+        </Link>
       ) : null}
     </div>
   );

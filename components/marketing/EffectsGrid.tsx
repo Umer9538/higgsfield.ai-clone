@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { EFFECTS } from "@/lib/marketing/content";
 import { SectionHeading } from "./ProductRail";
 
@@ -10,7 +11,7 @@ export function EffectsGrid() {
       <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         {EFFECTS.presets.map((preset) => (
           <li key={preset.name}>
-            <a href="#" className="group relative block overflow-hidden rounded-xl border border-hf-border">
+            <Link href="/ai/effects" className="group relative block overflow-hidden rounded-xl border border-hf-border">
               <div className="relative aspect-video w-full overflow-hidden">
                 <Image
                   src={preset.image}
@@ -31,18 +32,18 @@ export function EffectsGrid() {
                   Recreate
                 </span>
               </div>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
 
       <div className="mt-6 flex justify-center">
-        <a
-          href="#"
-          className="rounded-full border border-hf-border px-5 py-2.5 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+        <Link
+          href="/ai/effects"
+          className="flex min-h-11 items-center rounded-full border border-hf-border px-5 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
         >
           {EFFECTS.footerCta}
-        </a>
+        </Link>
       </div>
     </section>
   );

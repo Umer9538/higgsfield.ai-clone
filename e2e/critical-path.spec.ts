@@ -1026,3 +1026,128 @@ test("cinema studio: parameter popovers and the image/video mode switcher", asyn
   await page.getByRole("button", { name: "Video", exact: true }).click();
   await expect(modelPill).toHaveAttribute("aria-label", /currently Cinema Studio 4\.0/);
 });
+
+const AUDIT_ROUTES = [
+  "/", "/explore", "/pricing", "/assets", "/enterprise", "/canvas", "/academy", "/community",
+  "/contests", "/plugins", "/originals", "/mcp", "/chatgpt-plugin", "/supercomputer", "/login",
+  "/signup", "/welcome-quiz", "/ai/video", "/ai/image", "/ai/audio", "/ai/edit",
+  "/ai/motion-control", "/ai/genjutsu", "/ai/effects", "/ai/cinema-studio",
+  "/ai/marketing-studio", "/ai/3d-jutsu",
+];
+
+test("no route ships a placeholder anchor or a layout shift", async ({ page }) => {
+  const offenders: string[] = [];
+
+  for (const route of AUDIT_ROUTES) {
+    await page.goto(route);
+    const result = await page.evaluate(
+      () =>
+        new Promise<{ dead: number; cls: number }>((resolve) => {
+          let cls = 0;
+          try {
+            new PerformanceObserver((list) => {
+              for (const entry of list.getEntries()) {
+                const shift = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+                if (!shift.hadRecentInput) cls += shift.value ?? 0;
+              }
+            }).observe({ type: "layout-shift", buffered: true });
+          } catch {
+            // Unsupported: the dead-anchor check still runs.
+          }
+          setTimeout(
+            () =>
+              resolve({
+                dead: document.querySelectorAll('a[href="#"], a:not([href])').length,
+                cls: Math.round(cls * 1000) / 1000,
+              }),
+            600,
+          );
+        }),
+    );
+
+    if (result.dead > 0) offenders.push(`${route}: ${result.dead} placeholder anchors`);
+    if (result.cls > 0.1) offenders.push(`${route}: CLS ${result.cls}`);
+  }
+
+  expect(offenders, offenders.join("\n")).toEqual([]);
+});
+
+test("academy search filters the course list", async ({ page }) => {
+  await page.goto("/academy");
+
+  // Direct children only: each course card contains its own <ul> of meta chips,
+  // so a descendant listitem query counts those too.
+  const cards = page.locator('ul[aria-label="Courses"] > li');
+  const all = await cards.count();
+  expect(all).toBeGreaterThan(3);
+
+  await page.getByPlaceholder("Search courses").fill("VFX");
+
+  // Assert on the live-region count first: it auto-waits for the re-render,
+  // whereas an immediate count() can read the pre-filter list.
+  await expect(page.getByText(/\d+ courses/)).toContainText("1 courses");
+  await expect(cards).toHaveCount(1);
+  expect(1).toBeLessThan(all);
+
+  // Search composes with the category tabs
+  await page.getByPlaceholder("Search courses").fill("");
+  await page.getByRole("tab", { name: "UGC & Social Content" }).click();
+  await expect.poll(async () => cards.count()).toBeLessThan(all);
+
+  await page.getByPlaceholder("Search courses").fill("zzzznothing");
+  await expect(page.getByText("No courses match that search.")).toBeVisible();
+});
+
+test("modals trap focus and close on Escape and backdrop", async ({ page }) => {
+  await page.goto("/academy");
+  await page.getByRole("button", { name: "View details" }).first().click();
+
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute("aria-modal", "true");
+
+  // Focus starts inside and Tab cycles without escaping
+  for (let i = 0; i < 8; i++) {
+    await page.keyboard.press("Tab");
+    const inside = await dialog.evaluate((el) => el.contains(document.activeElement));
+    expect(inside, `focus escaped the dialog on tab ${i + 1}`).toBe(true);
+  }
+
+  // Escape closes
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+
+  // Backdrop click closes. Clicked near the corner: the backdrop's centre
+  // sits under the dialog panel, so a centred click is intercepted.
+  await page.getByRole("button", { name: "View details" }).first().click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.mouse.click(8, 8);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+});
+
+test("result video scrubber, mute and play controls respond", async ({ page }) => {
+  await page.goto("/ai/video");
+  await page.getByRole("button", { name: /^Generate/ }).click();
+  await expect(page.getByText("Generation complete")).toBeVisible({ timeout: 20_000 });
+
+  const video = page.locator("video").first();
+  await expect.poll(async () => video.evaluate((el: HTMLVideoElement) => el.readyState)).toBeGreaterThanOrEqual(1);
+
+  // Play, then pause
+  await page.getByRole("button", { name: "Play" }).first().click();
+  await expect.poll(async () => video.evaluate((el: HTMLVideoElement) => !el.paused)).toBe(true);
+  await page.getByRole("button", { name: "Pause" }).first().click();
+  await expect.poll(async () => video.evaluate((el: HTMLVideoElement) => el.paused)).toBe(true);
+
+  // Scrubbing moves the playhead
+  const seek = page.getByRole("slider", { name: "Seek" });
+  await seek.fill("2");
+  await expect.poll(async () => video.evaluate((el: HTMLVideoElement) => Math.round(el.currentTime))).toBe(2);
+
+  // Mute toggles both ways
+  expect(await video.evaluate((el: HTMLVideoElement) => el.muted)).toBe(true);
+  await page.getByRole("button", { name: "Unmute" }).click();
+  expect(await video.evaluate((el: HTMLVideoElement) => el.muted)).toBe(false);
+  await page.getByRole("button", { name: "Mute" }).click();
+  expect(await video.evaluate((el: HTMLVideoElement) => el.muted)).toBe(true);
+});

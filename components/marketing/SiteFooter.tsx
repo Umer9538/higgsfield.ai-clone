@@ -1,4 +1,6 @@
 import { FOOTER, FOOTER_COLUMNS } from "@/lib/marketing/content";
+import { SmartLink } from "@/components/ui/SmartLink";
+import { routeFor } from "@/lib/routes";
 
 /**
  * Full-bleed lime block with black text. This inversion is the site's single
@@ -24,9 +26,11 @@ export function SiteFooter() {
                   <ul className="mt-3 space-y-2.5">
                     {column.links.map((link) => (
                       <li key={link}>
-                        <a href="#" className="inline-flex min-h-11 items-center text-sm font-medium hover:underline md:min-h-0">
-                          {link}
-                        </a>
+                        <SmartLink
+                          label={link}
+                          href={routeFor(link)}
+                          className="inline-flex min-h-11 items-center text-sm font-medium hover:underline md:min-h-0"
+                        />
                       </li>
                     ))}
                   </ul>
@@ -40,12 +44,10 @@ export function SiteFooter() {
             <ul className="flex flex-wrap items-center gap-5">
               {FOOTER.socials.map((social) => (
                 <li key={social}>
-                  <a
-                    href="#"
+                  <SmartLink
+                    label={social}
                     className="inline-flex min-h-11 items-center font-medium hover:underline md:min-h-0"
-                  >
-                    {social}
-                  </a>
+                  />
                 </li>
               ))}
             </ul>
@@ -59,9 +61,11 @@ export function SiteFooter() {
           <ul className="flex flex-wrap items-center gap-4">
             {FOOTER.legal.map((item) => (
               <li key={item}>
-                <a href="#" className="inline-flex min-h-11 items-center font-medium transition-colors hover:text-white md:min-h-0">
-                  {item}
-                </a>
+                <SmartLink
+                  label={item}
+                  href={routeFor(item)}
+                  className="inline-flex min-h-11 items-center font-medium transition-colors hover:text-white md:min-h-0"
+                />
               </li>
             ))}
           </ul>

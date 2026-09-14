@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MediaTile, RailHeading, tile } from "./Shared";
 import { COMMUNITY } from "@/lib/sections/content";
+import { SmartLink } from "@/components/ui/SmartLink";
 
 export function CommunityFeed() {
   const [tab, setTab] = useState(COMMUNITY.tabs[0]);
@@ -126,16 +127,14 @@ export function CommunityFeed() {
         <ul className="mt-4 flex flex-wrap justify-center gap-2">
           {COMMUNITY.socials.map((social) => (
             <li key={social}>
-              <a
-                href="#"
+              <SmartLink
+                label={social}
                 className={`inline-flex min-h-11 items-center rounded-lg px-4 py-2 text-sm transition-colors md:min-h-0 ${
                   social === "Discord"
                     ? "bg-hf-lime font-semibold text-black hover:bg-hf-lime-deep"
                     : "border border-hf-border text-white hover:border-hf-lime/50"
                 }`}
-              >
-                {social}
-              </a>
+              />
             </li>
           ))}
         </ul>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Bell, Play, Trophy } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { SiteFooter } from "@/components/marketing/SiteFooter";
@@ -42,13 +43,13 @@ export default function OriginalsPage() {
             <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {ORIGINALS.films.slice(railIndex * 2, railIndex * 2 + 4).map((film, index) => (
                 <li key={`${rail.id}-${film}`}>
-                  <a href="#">
+                  <Link href="/community">
                     <MediaTile
                       src={tile(railIndex * 4 + index + 1)}
                       label={film}
                       caption="Higgsfield Studio"
                     />
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

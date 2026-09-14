@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { HERO_CARDS } from "@/lib/marketing/content";
 
 export function Hero() {
@@ -7,7 +8,7 @@ export function Hero() {
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {HERO_CARDS.map((card) => (
           <li key={card.id}>
-            <a href="#" className="group block">
+            <Link href={card.href} className="group block">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-hf-border">
                 <Image
                   src={card.image}
@@ -22,7 +23,7 @@ export function Hero() {
                 {card.title}
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-hf-muted">{card.description}</p>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Layers, PlayCircle } from "lucide-react";
+import { Clock, Layers, PlayCircle, Search } from "lucide-react";
 import { MediaTile, RailHeading, tile } from "./Shared";
 import { ACADEMY } from "@/lib/sections/content";
 import { Modal } from "@/components/ui/Modal";
@@ -9,19 +9,42 @@ import { useToast } from "@/components/ui/Toast";
 
 export function CourseGrid() {
   const [category, setCategory] = useState<string>("All");
+  const [query, setQuery] = useState("");
   const [detail, setDetail] = useState<(typeof ACADEMY.courses)[number] | null>(null);
   const { toast } = useToast();
 
   const categories = ["All", ...ACADEMY.categories];
-  const courses =
-    category === "All"
-      ? ACADEMY.courses
-      : ACADEMY.courses.filter((course) => course.category === category);
+  const needle = query.trim().toLowerCase();
+  const courses = ACADEMY.courses
+    .filter((course) => category === "All" || course.category === category)
+    .filter(
+      (course) =>
+        !needle ||
+        course.title.toLowerCase().includes(needle) ||
+        course.body.toLowerCase().includes(needle) ||
+        course.level.toLowerCase().includes(needle),
+    );
 
   return (
     <>
       <section className="mt-14">
         <RailHeading title={ACADEMY.categoriesTitle} />
+        <label className="relative mt-4 block max-w-sm">
+          <span className="sr-only">Search courses</span>
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-hf-dim"
+            aria-hidden
+            strokeWidth={1.75}
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search courses"
+            className="h-11 w-full rounded-lg border border-hf-border bg-hf-surface pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+          />
+        </label>
+
         <div role="tablist" aria-label="Course category" className="mt-4 flex flex-wrap gap-1">
           {categories.map((item) => {
             const active = category === item;
@@ -59,7 +82,13 @@ export function CourseGrid() {
           {courses.length} courses
         </p>
 
-        <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {courses.length === 0 ? (
+          <p className="mt-6 rounded-2xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
+            No courses match that search.
+          </p>
+        ) : null}
+
+        <ul aria-label="Courses" className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((course, index) => (
             <li
               key={course.id}

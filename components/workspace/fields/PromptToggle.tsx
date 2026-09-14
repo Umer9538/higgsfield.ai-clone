@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { Sparkles } from "lucide-react";
 import { useField } from "../state";
 
@@ -51,8 +53,8 @@ export function PromptToggle({
 
 export function LinkRow({ label, icon }: { label: string; icon?: string }) {
   return (
-    <a
-      href="#"
+    <Link
+      href="/chatgpt-plugin"
       className="flex items-center justify-between gap-3 rounded-xl border border-hf-border bg-hf-surface-2 px-3.5 py-3 text-sm font-medium text-white transition-colors hover:bg-hf-surface-3"
     >
       <span className="flex items-center gap-2">
@@ -62,6 +64,6 @@ export function LinkRow({ label, icon }: { label: string; icon?: string }) {
         {label}
       </span>
       <span className="text-hf-dim">&rsaquo;</span>
-    </a>
+    </Link>
   );
 }
