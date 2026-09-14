@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { downloadAsset } from "@/lib/ui/download";
@@ -17,6 +17,11 @@ import {
   Wand2,
 } from "lucide-react";
 import { ASSETS, FOLDERS, type Asset, type AssetKind } from "@/lib/assets/content";
+import {
+  getGeneratedServerSnapshot,
+  getGeneratedSnapshot,
+  subscribeGenerated,
+} from "@/lib/assets/store";
 
 type Tab = "all" | "video" | "image" | "audio" | "folders";
 type Sort = "newest" | "oldest";
@@ -132,9 +137,17 @@ export function AssetLibrary() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Generations made in the workspace appear here immediately, newest first.
+  const generated = useSyncExternalStore(
+    subscribeGenerated,
+    getGeneratedSnapshot,
+    getGeneratedServerSnapshot,
+  );
+
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return ASSETS.filter((asset) => !deleted.includes(asset.id))
+    return [...generated, ...ASSETS]
+      .filter((asset) => !deleted.includes(asset.id))
       .filter((asset) => (tab === "all" || tab === "folders" ? true : asset.kind === tab))
       .filter(
         (asset) =>
@@ -148,7 +161,7 @@ export function AssetLibrary() {
           ? b.createdAt.localeCompare(a.createdAt)
           : a.createdAt.localeCompare(b.createdAt),
       );
-  }, [tab, query, sort, deleted]);
+  }, [tab, query, sort, deleted, generated]);
 
   const download = async (asset: Asset) => {
     const filename = asset.src.split("/").pop() ?? `${asset.id}.jpg`;

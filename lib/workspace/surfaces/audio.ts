@@ -9,6 +9,7 @@ export const audio: Surface = {
     {
       kind: "prompt",
       id: "script",
+      model: "Seed Audio 1.0",
       label: "Script",
       placeholder: "Type your script here. Describe how it should sound and who is speaking.",
       maxLength: 2000,

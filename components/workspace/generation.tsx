@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { GenerationResult } from "@/lib/workspace/types";
+import type { GenerationResult, Surface } from "@/lib/workspace/types";
+import { addGeneratedAsset } from "@/lib/assets/store";
+import { useWorkspace } from "./state";
 
 export type GenerationStatus = "idle" | "running" | "done";
 
@@ -35,11 +37,14 @@ const GenerationContext = createContext<GenerationContextValue | null>(null);
 
 export function GenerationProvider({
   kind,
+  surface,
   children,
 }: {
   kind: GenerationResult["kind"];
+  surface?: Surface;
   children: React.ReactNode;
 }) {
+  const { values } = useWorkspace();
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [progress, setProgress] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -66,9 +71,26 @@ export function GenerationProvider({
       if (next >= 100) {
         clear();
         setStatus("done");
+        // Persist the output so it appears in the asset library immediately.
+        const result = surface?.result;
+        if (result) {
+          const promptField = surface?.fields.find((field) => field.kind === "prompt");
+          const prompt = promptField ? String(values[promptField.id] ?? "") : "";
+          addGeneratedAsset({
+            kind: result.kind,
+            model: result.meta.find((m) => m.label === "Model")?.value ?? surface.label,
+            prompt,
+            src: result.src,
+            poster: result.poster,
+            spec: result.meta
+              .filter((m) => m.label !== "Model")
+              .map((m) => m.value)
+              .join(" · "),
+          });
+        }
       }
     }, TICK_MS);
-  }, [clear]);
+  }, [clear, surface, values]);
 
   const reset = useCallback(() => {
     clear();

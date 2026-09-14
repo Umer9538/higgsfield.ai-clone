@@ -66,6 +66,8 @@ export type Field =
       chips?: { icon: IconName; label: string }[];
       maxLength?: number;
       optional?: boolean;
+      /** Named in the Magic Enhance confirmation */
+      model?: string;
     }
   /** Label over value with a chevron, e.g. Model / Seedance 2.5 */
   | { kind: "select"; id: string; label: string; value: string }

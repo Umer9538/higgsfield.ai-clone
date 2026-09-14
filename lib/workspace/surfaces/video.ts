@@ -33,6 +33,7 @@ export const video: Surface = {
     {
       kind: "prompt",
       id: "prompt",
+      model: "Seedance 2.5",
       label: "Prompt",
       placeholder:
         "Describe the visual change you want — e.g., “Make it snow” or “Make it nighttime”. Add reference images or elements using @...",

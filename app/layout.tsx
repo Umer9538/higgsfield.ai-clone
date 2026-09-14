@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/lib/auth/context";
+import { CommandPalette } from "@/components/ui/CommandPalette";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,7 +28,10 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="bg-hf-black text-hf-text font-sans antialiased">
         <AuthProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {children}
+            <CommandPalette />
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

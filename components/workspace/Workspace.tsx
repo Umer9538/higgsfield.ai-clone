@@ -16,7 +16,7 @@ export function Workspace({ surface }: { surface: Surface }) {
   if (surface.layout === "dock") {
     return (
       <WorkspaceProvider fields={surface.fields}>
-        <GenerationProvider kind={surface.result?.kind ?? "image"}>
+        <GenerationProvider kind={surface.result?.kind ?? "image"} surface={surface}>
           <div className="flex min-h-[calc(100dvh-var(--spacing-header))] flex-col">
             <div className="flex flex-1 items-center justify-center px-4 py-12">
               <WorkspaceContent surface={surface} />
@@ -30,7 +30,7 @@ export function Workspace({ surface }: { surface: Surface }) {
 
   return (
     <WorkspaceProvider fields={surface.fields}>
-      <GenerationProvider kind={surface.result?.kind ?? "video"}>
+      <GenerationProvider kind={surface.result?.kind ?? "video"} surface={surface}>
         <div className="flex flex-col lg:flex-row">
           <ControlPanel surface={surface} />
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:h-[calc(100dvh-var(--spacing-header))] lg:p-8">

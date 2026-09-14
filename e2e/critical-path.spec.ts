@@ -665,9 +665,10 @@ test("canvas add, connect and delete change real state", async ({ page }) => {
   const before = await read();
 
   await page.getByRole("button", { name: "Add node" }).click();
+  await page.getByRole("menuitem", { name: /Text Prompt/ }).click();
   await expect.poll(async () => (await read()).nodes).toBe(before.nodes + 1);
 
-  await page.getByRole("button", { name: "Delete" }).click();
+  await page.getByRole("button", { name: "Delete", exact: true }).click();
   await expect.poll(async () => (await read()).nodes).toBe(before.nodes);
 });
 
@@ -719,4 +720,123 @@ test("a first-run sign-up routes straight into the onboarding quiz", async ({ pa
   await page.getByRole("dialog").getByRole("button", { name: "Continue with Apple" }).click();
   await expect(page).toHaveURL(/\/welcome-quiz$/);
   await expect(page.getByRole("radiogroup", { name: "Primary workflow" })).toBeVisible();
+});
+
+test("command palette opens on Ctrl/Cmd+K and navigates", async ({ page }) => {
+  await page.goto("/");
+
+  // Wait for the shortcut listener to attach, otherwise the keypress races hydration.
+  await page.locator("html[data-palette-ready='true']").waitFor();
+
+  // Headless Chromium on macOS swallows a real Cmd+K before the page sees it,
+  // so the driven keystroke uses Control. The metaKey path is asserted below.
+  await page.keyboard.press("Control+k");
+  const palette = page.getByRole("dialog", { name: "Command palette" });
+  await expect(palette).toBeVisible();
+
+  // Fuzzy search narrows the list
+  await palette.getByRole("combobox").fill("canvas");
+  const options = palette.getByRole("option");
+  await expect(options.first()).toContainText("Open Canvas");
+
+  // Keyboard navigation and Enter
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/canvas$/);
+
+  // Escape closes it
+  await page.keyboard.press("Control+k");
+  await expect(page.getByRole("dialog", { name: "Command palette" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Command palette" })).toHaveCount(0);
+});
+
+test("the Cmd (meta) shortcut is wired, not just Ctrl", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("html[data-palette-ready='true']").waitFor();
+  await page.evaluate(() =>
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true })),
+  );
+  await expect(page.getByRole("dialog", { name: "Command palette" })).toBeVisible();
+});
+
+test("palette arrow keys move the selection", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("html[data-palette-ready='true']").waitFor();
+  await page.keyboard.press("Control+k");
+  const palette = page.getByRole("dialog", { name: "Command palette" });
+
+  const first = palette.getByRole("option").first();
+  await expect(first).toHaveAttribute("aria-selected", "true");
+
+  await page.keyboard.press("ArrowDown");
+  await expect(first).toHaveAttribute("aria-selected", "false");
+  await expect(palette.getByRole("option").nth(1)).toHaveAttribute("aria-selected", "true");
+});
+
+test("magic enhance appends cinema parameters and names the model", async ({ page }) => {
+  await page.goto("/ai/video");
+
+  const prompt = page.locator("#prompt");
+  await prompt.fill("A skater carving an empty pool");
+
+  await page.getByRole("button", { name: "Magic Enhance" }).click();
+  await expect(page.locator("[data-toast]").last()).toContainText("Prompt enhanced for Seedance 2.5");
+
+  const value = await prompt.inputValue();
+  expect(value).toContain("A skater carving an empty pool");
+  expect(value).toContain("cinematic lighting");
+  expect(value).toContain("35mm lens");
+  expect(value).toContain("photorealistic render");
+
+  // Enhancing twice does not duplicate the parameters
+  await page.getByRole("button", { name: "Magic Enhance" }).click();
+  await expect(page.locator("[data-toast]").last()).toContainText("already enhanced");
+  expect((await prompt.inputValue()).match(/35mm lens/g)?.length).toBe(1);
+});
+
+test("a generation is persisted and appears in the asset library", async ({ page }) => {
+  await page.goto("/ai/video");
+  await page.getByRole("button", { name: /^Generate/ }).click();
+  await expect(page.getByText("Generation complete")).toBeVisible({ timeout: 20_000 });
+
+  const stored = await page.evaluate(() => window.localStorage.getItem("hf.generatedAssets"));
+  expect(stored).toBeTruthy();
+  expect(JSON.parse(stored!)).toHaveLength(1);
+
+  // It shows in the library without a reload of the store
+  await page.goto("/assets");
+  const first = page.getByRole("listitem").first();
+  await expect(first).toContainText(/Generation/);
+  await expect(first).toContainText("Seedance 2.5");
+
+  // And under the Videos tab
+  await page.getByRole("tab", { name: "Videos" }).click();
+  await expect(page.getByRole("listitem").first()).toContainText(/Generation/);
+});
+
+test("canvas nodes are typed and their parameters are editable", async ({ page }) => {
+  await page.goto("/canvas");
+
+  // Add a typed node from the picker
+  await page.getByRole("button", { name: "Add node" }).click();
+  await page.getByRole("menuitem", { name: /Video Output/ }).click();
+  await expect(page.locator("[data-toast]").last()).toContainText("Video Output node added");
+
+  // Its parameters render as real inputs and persist edits
+  const durations = page.getByLabel("Duration");
+  await durations.last().selectOption("10s");
+  await expect(durations.last()).toHaveValue("10s");
+
+  // Text prompt nodes take free text
+  const promptBox = page.getByRole("textbox", { name: "Prompt" }).first();
+  await promptBox.fill("Rooftop chase at dusk");
+  await expect(promptBox).toHaveValue("Rooftop chase at dusk");
+
+  // Per-node delete works from the card header
+  const counter = page.getByText(/\d+ nodes · \d+ connections/);
+  const nodesNow = Number(((await counter.textContent()) ?? "").match(/\d+/)![0]);
+  await page.getByRole("button", { name: /^Delete Video Output node/ }).last().click();
+  await expect.poll(async () =>
+    Number(((await counter.textContent()) ?? "").match(/\d+/)![0]),
+  ).toBe(nodesNow - 1);
 });

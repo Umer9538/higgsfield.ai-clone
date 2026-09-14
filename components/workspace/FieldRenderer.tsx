@@ -27,6 +27,7 @@ export function FieldRenderer({ field }: { field: Field }) {
           chips={field.chips}
           maxLength={field.maxLength}
           optional={field.optional}
+          model={field.model}
         />
       );
     case "select":

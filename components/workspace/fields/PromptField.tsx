@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Sparkles } from "lucide-react";
 import { Icon } from "../Icon";
+import { useToast } from "@/components/ui/Toast";
+import { ENHANCERS } from "@/lib/workspace/enhance";
 import { useField } from "../state";
 import type { IconName } from "@/lib/workspace/types";
 
@@ -12,6 +15,7 @@ export function PromptField({
   chips,
   maxLength,
   optional,
+  model,
 }: {
   id: string;
   label?: string;
@@ -19,9 +23,24 @@ export function PromptField({
   chips?: { icon: IconName; label: string }[];
   maxLength?: number;
   optional?: boolean;
+  model?: string;
 }) {
   const [value, setValue] = useField<string>(id, "");
   const [audioOn, setAudioOn] = useState(true);
+  const { toast } = useToast();
+
+  const enhance = () => {
+    const additions = ENHANCERS.filter(
+      (phrase) => !value.toLowerCase().includes(phrase.toLowerCase()),
+    );
+    if (additions.length === 0) {
+      toast("Prompt already enhanced", "info");
+      return;
+    }
+    const base = value.trim().replace(/,\s*$/, "");
+    setValue(base ? `${base}, ${additions.join(", ")}` : additions.join(", "));
+    toast(`Prompt enhanced for ${model ?? "this model"}`);
+  };
 
   const onChip = (chipLabel: string) => {
     if (chipLabel === "On" || chipLabel === "Off") {
@@ -60,6 +79,14 @@ export function PromptField({
       {chips || maxLength ? (
         <div className="mt-1 flex items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={enhance}
+              className="flex items-center gap-1.5 rounded-lg bg-hf-lime/15 px-2 py-1 text-xs font-medium text-hf-lime transition-colors hover:bg-hf-lime/25"
+            >
+              <Sparkles className="size-3.5" aria-hidden strokeWidth={2} />
+              Magic Enhance
+            </button>
             {chips?.map((chip) => (
               <button
                 key={chip.label}

@@ -29,6 +29,7 @@ export const edit: Surface = {
     {
       kind: "prompt",
       id: "prompt",
+      model: "Seedance 2.5 Edit",
       label: "Prompt",
       placeholder: "Describe what to change in the video. Add reference images or elements using @...",
       chips: [
