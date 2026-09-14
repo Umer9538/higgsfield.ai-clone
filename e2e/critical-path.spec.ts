@@ -1036,6 +1036,9 @@ const AUDIT_ROUTES = [
 ];
 
 test("no route ships a placeholder anchor or a layout shift", async ({ page }) => {
+  // A 27-route crawl with a settle window per page; the default 30s budget is
+  // fine locally but not against a deployment over a real network.
+  test.setTimeout(240_000);
   const offenders: string[] = [];
 
   for (const route of AUDIT_ROUTES) {
