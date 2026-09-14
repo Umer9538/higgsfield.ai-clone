@@ -18,7 +18,7 @@ interface NavItem {
  * surfaces that have not been built yet and render as inert text.
  */
 const NAV: NavItem[] = [
-  { key: "explore", label: "Explore", href: "/" },
+  { key: "explore", label: "Explore", href: "/explore" },
   { key: "image", label: "Image", href: "/ai/image" },
   { key: "video", label: "Video", href: "/ai/video" },
   { key: "audio", label: "Audio", href: "/ai/audio" },

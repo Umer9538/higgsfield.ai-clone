@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { Field } from "@/lib/workspace/types";
 
 export type FieldValue = string | boolean;
@@ -34,7 +35,18 @@ export function WorkspaceProvider({
   fields: Field[];
   children: React.ReactNode;
 }) {
-  const [values, setValues] = useState<Record<string, FieldValue>>(() => initialValues(fields));
+  // Remix links arrive as /ai/video?prompt=... — seed the first prompt field with it.
+  const searchParams = useSearchParams();
+  const incomingPrompt = searchParams.get("prompt");
+
+  const [values, setValues] = useState<Record<string, FieldValue>>(() => {
+    const seed = initialValues(fields);
+    if (incomingPrompt) {
+      const target = fields.find((field) => field.kind === "prompt");
+      if (target) seed[target.id] = incomingPrompt;
+    }
+    return seed;
+  });
 
   const setValue = useCallback((id: string, value: FieldValue) => {
     setValues((prev) => ({ ...prev, [id]: value }));

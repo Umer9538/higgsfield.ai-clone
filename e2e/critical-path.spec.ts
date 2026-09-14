@@ -356,6 +356,7 @@ test("assets library filters, searches, sorts and deletes", async ({ page }) => 
 
 const ALL_ROUTES = [
   "/",
+  "/explore",
   "/pricing",
   "/enterprise",
   "/assets",
@@ -419,4 +420,56 @@ test("every nav item links to a working route", async ({ page }) => {
     const response = await page.goto(href as string);
     expect(response?.status(), `${href} should return 200`).toBe(200);
   }
+});
+
+test("explore feed filters, searches and sorts", async ({ page }) => {
+  await page.goto("/explore");
+
+  await expect(page.getByRole("heading", { name: "Visual Effects" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Explore more AI features" })).toBeVisible();
+
+  const count = page.getByText(/\d+ generations/);
+  const initial = Number((await count.textContent())?.match(/\d+/)?.[0]);
+  expect(initial).toBeGreaterThan(0);
+
+  // Category tabs narrow the rails
+  await page.getByRole("tab", { name: "Image" }).click();
+  await expect(page.getByRole("heading", { name: "Visual Effects" })).toBeHidden();
+  await expect(page.getByRole("heading", { name: "Higgsfield Soul 2.0" })).toBeVisible();
+
+  // Search narrows further
+  await page.getByRole("tab", { name: "All" }).click();
+  await page.getByPlaceholder("Search prompts, models, creators").fill("skater");
+  const searched = Number((await count.textContent())?.match(/\d+/)?.[0]);
+  expect(searched).toBeLessThan(initial);
+
+  // Sorting is wired
+  await page.getByPlaceholder("Search prompts, models, creators").fill("");
+  await page.getByLabel("Sort the feed").selectOption("most-liked");
+  await expect(page.getByLabel("Sort the feed")).toHaveValue("most-liked");
+});
+
+test("card hover exposes prompt, model badge and a Remix that prefills the prompt", async ({ page }) => {
+  await page.goto("/explore");
+
+  const card = page.locator("article").first();
+  await card.hover();
+
+  // Model badge and spec tag
+  await expect(card.getByText("Higgsfield Effects")).toBeVisible();
+  await expect(card.getByText(/\d+s · (1080p|720p|4K)/)).toBeVisible();
+
+  const remix = card.getByRole("link", { name: "Remix" });
+  await expect(remix).toBeVisible();
+
+  // Remix carries the prompt through to the video workspace
+  const href = await remix.getAttribute("href");
+  expect(href).toContain("/ai/video?prompt=");
+
+  const promptText = await card.locator("p").first().textContent();
+  await remix.click();
+  await expect(page).toHaveURL(/\/ai\/video\?prompt=/);
+
+  const textarea = page.locator("#prompt");
+  await expect(textarea).toHaveValue(promptText!.trim());
 });

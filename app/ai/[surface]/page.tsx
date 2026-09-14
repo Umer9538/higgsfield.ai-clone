@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -31,7 +32,9 @@ export default async function SurfacePage({
   return (
     <>
       <AppHeader activeNav={surface.id} />
-      <Workspace surface={surface} />
+      <Suspense fallback={null}>
+        <Workspace surface={surface} />
+      </Suspense>
     </>
   );
 }
