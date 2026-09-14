@@ -19,27 +19,41 @@ const MAX_CONCURRENT = 4;
  * whole set on every enter and exit keeps it self-healing — an earlier queue
  * of callbacks went stale on fast scrolls and left nothing playing.
  */
-const visible = new Map<string, (on: boolean) => void>();
-
-function sync() {
-  let index = 0;
-  for (const [, setStreaming] of visible) {
-    setStreaming(index < MAX_CONCURRENT);
-    index += 1;
-  }
+interface Entry {
+  el: HTMLElement;
+  setStreaming: (on: boolean) => void;
 }
 
-function enter(id: string, setStreaming: (on: boolean) => void) {
-  visible.set(id, setStreaming);
+const visible = new Map<string, Entry>();
+
+/**
+ * Grant the slots to the topmost cards on screen. Registration order is the
+ * order IntersectionObserver happens to fire, which left the first and most
+ * prominent card showing a still while cards further down played.
+ */
+function sync() {
+  const ranked = [...visible.values()]
+    .map((entry) => ({ entry, box: entry.el.getBoundingClientRect() }))
+    .sort((a, b) =>
+      // Reading order. Cards in the same row share a top, so without the
+      // left tie-break the sort is a no-op and registration order decides —
+      // which left the leftmost, most prominent card showing a still.
+      Math.abs(a.box.top - b.box.top) > 4 ? a.box.top - b.box.top : a.box.left - b.box.left,
+    );
+  ranked.forEach(({ entry }, index) => entry.setStreaming(index < MAX_CONCURRENT));
+}
+
+function enter(id: string, entry: Entry) {
+  visible.set(id, entry);
   sync();
 }
 
 function exit(id: string) {
   // Tell the leaving card to stop before dropping it: sync() only walks the
   // entries that remain, so a deleted card would otherwise keep its source.
-  const setStreaming = visible.get(id);
+  const entry = visible.get(id);
   visible.delete(id);
-  setStreaming?.(false);
+  entry?.setStreaming(false);
   sync();
 }
 
@@ -57,7 +71,8 @@ export function FeedMedia({ item }: { item: FeedItem }) {
     if (reduced) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => (entry.isIntersecting ? enter(id, setStreaming) : exit(id)),
+      ([entry]) =>
+        entry.isIntersecting ? enter(id, { el: node, setStreaming }) : exit(id),
       { rootMargin: "0px", threshold: 0.25 },
     );
 

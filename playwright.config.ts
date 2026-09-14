@@ -9,6 +9,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  // Against a deployment the pages stream video, and several parallel browsers
+  // saturate the local connection, aborting navigations. Local runs hit
+  // localhost and can parallelise freely.
+  workers: EXTERNAL ? 1 : undefined,
   reporter: process.env.CI ? "line" : [["list"]],
   use: {
     baseURL: EXTERNAL ?? `http://localhost:${PORT}`,
