@@ -156,3 +156,75 @@ test("grids collapse to one column on mobile and widen on tablet", async ({ page
   await page.goto("/assets");
   expect(await columnCount()).toBeGreaterThanOrEqual(2);
 });
+
+test("explore rails terminate with a fade and a straddling CTA, with no dead gaps", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/explore");
+
+  const rail = page.locator("section").filter({ hasText: "Visual Effects" }).first();
+  const grid = rail.locator("div.grid").first();
+  const fade = page.locator("[data-rail-fade]").first();
+  const cta = page.locator("[data-rail-cta]").first();
+
+  // The grid is clamped rather than running on
+  const gridBox = (await grid.boundingBox())!;
+  expect(gridBox.height).toBeLessThanOrEqual(32 * 16 + 2);
+
+  // Fade sits over the bottom of the grid and never eats clicks
+  await expect(fade).toBeAttached();
+  expect(await fade.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe("none");
+  const fadeBox = (await fade.boundingBox())!;
+  expect(fadeBox.y + fadeBox.height).toBeGreaterThan(gridBox.y + gridBox.height - 40);
+
+  // Pill is centred on the rail and straddles the bottom boundary
+  const railBox = (await rail.boundingBox())!;
+  const ctaBox = (await cta.boundingBox())!;
+  expect(Math.abs(ctaBox.x + ctaBox.width / 2 - (railBox.x + railBox.width / 2))).toBeLessThan(4);
+  expect(ctaBox.y).toBeLessThan(gridBox.y + gridBox.height);
+  expect(ctaBox.y + ctaBox.height).toBeGreaterThan(gridBox.y + gridBox.height);
+
+  // Dense: every card sits inside the grid's horizontal bounds, no orphan column
+  const cards = rail.locator("article");
+  const count = await cards.count();
+  expect(count).toBeGreaterThan(8);
+  for (let i = 0; i < count; i++) {
+    const box = await cards.nth(i).boundingBox();
+    if (!box) continue;
+    expect(box.x).toBeGreaterThanOrEqual(gridBox.x - 1);
+    expect(box.x + box.width).toBeLessThanOrEqual(gridBox.x + gridBox.width + 1);
+  }
+
+  // The top row fills every column: no lopsided empty gap beside the first card
+  const firstRowTops = [];
+  for (let i = 0; i < 5; i++) {
+    const box = await cards.nth(i).boundingBox();
+    if (box) firstRowTops.push(Math.round(box.y));
+  }
+  expect(new Set(firstRowTops).size).toBe(1);
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+});
+
+test("hovering a card reveals Remix inside the card, without clipping the page", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/explore");
+
+  const card = page.locator("article").first();
+  await card.hover();
+
+  const remix = card.getByRole("link", { name: "Remix" });
+  await expect(remix).toBeVisible();
+
+  const cardBox = (await card.boundingBox())!;
+  const remixBox = (await remix.boundingBox())!;
+
+  // Contained by the card on every edge
+  expect(remixBox.x).toBeGreaterThanOrEqual(cardBox.x - 1);
+  expect(remixBox.x + remixBox.width).toBeLessThanOrEqual(cardBox.x + cardBox.width + 1);
+  expect(remixBox.y + remixBox.height).toBeLessThanOrEqual(cardBox.y + cardBox.height + 1);
+
+  // And hovering introduced no scrollbars
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+});

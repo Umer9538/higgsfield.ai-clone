@@ -3,13 +3,16 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Play, Search, Wand2 } from "lucide-react";
+import { ArrowUpRight, Heart, Play, Search, Wand2 } from "lucide-react";
 import { CATEGORIES, FEATURE_TAGS, RAILS, SORTS, TRENDING_PROMPTS, type FeedItem } from "@/lib/explore/content";
 
 function FeedCard({ item }: { item: FeedItem }) {
   return (
-    <article className="group relative mb-3 break-inside-avoid overflow-hidden rounded-xl border border-hf-border">
-      <div className={`relative w-full ${item.aspect}`}>
+    <article
+      style={{ gridRowEnd: `span ${item.span}` }}
+      className="group relative block overflow-hidden rounded-xl border border-hf-border"
+    >
+      <div className="relative size-full">
         <Image
           src={item.src}
           alt=""
@@ -189,7 +192,7 @@ export function ExploreFeed() {
         </p>
       ) : (
         rails.map((rail) => (
-          <section key={rail.id} className="mt-10">
+          <section key={rail.id} className="mt-14">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="font-display text-xl font-bold tracking-tight text-hf-lime uppercase sm:text-2xl">
@@ -197,21 +200,57 @@ export function ExploreFeed() {
                 </h2>
                 <p className="mt-1.5 text-sm text-hf-muted">{rail.sub}</p>
               </div>
-              {rail.cta ? (
+              <div className="flex shrink-0 items-center gap-2">
                 <Link
                   href="/ai/effects"
-                  className="shrink-0 rounded-lg bg-hf-lime px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+                  className="flex min-h-11 items-center rounded-lg bg-hf-lime px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep md:min-h-0 md:py-2"
                 >
-                  {rail.cta}
+                  {rail.cta ?? "Try free"}
                 </Link>
-              ) : null}
+                <Link
+                  href="/academy"
+                  className="flex min-h-11 items-center rounded-lg bg-white px-4 text-sm font-medium text-black transition-opacity hover:opacity-90 md:min-h-0 md:py-2"
+                >
+                  Learn more
+                </Link>
+              </div>
             </div>
 
-            {/* CSS columns give real masonry with the varied card heights */}
-            <div className="mt-4 columns-1 gap-3 sm:columns-2 md:columns-3 lg:columns-4">
-              {rail.items.map((item) => (
-                <FeedCard key={item.id} item={item} />
-              ))}
+            {/* Masonry clamped to a whole number of rows so the grid terminates
+                deliberately instead of slicing a card mid-frame. */}
+            <div className={`relative mt-4 ${rail.items.length > 6 ? "pb-7" : ""}`}>
+              <div
+                className={`grid auto-rows-[12px] grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 ${
+                  rail.items.length > 6 ? "max-h-[32rem] overflow-hidden" : ""
+                }`}
+              >
+                {rail.items.map((item) => (
+                  <FeedCard key={item.id} item={item} />
+                ))}
+              </div>
+
+              {rail.items.length > 6 ? (
+                <>
+                  {/* Taper into the page background. Non-interactive so the
+                      Remix buttons underneath stay clickable. */}
+                  <div
+                    data-rail-fade
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-0 bottom-7 h-40 bg-gradient-to-t from-hf-black via-hf-black/80 to-transparent"
+                  />
+
+                  <div className="absolute inset-x-0 bottom-0 flex justify-center">
+                    <a
+                      href="#"
+                      data-rail-cta
+                      className="flex min-h-11 items-center gap-1.5 rounded-full bg-hf-lime px-5 text-sm font-semibold text-black shadow-lg transition-colors hover:bg-hf-lime-deep"
+                    >
+                      View all {rail.title}
+                      <ArrowUpRight className="size-4" aria-hidden strokeWidth={2.5} />
+                    </a>
+                  </div>
+                </>
+              ) : null}
             </div>
           </section>
         ))

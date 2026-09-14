@@ -13,8 +13,12 @@ export interface FeedItem {
   /** "5s · 1080p" for video, "2K · 16:9" for stills */
   spec: string;
   kind: "video" | "image";
-  /** Tailwind aspect class — the varied heights are what make it masonry */
-  aspect: string;
+  /**
+   * Grid row span. Heights come from the span, not an aspect class: CSS
+   * columns overflow sideways when the container height is clamped, which
+   * leaves one card per column and a dead gap underneath.
+   */
+  span: number;
   src: string;
 }
 
@@ -41,7 +45,8 @@ const PROMPTS = [
 
 const SPECS_VIDEO = ["5s · 1080p", "8s · 720p", "10s · 4K", "5s · 4K"];
 const SPECS_IMAGE = ["2K · 16:9", "4K · 3:4", "2K · 9:16", "4K · 1:1"];
-const ASPECTS = ["aspect-video", "aspect-[4/5]", "aspect-square", "aspect-[3/4]", "aspect-video", "aspect-[9/16]"];
+/** Row spans at 12px rows + 12px gaps: roughly 204 / 252 / 300 / 348px tall. */
+const SPANS = [9, 11, 13, 15, 11, 13];
 
 function build(prefix: string, model: string, kind: FeedItem["kind"], count: number, offset = 0): FeedItem[] {
   return Array.from({ length: count }, (_, i) => {
@@ -54,7 +59,7 @@ function build(prefix: string, model: string, kind: FeedItem["kind"], count: num
       likes: 60 + ((n * 137) % 900),
       spec: kind === "video" ? SPECS_VIDEO[n % SPECS_VIDEO.length] : SPECS_IMAGE[n % SPECS_IMAGE.length],
       kind,
-      aspect: ASPECTS[n % ASPECTS.length],
+      span: SPANS[n % SPANS.length],
       src: `/media/effects/${(n % 15) + 1}.jpg`,
     };
   });
@@ -76,35 +81,35 @@ export const RAILS: Rail[] = [
     sub: "Big-budget visual effects, from explosions to surreal transformations.",
     cta: "Try for free",
     category: "Effects",
-    items: build("fx", "Higgsfield Effects", "video", 8),
+    items: build("fx", "Higgsfield Effects", "video", 15),
   },
   {
     id: "seedance-25",
     title: "Seedance 2.5",
     sub: "The most advanced AI video model.",
     category: "Video",
-    items: build("sd25", "Seedance 2.5", "video", 8, 3),
+    items: build("sd25", "Seedance 2.5", "video", 15, 3),
   },
   {
     id: "seedance-20",
     title: "Seedance 2.0",
     sub: "Browse premium AI video generations from the Higgsfield community.",
     category: "Video",
-    items: build("sd20", "Google Veo 3.1", "video", 8, 6),
+    items: build("sd20", "Google Veo 3.1", "video", 15, 6),
   },
   {
     id: "gpt-image-2",
     title: "GPT Image 2",
     sub: "4K images with near-perfect text rendering.",
     category: "Image",
-    items: build("gpt", "Nano Banana Pro", "image", 8, 9),
+    items: build("gpt", "Nano Banana Pro", "image", 15, 9),
   },
   {
     id: "soul",
     title: "Higgsfield Soul 2.0",
     sub: "A culture-native photo model built for fashion, aesthetics, and creative expression.",
     category: "Image",
-    items: build("soul", "Higgsfield Soul 2.0", "image", 8, 12),
+    items: build("soul", "Higgsfield Soul 2.0", "image", 15, 12),
   },
 ];
 
