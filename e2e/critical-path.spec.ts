@@ -303,6 +303,7 @@ test("auth page supports email sign-in and the forgot-password code flow", async
 
   // The "code sent" toast is still on screen, so assert against the newest one
   await expect(page.locator("[data-toast]").last()).toContainText(/Successfully signed in/);
+  await expect(page).toHaveURL(/\/explore$/);
 });
 
 test("signup route toggles to sign-in mode", async ({ page }) => {
@@ -339,8 +340,8 @@ test("welcome quiz walks three steps and lands in a personalised workspace", asy
 
   await finish.click();
 
-  // Personalised redirect: Nano Banana Pro is an image model
-  await expect(page).toHaveURL(/\/ai\/image$/);
+  // Completing the quiz always lands on the feed
+  await expect(page).toHaveURL(/\/explore$/);
 
   const saved = await page.evaluate(() => window.localStorage.getItem("hf.onboarding"));
   expect(saved).toBeTruthy();
@@ -348,6 +349,37 @@ test("welcome quiz walks three steps and lands in a personalised workspace", asy
   expect(parsed.role).toBe("filmmaker");
   expect(parsed.models).toContain("nano-banana-pro");
   expect(parsed.claimedDiscount).toBe(true);
+  expect(parsed.hasCompletedOnboarding).toBe(true);
+
+  // And records the one-shot flag
+  const flag = await page.evaluate(() => window.localStorage.getItem("hf.onboardingCompleted"));
+  expect(flag).toBe("true");
+});
+
+test("onboarding prompts once: first sign-up detours, later sign-ups do not", async ({ page }) => {
+  // First sign-up on a clean device goes to the quiz
+  await page.goto("/");
+  await page.getByRole("banner").getByRole("button", { name: "Sign up" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Continue with Google" }).click();
+  await expect(page).toHaveURL(/\/welcome-quiz$/);
+
+  // Complete it
+  await page.getByRole("radio", { name: /UGC Creator/ }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("radio", { name: /Beginner/ }).click();
+  await page.getByRole("checkbox", { name: /Seedance 2.5/ }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("radio", { name: /Win client work/ }).click();
+  await page.getByRole("button", { name: "Finish and start creating" }).click();
+  await expect(page).toHaveURL(/\/explore$/);
+
+  // Sign out, then sign up again on the same device: no second detour
+  await page.getByRole("banner").getByRole("button", { name: "Account" }).click();
+  await page.getByRole("menuitem", { name: "Sign out" }).click();
+
+  await page.getByRole("banner").getByRole("button", { name: "Sign up" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Continue with Apple" }).click();
+  await expect(page).toHaveURL(/\/explore$/);
 });
 
 test("lime renders as #d1fe17 on the active link, New badge and Generate", async ({ page }) => {
@@ -681,7 +713,7 @@ test("community follow toggles and plugin install toggles", async ({ page }) => 
   await expect(page.getByRole("button", { name: /^Uninstall Premiere Pro/ })).toBeVisible();
 });
 
-test("signing up routes straight into the onboarding quiz", async ({ page }) => {
+test("a first-run sign-up routes straight into the onboarding quiz", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("banner").getByRole("button", { name: "Sign up" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Continue with Apple" }).click();

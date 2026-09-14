@@ -38,19 +38,36 @@ export const GOALS: Choice[] = [
   { id: "learn", label: "Learn the craft", description: "Build skills through Academy workflows" },
 ];
 
-/** Maps a chosen model onto the surface the workspace should open on. */
-export const MODEL_TO_SURFACE: Record<string, string> = {
-  "seedance-25": "video",
-  "veo-31": "video",
-  "kling-30": "video",
-  "nano-banana-pro": "image",
-  "soul-20": "image",
-  "gpt-image-2": "image",
-};
-
 export const STORAGE_KEY = "hf.onboarding";
+export const COMPLETED_KEY = "hf.onboardingCompleted";
+
+/** Where every completed auth or onboarding flow lands. */
+export const LANDING_ROUTE = "/explore";
+
+/**
+ * True once the quiz has been finished on this device. Used to make the
+ * onboarding prompt fire exactly once: first sign-up goes to the quiz,
+ * every later sign-in goes straight to the landing route.
+ */
+export function hasCompletedOnboarding(): boolean {
+  try {
+    return window.localStorage.getItem(COMPLETED_KEY) === "true";
+  } catch {
+    // Blocked storage: treat as not completed rather than trapping the user.
+    return false;
+  }
+}
+
+export function markOnboardingCompleted(): void {
+  try {
+    window.localStorage.setItem(COMPLETED_KEY, "true");
+  } catch {
+    // Non-fatal; the quiz simply may prompt again on the next sign-up.
+  }
+}
 
 export interface QuizAnswers {
+  hasCompletedOnboarding: true;
   role: string | null;
   level: string | null;
   models: string[];

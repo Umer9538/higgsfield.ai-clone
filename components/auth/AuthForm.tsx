@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { useAuth } from "@/lib/auth/context";
 import { useToast } from "@/components/ui/Toast";
+import { LANDING_ROUTE, hasCompletedOnboarding } from "@/lib/onboarding/content";
 
 export type AuthMode = "signin" | "signup";
 
@@ -36,7 +37,10 @@ export function AuthForm({
     const account = signIn(address);
     toast(`Successfully signed in as ${account.handle}`);
     onDone?.();
-    router.push(mode === "signup" ? "/welcome-quiz" : "/explore");
+    // First sign-up runs the quiz once. Sign-in, and any sign-up after the
+    // quiz has been completed on this device, goes straight to the feed.
+    const needsOnboarding = mode === "signup" && !hasCompletedOnboarding();
+    router.push(needsOnboarding ? "/welcome-quiz" : LANDING_ROUTE);
   };
 
   const submit = (event: React.FormEvent) => {

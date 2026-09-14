@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, Tag } from "lucide-react";
 import {
   GOALS,
+  LANDING_ROUTE,
   LEVELS,
   MODELS,
-  MODEL_TO_SURFACE,
   ROLES,
   STORAGE_KEY,
+  markOnboardingCompleted,
   type Choice,
   type QuizAnswers,
 } from "@/lib/onboarding/content";
@@ -74,6 +75,7 @@ export function Quiz() {
 
   const finish = () => {
     const answers: QuizAnswers = {
+      hasCompletedOnboarding: true,
       role,
       level,
       models,
@@ -86,9 +88,9 @@ export function Quiz() {
     } catch {
       // Blocked storage just means preferences do not persist.
     }
-    const surface = MODEL_TO_SURFACE[models[0]] ?? "video";
+    markOnboardingCompleted();
     toast("Profile saved — your workspace is personalised");
-    router.push(`/ai/${surface}`);
+    router.push(LANDING_ROUTE);
   };
 
   return (
