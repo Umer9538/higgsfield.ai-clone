@@ -31,7 +31,12 @@ const NAV: NavItem[] = [
   { key: "supercomputer", label: "Supercomputer", href: "/supercomputer" },
   { key: "3d-jutsu", label: "3D Jutsu", href: "/ai/3d-jutsu", badge: "New" },
   { key: "edit", label: "Edit", href: "/ai/edit" },
-  { key: "academy", label: "Academy" },
+  { key: "academy", label: "Academy", href: "/academy" },
+  { key: "community", label: "Community", href: "/community" },
+  { key: "contests", label: "Contests", href: "/contests" },
+  { key: "plugins", label: "Plugins", href: "/plugins" },
+  { key: "canvas", label: "Canvas", href: "/canvas" },
+  { key: "originals", label: "Originals", href: "/originals" },
 ];
 
 /** Both badge styles are lime; New is a solid chip, Free a tinted one. */

@@ -353,3 +353,70 @@ test("assets library filters, searches, sorts and deletes", async ({ page }) => 
   const afterDelete = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
   expect(afterDelete).toBe(initial - 1);
 });
+
+const ALL_ROUTES = [
+  "/",
+  "/pricing",
+  "/enterprise",
+  "/assets",
+  "/academy",
+  "/community",
+  "/contests",
+  "/plugins",
+  "/canvas",
+  "/originals",
+  "/mcp",
+  "/chatgpt-plugin",
+  "/supercomputer",
+  "/ai/video",
+  "/ai/image",
+  "/ai/audio",
+  "/ai/edit",
+  "/ai/motion-control",
+  "/ai/genjutsu",
+  "/ai/effects",
+  "/ai/cinema-studio",
+  "/ai/marketing-studio",
+  "/ai/3d-jutsu",
+];
+
+test("every route returns 200 and logs no console errors", async ({ page }) => {
+  const problems: string[] = [];
+
+  page.on("console", (message) => {
+    if (message.type() === "error") problems.push(`console: ${message.text()}`);
+  });
+  page.on("pageerror", (error) => problems.push(`pageerror: ${error.message}`));
+  page.on("requestfailed", (request) => {
+    // Ignore aborted media range requests, which are normal for <video>
+    const failure = request.failure()?.errorText ?? "";
+    if (!failure.includes("ERR_ABORTED")) {
+      problems.push(`requestfailed: ${request.url()} ${failure}`);
+    }
+  });
+
+  for (const route of ALL_ROUTES) {
+    const response = await page.goto(route);
+    expect(response?.status(), `${route} should return 200`).toBe(200);
+    await expect(page.getByRole("banner")).toBeVisible();
+  }
+
+  expect(problems, problems.join("\n")).toEqual([]);
+});
+
+test("every nav item links to a working route", async ({ page }) => {
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Main" });
+
+  const hrefs = await nav.getByRole("link").evaluateAll((links) =>
+    links.map((link) => (link as HTMLAnchorElement).getAttribute("href")).filter(Boolean),
+  );
+
+  // Every nav entry is a real link now, not inert text
+  expect(hrefs.length).toBeGreaterThanOrEqual(19);
+
+  for (const href of hrefs) {
+    const response = await page.goto(href as string);
+    expect(response?.status(), `${href} should return 200`).toBe(200);
+  }
+});
