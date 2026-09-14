@@ -604,7 +604,8 @@ test("card hover exposes prompt, model badge and a Remix that prefills the promp
 
   const promptText = await card.locator("p").first().textContent();
   await remix.click();
-  await expect(page).toHaveURL(/\/ai\/video\?prompt=/);
+  // Allow for real network latency: the feed streams video while navigating.
+  await expect(page).toHaveURL(/\/ai\/video\?prompt=/, { timeout: 20_000 });
 
   const textarea = page.locator("#prompt");
   await expect(textarea).toHaveValue(promptText!.trim());

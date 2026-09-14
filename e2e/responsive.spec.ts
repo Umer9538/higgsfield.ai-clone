@@ -20,6 +20,8 @@ async function horizontalOverflow(page: Page) {
 
 for (const [name, viewport] of [["mobile", MOBILE], ["tablet", TABLET]] as const) {
   test(`${name}: no horizontal overflow on any route`, async ({ page }) => {
+    // 24 route loads; the default 30s budget only holds against localhost.
+    test.setTimeout(240_000);
     await page.setViewportSize(viewport);
     const offenders: string[] = [];
 
