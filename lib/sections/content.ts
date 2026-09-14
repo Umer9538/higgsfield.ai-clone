@@ -84,11 +84,13 @@ export const COMMUNITY = {
     dates: "Jul 14 — Sep 14",
     cta: "Join the festival",
   },
+  /** tabs lists which view each rail belongs to; matching on the title was
+   *  fragile and the Projects tab fell through to showing everything. */
   rails: [
-    { id: "originals", title: "Originals by Higgsfield", link: "Explore all originals" },
-    { id: "festival", title: "Global Film Festival Live Projects", link: "Explore all live projects" },
-    { id: "projects", title: "Projects by Community", link: "Explore all projects" },
-    { id: "shots", title: "Shots", link: "Explore all shots" },
+    { id: "originals", title: "Originals by Higgsfield", link: "Explore all originals", tabs: ["Explore", "Originals"] },
+    { id: "festival", title: "Global Film Festival Live Projects", link: "Explore all live projects", tabs: ["Explore", "Projects"] },
+    { id: "projects", title: "Projects by Community", link: "Explore all projects", tabs: ["Explore", "Projects"] },
+    { id: "shots", title: "Shots", link: "Explore all shots", tabs: ["Explore", "Shots"] },
   ],
   creators: [
     { handle: "mrabujoe", role: "Director", projects: 24 },
@@ -148,12 +150,12 @@ export const PLUGINS = {
   headline: ["Higgsfield is now", "inside After Effects"],
   cta: "Download",
   hosts: [
-    { id: "photoshop", name: "Photoshop", vendor: "Adobe", installed: true },
-    { id: "after-effects", name: "After Effects", vendor: "Adobe", installed: true },
-    { id: "premiere", name: "Premiere Pro", vendor: "Adobe", installed: false },
-    { id: "resolve", name: "DaVinci Resolve", vendor: "Blackmagic", installed: false },
-    { id: "figma", name: "Figma", vendor: "Figma", installed: true },
-    { id: "blender", name: "Blender", vendor: "Blender Foundation", installed: false },
+    { id: "photoshop", name: "Photoshop", vendor: "Adobe", installed: true, version: "2.4.1", requires: "Photoshop 2024 or newer", blurb: "Generate and inpaint straight onto a layer, with masks preserved." },
+    { id: "after-effects", name: "After Effects", vendor: "Adobe", installed: true, version: "3.0.0", requires: "After Effects 24.0 or newer", blurb: "Drop generations onto the timeline and drive them with expressions." },
+    { id: "premiere", name: "Premiere Pro", vendor: "Adobe", installed: false, version: "1.9.2", requires: "Premiere Pro 24.2 or newer", blurb: "B-roll and transitions generated against the sequence you already have." },
+    { id: "resolve", name: "DaVinci Resolve", vendor: "Blackmagic", installed: false, version: "1.2.0", requires: "Resolve 19 Studio", blurb: "Render nodes that call Higgsfield models from inside the Fusion page." },
+    { id: "figma", name: "Figma", vendor: "Figma", installed: true, version: "2.0.6", requires: "Any Figma plan", blurb: "Fill frames with on-brand imagery without leaving the canvas." },
+    { id: "blender", name: "Blender", vendor: "Blender Foundation", installed: false, version: "0.9.4", requires: "Blender 4.2 or newer", blurb: "Texture and environment generation wired into the shader editor." },
   ],
   bridge: {
     title: "MCP: your agent, our models",
@@ -170,6 +172,31 @@ export const PLUGINS = {
 };
 
 /* ---------------------------------- Canvas ---------------------------------- */
+
+export interface ShowcaseItem {
+  id: string;
+  title: string;
+  category: "Marketing" | "Explainer videos" | "Apps" | "Games";
+  author: string;
+  image: string;
+}
+
+export const SUPERCOMPUTER_FILTERS = ["All", "Marketing", "Explainer videos", "Apps", "Games"] as const;
+
+export const SUPERCOMPUTER_SHOWCASE: ShowcaseItem[] = [
+  { id: "s1", title: "Hydration launch campaign", category: "Marketing", author: "adqua", image: "/media/steps/1.jpg" },
+  { id: "s2", title: "UGC unboxing set", category: "Marketing", author: "jighit", image: "/media/effects/2.jpg" },
+  { id: "s3", title: "Seasonal ad variants", category: "Marketing", author: "shestak", image: "/media/effects/5.jpg" },
+  { id: "s4", title: "How MCP works, in 90s", category: "Explainer videos", author: "ash", image: "/media/steps/2.jpg" },
+  { id: "s5", title: "Onboarding walkthrough", category: "Explainer videos", author: "mrabujoe", image: "/media/effects/7.jpg" },
+  { id: "s6", title: "Prompt craft primer", category: "Explainer videos", author: "higgsfield.studio", image: "/media/effects/9.jpg" },
+  { id: "s7", title: "Moodboard companion app", category: "Apps", author: "wer", image: "/media/steps/3.jpg" },
+  { id: "s8", title: "Shot list generator", category: "Apps", author: "rococo_pen", image: "/media/effects/11.jpg" },
+  { id: "s9", title: "Endless runner prototype", category: "Games", author: "ash", image: "/media/effects/13.jpg" },
+  { id: "s10", title: "Playable 3D lobby", category: "Games", author: "jighit", image: "/media/effects/14.jpg" },
+  { id: "s11", title: "Card battler mockup", category: "Games", author: "adqua", image: "/media/effects/15.jpg" },
+  { id: "s12", title: "Retail promo reel", category: "Marketing", author: "wer", image: "/media/effects/3.jpg" },
+];
 
 export const CANVAS = {
   headline: "One canvas. Every workflow.",

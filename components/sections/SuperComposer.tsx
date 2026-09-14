@@ -2,15 +2,20 @@
 
 import { useState } from "react";
 import { ArrowUp, Plus, Sparkles, Wrench } from "lucide-react";
+import Image from "next/image";
 import { useToast } from "@/components/ui/Toast";
-
-const FILTERS = ["All", "Marketing", "Explainer videos", "Apps", "Games"];
+import { SUPERCOMPUTER_FILTERS, SUPERCOMPUTER_SHOWCASE } from "@/lib/sections/content";
 
 export function SuperComposer() {
   const [prompt, setPrompt] = useState("");
-  const [filter, setFilter] = useState(FILTERS[0]);
+  const [filter, setFilter] = useState<string>(SUPERCOMPUTER_FILTERS[0]);
   const [sent, setSent] = useState<string[]>([]);
   const { toast } = useToast();
+
+  const shown =
+    filter === "All"
+      ? SUPERCOMPUTER_SHOWCASE
+      : SUPERCOMPUTER_SHOWCASE.filter((item) => item.category === filter);
 
   const send = () => {
     const text = prompt.trim();
@@ -101,7 +106,7 @@ export function SuperComposer() {
       </h2>
 
       <div role="tablist" aria-label="Showcase filter" className="mt-6 flex flex-wrap justify-center gap-2">
-        {FILTERS.map((item) => (
+        {SUPERCOMPUTER_FILTERS.map((item) => (
           <button
             key={item}
             type="button"
@@ -118,8 +123,41 @@ export function SuperComposer() {
       </div>
 
       <p aria-live="polite" className="mt-3 text-center text-xs text-hf-dim">
-        Showing {filter === "All" ? "all" : filter.toLowerCase()} projects
+        Showing {shown.length} {filter === "All" ? "all" : filter.toLowerCase()} projects
       </p>
+
+      {/* The grid used to live in the page, outside this component, so the
+          filter could only ever change the label. */}
+      <ul aria-label="Showcase" className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {shown.map((item) => (
+          <li key={item.id} className="overflow-hidden rounded-2xl border border-hf-border bg-hf-surface">
+            <div className="relative aspect-[4/3]">
+              <Image
+                src={item.image}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="p-4">
+              <p className="text-sm font-medium text-white">{item.title}</p>
+              <p className="mt-1 flex items-center gap-2 text-xs text-hf-dim">
+                <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-lime">
+                  {item.category}
+                </span>
+                by {item.author}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {shown.length === 0 ? (
+        <p className="mt-8 rounded-2xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
+          Nothing in this category yet.
+        </p>
+      ) : null}
     </>
   );
 }

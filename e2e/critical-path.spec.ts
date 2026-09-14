@@ -840,3 +840,107 @@ test("canvas nodes are typed and their parameters are editable", async ({ page }
     Number(((await counter.textContent()) ?? "").match(/\d+/)![0]),
   ).toBe(nodesNow - 1);
 });
+
+test("supercomputer tabs filter the showcase grid, not just the label", async ({ page }) => {
+  await page.goto("/supercomputer");
+
+  const label = page.getByText(/Showing \d+ .* projects/);
+  // Scoped: the footer also renders list items.
+  const cards = page.getByRole("list", { name: "Showcase" }).getByRole("listitem");
+
+  const all = await cards.count();
+  expect(all).toBeGreaterThan(6);
+  await expect(label).toContainText(`Showing ${all} all projects`);
+
+  for (const [tab, expected] of [
+    ["Games", "games"],
+    ["Apps", "apps"],
+    ["Marketing", "marketing"],
+    ["Explainer videos", "explainer videos"],
+  ] as const) {
+    await page.getByRole("tab", { name: tab }).click();
+
+    const count = await cards.count();
+    expect(count, `${tab} should narrow the grid`).toBeLessThan(all);
+    expect(count).toBeGreaterThan(0);
+
+    // Label tracks the active category and the real count
+    await expect(label).toContainText(`Showing ${count} ${expected} projects`);
+
+    // Every rendered card belongs to the chosen category
+    const badges = await cards.locator("span.text-hf-lime").allTextContents();
+    expect(new Set(badges.map((b) => b.trim()))).toEqual(new Set([tab]));
+  }
+
+  await page.getByRole("tab", { name: "All" }).click();
+  expect(await cards.count()).toBe(all);
+});
+
+test("community tabs select real collections", async ({ page }) => {
+  await page.goto("/community");
+  const label = page.getByText(/collections? in /);
+
+  await expect(label).toContainText("4 collections in Explore");
+
+  await page.getByRole("tab", { name: "Shots" }).click();
+  await expect(label).toContainText("1 collection in Shots");
+  await expect(page.getByRole("heading", { name: "Shots" })).toBeVisible();
+
+  // Projects used to fall through and show everything
+  await page.getByRole("tab", { name: "Projects" }).click();
+  await expect(label).toContainText("2 collections in Projects");
+  await expect(page.getByRole("heading", { name: "Originals by Higgsfield" })).toHaveCount(0);
+
+  await page.getByRole("tab", { name: "Originals" }).click();
+  await expect(label).toContainText("1 collection in Originals");
+});
+
+test("marketing studio templates filter by category and media type", async ({ page }) => {
+  await page.goto("/ai/marketing-studio");
+
+  const label = page.getByText(/Showing \d+ .* templates/);
+  const cards = page.getByRole("list", { name: "Templates" }).getByRole("listitem");
+  const all = await cards.count();
+  expect(all).toBeGreaterThan(8);
+
+  await page.getByRole("tab", { name: "UGC" }).click();
+  const ugc = await cards.count();
+  expect(ugc).toBeLessThan(all);
+  await expect(label).toContainText(`Showing ${ugc} ugc templates`);
+
+  // Media type narrows further and is reflected in the label
+  await page.getByRole("tab", { name: "Images" }).click();
+  await expect(label).toContainText("images only");
+
+  await page.getByRole("tab", { name: "All", exact: true }).first().click();
+  await page.getByRole("tab", { name: "Videos" }).click();
+  const videos = await cards.count();
+  expect(videos).toBeGreaterThan(0);
+  expect(videos).toBeLessThan(all);
+});
+
+test("plugin cards open details and the MCP connector switches", async ({ page }) => {
+  await page.goto("/plugins");
+
+  // Detail modal carries real metadata and secondary actions
+  await page.getByRole("button", { name: "Details for Blender" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("Blender 4.2 or newer");
+  await expect(dialog).toContainText("Not installed");
+
+  await dialog.getByRole("button", { name: "Check for updates" }).click();
+  await expect(page.locator("[data-toast]").last()).toContainText("up to date");
+
+  // Installing from the modal flips the card state behind it
+  await dialog.getByRole("button", { name: "Install" }).click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(page.getByRole("button", { name: /^Uninstall Blender/ })).toBeVisible();
+
+  // MCP connector switch
+  const connector = page.getByRole("switch", { name: /connector/ });
+  await expect(connector).toHaveAttribute("aria-checked", "false");
+  await connector.click();
+  await expect(connector).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByText("Connected", { exact: true })).toBeVisible();
+});

@@ -37,4 +37,22 @@ export const marketingStudio: Surface = {
       { label: "Ratio", value: "3:4" },
     ],
   },
+  templates: {
+    title: "Explore templates",
+    categories: ["All", "Product shot", "Motion", "UGC", "Ads", "Posters", "Marketplace"],
+    items: [
+      { id: "t1", title: "Serum on wet stone", category: "Product shot", kind: "Images", image: "/media/effects/1.jpg" },
+      { id: "t2", title: "Bottle rotation loop", category: "Motion", kind: "Videos", image: "/media/effects/2.jpg" },
+      { id: "t3", title: "Kitchen unboxing", category: "UGC", kind: "Videos", image: "/media/effects/3.jpg" },
+      { id: "t4", title: "Seasonal sale banner", category: "Ads", kind: "Images", image: "/media/effects/4.jpg" },
+      { id: "t5", title: "Typographic poster", category: "Posters", kind: "Images", image: "/media/effects/5.jpg" },
+      { id: "t6", title: "Marketplace hero tile", category: "Marketplace", kind: "Images", image: "/media/effects/6.jpg" },
+      { id: "t7", title: "Macro texture pour", category: "Product shot", kind: "Videos", image: "/media/effects/7.jpg" },
+      { id: "t8", title: "Creator testimonial", category: "UGC", kind: "Videos", image: "/media/effects/8.jpg" },
+      { id: "t9", title: "Split-screen comparison", category: "Ads", kind: "Videos", image: "/media/effects/9.jpg" },
+      { id: "t10", title: "Minimal studio still", category: "Product shot", kind: "Images", image: "/media/effects/10.jpg" },
+      { id: "t11", title: "Kinetic type burst", category: "Motion", kind: "Videos", image: "/media/effects/11.jpg" },
+      { id: "t12", title: "Listing carousel set", category: "Marketplace", kind: "Images", image: "/media/effects/12.jpg" },
+    ],
+  },
 };

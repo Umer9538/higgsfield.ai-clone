@@ -7,7 +7,7 @@ import { COMMUNITY } from "@/lib/sections/content";
 export function CommunityFeed() {
   const [tab, setTab] = useState(COMMUNITY.tabs[0]);
   const [following, setFollowing] = useState<string[]>([]);
-  const rails = tab === "Explore" ? COMMUNITY.rails : COMMUNITY.rails.filter((r) => r.title.toLowerCase().includes(tab.toLowerCase()) || tab === "Projects");
+  const rails = COMMUNITY.rails.filter((rail) => rail.tabs.includes(tab));
 
   return (
     <>
@@ -54,6 +54,10 @@ export function CommunityFeed() {
           </a>
         </div>
       </section>
+
+      <p aria-live="polite" className="mt-6 text-xs text-hf-dim">
+        {rails.length} {rails.length === 1 ? "collection" : "collections"} in {tab}
+      </p>
 
       {rails.map((rail, railIndex) => (
         <section key={rail.id} className="mt-12">

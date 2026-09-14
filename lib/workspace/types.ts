@@ -144,4 +144,10 @@ export interface Surface {
   content: Content;
   /** Mock output revealed after a generation run. Omitted where Generate is disabled. */
   result?: GenerationResult;
+  /** Filterable template gallery shown under the content pane. */
+  templates?: {
+    title: string;
+    categories: string[];
+    items: { id: string; title: string; category: string; kind: "Images" | "Videos"; image: string }[];
+  };
 }

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { SuperComposer } from "@/components/sections/SuperComposer";
 import { SiteFooter } from "@/components/marketing/SiteFooter";
@@ -21,21 +20,6 @@ export default function SupercomputerPage() {
 
         <SuperComposer />
 
-        <ul className="mt-8 grid gap-4 sm:grid-cols-3">
-          {[1, 2, 3].map((n) => (
-            <li key={n} className="overflow-hidden rounded-2xl border border-hf-border">
-              <div className="relative aspect-[4/3]">
-                <Image
-                  src={`/media/steps/${n}.jpg`}
-                  alt=""
-                  fill
-                  sizes="(max-width: 640px) 100vw, 33vw"
-                  className="object-cover"
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
       </main>
 
       <SiteFooter />
