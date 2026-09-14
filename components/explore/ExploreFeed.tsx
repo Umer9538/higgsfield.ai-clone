@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Heart, Play, Search, Wand2 } from "lucide-react";
 import { CATEGORIES, FEATURE_TAGS, RAILS, SORTS, TRENDING_PROMPTS, type FeedItem } from "@/lib/explore/content";
+import { FeedMedia } from "./FeedMedia";
 
 function FeedCard({ item }: { item: FeedItem }) {
   return (
@@ -13,13 +13,7 @@ function FeedCard({ item }: { item: FeedItem }) {
       className="group relative block overflow-hidden rounded-xl border border-hf-border"
     >
       <div className="relative size-full">
-        <Image
-          src={item.src}
-          alt=""
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover"
-        />
+        <FeedMedia item={item} />
       </div>
 
       {/* Author + likes, revealed on hover like the real cards */}

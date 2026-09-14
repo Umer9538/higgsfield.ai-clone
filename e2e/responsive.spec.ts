@@ -228,3 +228,50 @@ test("hovering a card reveals Remix inside the card, without clipping the page",
   // And hovering introduced no scrollbars
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
+
+test("explore video cards autoplay, are lazy, and keep overlays on top", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/explore");
+
+  const videos = page.locator("video[data-feed-video]");
+  await expect(videos.first()).toBeAttached();
+
+  // Every video carries a poster, so nothing shifts before playback starts
+  const total = await videos.count();
+  expect(total).toBeGreaterThan(10);
+  const postersMissing = await videos.evaluateAll(
+    (els) => els.filter((el) => !el.getAttribute("poster")).length,
+  );
+  expect(postersMissing).toBe(0);
+
+  // Correct playback attributes
+  const attrs = await videos.first().evaluate((el: HTMLVideoElement) => ({
+    muted: el.muted,
+    loop: el.loop,
+    playsInline: el.playsInline,
+    preload: el.preload,
+  }));
+  expect(attrs).toEqual({ muted: true, loop: true, playsInline: true, preload: "metadata" });
+
+  // Lazy: offscreen cards have no src attached yet
+  const attached = await videos.evaluateAll((els) => els.filter((el) => el.getAttribute("src")).length);
+  expect(attached).toBeGreaterThan(0);
+  expect(attached).toBeLessThan(total);
+
+  // The first card is buffered and actually playing
+  const first = videos.first();
+  await expect
+    .poll(async () => first.evaluate((el: HTMLVideoElement) => el.readyState), { timeout: 20_000 })
+    .toBeGreaterThanOrEqual(3);
+  await expect
+    .poll(async () => first.evaluate((el: HTMLVideoElement) => !el.paused && el.currentTime > 0), {
+      timeout: 20_000,
+    })
+    .toBe(true);
+
+  // Hovering shows the overlay above the video without pausing it
+  const card = page.locator("article").first();
+  await card.hover();
+  await expect(card.getByRole("link", { name: "Remix" })).toBeVisible();
+  expect(await first.evaluate((el: HTMLVideoElement) => el.paused)).toBe(false);
+});

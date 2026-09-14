@@ -20,6 +20,9 @@ export interface FeedItem {
    */
   span: number;
   src: string;
+  /** Present on video items; images keep src only. */
+  video?: string;
+  poster?: string;
 }
 
 const AUTHORS = ["rococo_pen", "wer", "jighit", "mrabujoe", "shestak", "ash", "adqua", "higgsfield.studio"];
@@ -60,7 +63,10 @@ function build(prefix: string, model: string, kind: FeedItem["kind"], count: num
       spec: kind === "video" ? SPECS_VIDEO[n % SPECS_VIDEO.length] : SPECS_IMAGE[n % SPECS_IMAGE.length],
       kind,
       span: SPANS[n % SPANS.length],
-      src: `/media/effects/${(n % 15) + 1}.jpg`,
+      // Video rails play a mirrored clip; image rails stay stills.
+      src: kind === "video" ? `/media/clips/${(n % 7) + 1}.jpg` : `/media/effects/${(n % 15) + 1}.jpg`,
+      video: kind === "video" ? `/media/clips/${(n % 7) + 1}.mp4` : undefined,
+      poster: kind === "video" ? `/media/clips/${(n % 7) + 1}.jpg` : undefined,
     };
   });
 }
