@@ -244,19 +244,33 @@ test("explore video cards autoplay, are lazy, and keep overlays on top", async (
   );
   expect(postersMissing).toBe(0);
 
-  // Correct playback attributes
+  // Correct playback attributes. preload is "none" rather than "metadata":
+  // sources are attached only when a card wins a streaming slot, which is a
+  // stronger form of lazy loading than metadata preloading.
   const attrs = await videos.first().evaluate((el: HTMLVideoElement) => ({
     muted: el.muted,
     loop: el.loop,
     playsInline: el.playsInline,
     preload: el.preload,
   }));
-  expect(attrs).toEqual({ muted: true, loop: true, playsInline: true, preload: "metadata" });
+  expect(attrs).toEqual({ muted: true, loop: true, playsInline: true, preload: "none" });
 
-  // Lazy: offscreen cards have no src attached yet
-  const attached = await videos.evaluateAll((els) => els.filter((el) => el.getAttribute("src")).length);
-  expect(attached).toBeGreaterThan(0);
-  expect(attached).toBeLessThan(total);
+  // Lazy and capped: only a handful stream at once, and none offscreen.
+  const streaming = await videos.evaluateAll((els) =>
+    els.filter((el) => el.getAttribute("src")).length,
+  );
+  expect(streaming).toBeGreaterThan(0);
+  expect(streaming).toBeLessThanOrEqual(4);
+  expect(streaming).toBeLessThan(total);
+
+  const offscreenStreaming = await videos.evaluateAll((els) =>
+    els.filter((el) => {
+      if (!el.getAttribute("src")) return false;
+      const box = el.getBoundingClientRect();
+      return box.bottom <= 0 || box.top >= window.innerHeight;
+    }).length,
+  );
+  expect(offscreenStreaming).toBe(0);
 
   // The first card is buffered and actually playing
   const first = videos.first();
@@ -274,4 +288,20 @@ test("explore video cards autoplay, are lazy, and keep overlays on top", async (
   await card.hover();
   await expect(card.getByRole("link", { name: "Remix" })).toBeVisible();
   expect(await first.evaluate((el: HTMLVideoElement) => el.paused)).toBe(false);
+});
+
+test("leaving the feed is not blocked by streaming video", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/explore");
+  await page.waitForTimeout(1500);
+
+  // Streaming video used to hold the browser's per-host connections open and
+  // starve navigation. Remixing must stay responsive.
+  const card = page.locator("article").first();
+  await card.hover();
+
+  const started = Date.now();
+  await card.getByRole("link", { name: "Remix" }).click();
+  await page.waitForURL(/\/ai\/video\?prompt=/, { timeout: 15_000 });
+  expect(Date.now() - started).toBeLessThan(10_000);
 });
