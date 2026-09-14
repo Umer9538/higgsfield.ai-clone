@@ -63,7 +63,8 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
   const { toast } = useToast();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-hf-border bg-hf-black/95 backdrop-blur">
+    <>
+      <header className="sticky top-0 z-50 border-b border-hf-border bg-hf-black/95 backdrop-blur">
       <div className="flex h-header items-center gap-4 px-4">
         <Link
           href="/"
@@ -75,7 +76,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
 
         <nav
           aria-label="Main"
-          className="hidden min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm whitespace-nowrap md:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="hidden min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm whitespace-nowrap [mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] md:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {NAV.map((item) => {
             const active = item.key === activeNav;
@@ -190,13 +191,6 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
         </div>
       </div>
 
-      <MobileNav
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        items={NAV}
-        activeNav={activeNav}
-      />
-
       {searchOpen ? (
         <div className="border-t border-hf-border px-4 py-3">
           <label className="mx-auto block max-w-xl">
@@ -210,6 +204,16 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
           </label>
         </div>
       ) : null}
-    </header>
+      </header>
+
+      {/* Rendered outside <header>: its backdrop-filter would otherwise become
+          the containing block for this fixed overlay. */}
+      <MobileNav
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        items={NAV}
+        activeNav={activeNav}
+      />
+    </>
   );
 }

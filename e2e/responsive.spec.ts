@@ -49,6 +49,17 @@ test("mobile: hamburger drawer replaces the horizontal nav", async ({ page }) =>
   const drawer = page.getByRole("dialog", { name: "Navigation" });
   await expect(drawer).toBeVisible();
 
+  // A visible element can still be mispositioned: assert the panel actually
+  // fills the viewport height and paints an opaque background behind the list.
+  const box = await drawer.boundingBox();
+  expect(box!.height).toBeGreaterThan(MOBILE.height * 0.9);
+  const opaque = await drawer.evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(opaque).not.toContain("rgba(0, 0, 0, 0)");
+
+  // Nav items must sit inside the painted panel, not overflow it
+  const firstItem = await drawer.getByRole("link").first().boundingBox();
+  expect(firstItem!.y + firstItem!.height).toBeLessThanOrEqual(box!.y + box!.height + 1);
+
   // Every nav destination is reachable, plus search and the action buttons
   for (const label of ["Explore", "Video", "Cinema Studio", "Canvas", "Originals"]) {
     await expect(drawer.getByRole("link", { name: new RegExp(`^${label}$`) })).toBeVisible();
