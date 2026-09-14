@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useToast } from "@/components/ui/Toast";
+import { downloadAsset } from "@/lib/ui/download";
 import {
   Download,
   Maximize2,
@@ -166,10 +168,37 @@ const ACTIONS = [
   { label: "Upscale", icon: Wand2 },
   { label: "Variations", icon: Sparkles },
   { label: "Share", icon: Share2 },
-];
+] as const;
 
 export function ResultCard({ result }: { result: GenerationResult }) {
   const { reset } = useGeneration();
+  const { toast } = useToast();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const runAction = async (label: (typeof ACTIONS)[number]["label"]) => {
+    if (label === "Download") {
+      setBusy(label);
+      const filename = result.src.split("/").pop() ?? "higgsfield-result";
+      const ok = await downloadAsset(result.src, filename);
+      setBusy(null);
+      toast(ok ? `Downloaded ${filename}` : `Opened ${filename} in a new tab`);
+      return;
+    }
+    if (label === "Share") {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast("Link copied to clipboard");
+      } catch {
+        toast("Copy blocked by the browser", "info");
+      }
+      return;
+    }
+    if (label === "Upscale") {
+      toast("Upscaling queued \u2014 4K ready in about 40s", "info");
+      return;
+    }
+    toast("Queued 4 variations", "info");
+  };
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -210,10 +239,12 @@ export function ResultCard({ result }: { result: GenerationResult }) {
           <button
             key={label}
             type="button"
-            className="flex items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface px-3 py-2 text-sm text-white transition-colors hover:bg-hf-surface-3"
+            onClick={() => void runAction(label)}
+            disabled={busy === label}
+            className="flex items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface px-3 py-2 text-sm text-white transition-colors hover:bg-hf-surface-3 disabled:opacity-60"
           >
             <ActionIcon className="size-4 text-hf-dim" aria-hidden strokeWidth={1.75} />
-            {label}
+            {busy === label ? "Working\u2026" : label}
           </button>
         ))}
       </div>

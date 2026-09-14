@@ -6,6 +6,7 @@ import { COMMUNITY } from "@/lib/sections/content";
 
 export function CommunityFeed() {
   const [tab, setTab] = useState(COMMUNITY.tabs[0]);
+  const [following, setFollowing] = useState<string[]>([]);
   const rails = tab === "Explore" ? COMMUNITY.rails : COMMUNITY.rails.filter((r) => r.title.toLowerCase().includes(tab.toLowerCase()) || tab === "Projects");
 
   return (
@@ -93,9 +94,21 @@ export function CommunityFeed() {
               </span>
               <button
                 type="button"
-                className="shrink-0 rounded-lg border border-hf-border px-3 py-1.5 text-xs text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+                aria-pressed={following.includes(creator.handle)}
+                onClick={() =>
+                  setFollowing((prev) =>
+                    prev.includes(creator.handle)
+                      ? prev.filter((h) => h !== creator.handle)
+                      : [...prev, creator.handle],
+                  )
+                }
+                className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs transition-colors ${
+                  following.includes(creator.handle)
+                    ? "border-hf-lime bg-hf-lime/15 text-hf-lime"
+                    : "border-hf-border text-white hover:border-hf-lime/50 hover:text-hf-lime"
+                }`}
               >
-                Follow
+                {following.includes(creator.handle) ? "Following" : "Follow"}
               </button>
             </li>
           ))}

@@ -347,7 +347,10 @@ test("assets library filters, searches, sorts and deletes", async ({ page }) => 
   await first.hover();
   await expect(first.getByRole("button", { name: /^Download/ })).toBeVisible();
   await expect(first.getByRole("button", { name: /^Copy prompt/ })).toBeVisible();
-  await expect(first.getByRole("button", { name: /Open .* in Studio/ })).toBeVisible();
+  // Open in Studio is a real link into the workspace, carrying the prompt
+  const openInStudio = first.getByRole("link", { name: /Open .* in Studio/ });
+  await expect(openInStudio).toBeVisible();
+  await expect(openInStudio).toHaveAttribute("href", /\/ai\/(video|image|audio)\?prompt=/);
   await first.getByRole("button", { name: /^Delete/ }).click();
 
   const afterDelete = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
@@ -472,4 +475,107 @@ test("card hover exposes prompt, model badge and a Remix that prefills the promp
 
   const textarea = page.locator("#prompt");
   await expect(textarea).toHaveValue(promptText!.trim());
+});
+
+test("result actions produce real feedback and a real download", async ({ page }) => {
+  await page.goto("/ai/video");
+  await page.getByRole("button", { name: /^Generate/ }).click();
+  await expect(page.getByText("Generation complete")).toBeVisible({ timeout: 20_000 });
+
+  // Share copies and toasts
+  await page.getByRole("button", { name: "Share" }).click();
+  await expect(page.locator("[data-toast]")).toContainText(/copied|blocked/i);
+
+  // Upscale queues with explicit feedback
+  await page.getByRole("button", { name: "Upscale" }).click();
+  await expect(page.locator("[data-toast]").last()).toContainText(/Upscaling queued/i);
+
+  // Download produces an actual file
+  const [download] = await Promise.all([
+    page.waitForEvent("download", { timeout: 15_000 }),
+    page.getByRole("button", { name: "Download" }).click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/\.(mp4|jpg)$/);
+});
+
+test("workspace controls mutate state rather than sitting inert", async ({ page }) => {
+  await page.goto("/ai/video");
+
+  // Output pills cycle
+  const pill = page.getByRole("button", { name: /^5s setting/ });
+  await expect(pill).toContainText("5s");
+  await pill.click();
+  await expect(pill).toContainText("8s");
+
+  // Select row opens a listbox and changes the value
+  const model = page.getByRole("button", { name: /Model/ }).first();
+  await model.click();
+  await page.getByRole("option", { name: "Kling 3.0" }).click();
+  await expect(model).toContainText("Kling 3.0");
+
+  // Preset card swaps
+  await page.getByRole("button", { name: "Change" }).click();
+  await page.getByRole("option", { name: "High flip" }).click();
+  await expect(page.getByText("High flip")).toBeVisible();
+});
+
+test("canvas add, connect and delete change real state", async ({ page }) => {
+  await page.goto("/canvas");
+
+  const counter = page.getByText(/\d+ nodes · \d+ connections/);
+  const read = async () => {
+    const text = (await counter.textContent()) ?? "";
+    const [nodes, edges] = text.match(/\d+/g)!.map(Number);
+    return { nodes, edges };
+  };
+
+  const before = await read();
+
+  await page.getByRole("button", { name: "Add node" }).click();
+  await expect.poll(async () => (await read()).nodes).toBe(before.nodes + 1);
+
+  await page.getByRole("button", { name: "Delete" }).click();
+  await expect.poll(async () => (await read()).nodes).toBe(before.nodes);
+});
+
+test("academy filters courses and opens a detail modal", async ({ page }) => {
+  await page.goto("/academy");
+
+  const count = page.getByText(/\d+ courses/);
+  const initial = Number((await count.textContent())?.match(/\d+/)?.[0]);
+
+  await page.getByRole("tab", { name: "Automate & Agents" }).click();
+  const filtered = Number((await count.textContent())?.match(/\d+/)?.[0]);
+  expect(filtered).toBeLessThan(initial);
+
+  await page.getByRole("tab", { name: "All" }).click();
+  await page.getByRole("button", { name: "View details" }).first().click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+});
+
+test("pricing plan selection opens a confirmation modal", async ({ page }) => {
+  await page.goto("/pricing");
+
+  await page.getByRole("list", { name: "Plans" }).getByRole("button", { name: "Get Pro" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("Pro plan selected");
+
+  await dialog.getByRole("button", { name: "Continue to checkout" }).click();
+  await expect(page.locator("[data-toast]")).toContainText("added to your cart");
+});
+
+test("community follow toggles and plugin install toggles", async ({ page }) => {
+  await page.goto("/community");
+  const follow = page.getByRole("button", { name: "Follow" }).first();
+  await follow.click();
+  await expect(page.getByRole("button", { name: "Following" }).first()).toBeVisible();
+
+  await page.goto("/plugins");
+  const install = page.getByRole("button", { name: /^Install Premiere Pro/ });
+  await install.click();
+  await expect(page.getByRole("button", { name: /^Uninstall Premiere Pro/ })).toBeVisible();
 });

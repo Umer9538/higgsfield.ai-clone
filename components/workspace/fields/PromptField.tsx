@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Icon } from "../Icon";
 import { useField } from "../state";
 import type { IconName } from "@/lib/workspace/types";
@@ -20,6 +21,16 @@ export function PromptField({
   optional?: boolean;
 }) {
   const [value, setValue] = useField<string>(id, "");
+  const [audioOn, setAudioOn] = useState(true);
+
+  const onChip = (chipLabel: string) => {
+    if (chipLabel === "On" || chipLabel === "Off") {
+      setAudioOn((prev) => !prev);
+      return;
+    }
+    // "@ Elements" inserts the mention token so the next keystroke continues it
+    setValue(`${value}${value.endsWith(" ") || value === "" ? "" : " "}@`);
+  };
 
   return (
     <div className="rounded-xl border border-hf-border bg-hf-surface-2 p-3 focus-within:border-hf-lime/40">
@@ -53,10 +64,16 @@ export function PromptField({
               <button
                 key={chip.label}
                 type="button"
-                className="flex items-center gap-1.5 rounded-lg bg-hf-surface-4 px-2 py-1 text-xs text-hf-muted transition-colors hover:text-white"
+                onClick={() => onChip(chip.label === "On" ? (audioOn ? "On" : "Off") : chip.label)}
+                aria-pressed={chip.label === "On" ? audioOn : undefined}
+                className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs transition-colors ${
+                  chip.label === "On" && audioOn
+                    ? "bg-hf-lime/15 text-hf-lime"
+                    : "bg-hf-surface-4 text-hf-muted hover:text-white"
+                }`}
               >
                 <Icon name={chip.icon} className="size-3.5" />
-                {chip.label}
+                {chip.label === "On" ? (audioOn ? "On" : "Off") : chip.label}
               </button>
             ))}
           </div>

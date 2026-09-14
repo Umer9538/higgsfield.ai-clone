@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { ActionButton } from "@/components/ui/ActionButton";
 import { PRODUCT_TILES, PROMO_PANEL } from "@/lib/marketing/content";
 
 const BADGE_TONES: Record<"top" | "new" | "free", string> = {
@@ -24,12 +25,9 @@ export function ProductRail() {
           </div>
 
           <div className="relative mt-6">
-            <button
-              type="button"
-              className="rounded-full bg-hf-lime px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
-            >
+            <ActionButton message="54% discount applied — continue to checkout" className="!rounded-full !py-2.5">
               {PROMO_PANEL.cta}
-            </button>
+            </ActionButton>
             <p className="mt-2.5">
               <span className="rounded-full bg-hf-pink px-2.5 py-1 text-[11px] font-medium text-white">
                 {PROMO_PANEL.note}

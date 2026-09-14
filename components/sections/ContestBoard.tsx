@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle, Trophy } from "lucide-react";
 import { RailHeading } from "./Shared";
 import { CONTESTS } from "@/lib/sections/content";
+import { useToast } from "@/components/ui/Toast";
 
 function useCountdown(deadline: string) {
   // Start at null so server and first client render agree, then fill in.
@@ -32,6 +33,8 @@ function Segment({ value, unit }: { value: string; unit: string }) {
 export function ContestBoard() {
   const [tab, setTab] = useState(CONTESTS.tabs[0]);
   const left = useCountdown(CONTESTS.active.deadline);
+  const [entered, setEntered] = useState(false);
+  const { toast } = useToast();
 
   const days = left === null ? "--" : String(Math.floor(left / 86400000)).padStart(2, "0");
   const hours = left === null ? "--" : String(Math.floor((left % 86400000) / 3600000)).padStart(2, "0");
@@ -66,6 +69,7 @@ export function ContestBoard() {
         <span className="text-xs text-hf-muted">{CONTESTS.notice.body}</span>
         <button
           type="button"
+          onClick={() => toast("Final cut upload opened")}
           className="ml-auto shrink-0 rounded-lg border border-hf-border px-3 py-1.5 text-xs text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
         >
           {CONTESTS.notice.cta}
@@ -135,9 +139,10 @@ export function ContestBoard() {
 
             <button
               type="button"
+              onClick={() => setEntered(true)}
               className="mt-6 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
             >
-              {CONTESTS.active.cta}
+              {entered ? "Festival project created" : CONTESTS.active.cta}
             </button>
           </section>
 

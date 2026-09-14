@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { Link2, Plus, Trash2 } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 import { CANVAS } from "@/lib/sections/content";
 
 interface Point {
@@ -14,11 +16,59 @@ interface Point {
  */
 export function NodeCanvas() {
   const boardRef = useRef<HTMLDivElement>(null);
+  const [nodes, setNodes] = useState(() => CANVAS.nodes.map((node) => ({ ...node })));
+  const [edges, setEdges] = useState<[string, string][]>(() =>
+    CANVAS.edges.map(([a, b]) => [a, b] as [string, string]),
+  );
   const [positions, setPositions] = useState<Record<string, Point>>(
     Object.fromEntries(CANVAS.nodes.map((node) => [node.id, { x: node.x, y: node.y }])),
   );
   const [dragging, setDragging] = useState<string | null>(null);
   const [selected, setSelected] = useState<string>(CANVAS.nodes[0].id);
+  const [linkFrom, setLinkFrom] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const addNode = () => {
+    const id = `node-${Date.now()}`;
+    setNodes((prev) => [
+      ...prev,
+      { id, label: "New node", kind: "Prompt", x: 30 + prev.length * 4, y: 70 },
+    ]);
+    setPositions((prev) => ({ ...prev, [id]: { x: 30 + nodes.length * 4, y: 70 } }));
+    setSelected(id);
+    toast("Node added");
+  };
+
+  const deleteNode = (id: string) => {
+    setNodes((prev) => prev.filter((node) => node.id !== id));
+    setEdges((prev) => prev.filter(([a, b]) => a !== id && b !== id));
+    setPositions((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    toast("Node deleted");
+  };
+
+  const startLink = (id: string) => {
+    if (linkFrom === null) {
+      setLinkFrom(id);
+      toast("Pick a second node to connect", "info");
+      return;
+    }
+    if (linkFrom === id) {
+      setLinkFrom(null);
+      return;
+    }
+    setEdges((prev) => {
+      const exists = prev.some(([a, b]) => (a === linkFrom && b === id) || (a === id && b === linkFrom));
+      return exists
+        ? prev.filter(([a, b]) => !((a === linkFrom && b === id) || (a === id && b === linkFrom)))
+        : [...prev, [linkFrom, id] as [string, string]];
+    });
+    toast("Connection updated");
+    setLinkFrom(null);
+  };
 
   const move = useCallback(
     (id: string, clientX: number, clientY: number) => {
@@ -44,6 +94,40 @@ export function NodeCanvas() {
 
   return (
     <div>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={addNode}
+          className="flex items-center gap-1.5 rounded-lg bg-hf-lime px-3 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+        >
+          <Plus className="size-4" aria-hidden strokeWidth={2.5} />
+          Add node
+        </button>
+        <button
+          type="button"
+          onClick={() => startLink(selected)}
+          aria-pressed={linkFrom !== null}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-colors ${
+            linkFrom ? "border-hf-lime bg-hf-lime/10 text-hf-lime" : "border-hf-border text-white hover:border-hf-lime/50"
+          }`}
+        >
+          <Link2 className="size-4" aria-hidden strokeWidth={1.75} />
+          {linkFrom ? "Pick target" : "Connect"}
+        </button>
+        <button
+          type="button"
+          onClick={() => deleteNode(selected)}
+          disabled={nodes.length <= 1}
+          className="flex items-center gap-1.5 rounded-lg border border-hf-border px-3 py-2 text-sm text-white transition-colors hover:border-hf-pink hover:text-hf-pink disabled:opacity-40"
+        >
+          <Trash2 className="size-4" aria-hidden strokeWidth={1.75} />
+          Delete
+        </button>
+        <span aria-live="polite" className="ml-auto text-xs text-hf-dim">
+          {nodes.length} nodes · {edges.length} connections
+        </span>
+      </div>
+
       <div
         ref={boardRef}
         onPointerMove={(event) => dragging && move(dragging, event.clientX, event.clientY)}
@@ -57,7 +141,7 @@ export function NodeCanvas() {
         }}
       >
         <svg className="pointer-events-none absolute inset-0 size-full" aria-hidden>
-          {CANVAS.edges.map(([from, to]) => {
+          {edges.map(([from, to]) => {
             const a = positions[from];
             const b = positions[to];
             if (!a || !b) return null;
@@ -80,8 +164,9 @@ export function NodeCanvas() {
           })}
         </svg>
 
-        {CANVAS.nodes.map((node) => {
+        {nodes.map((node) => {
           const pos = positions[node.id];
+          if (!pos) return null;
           const isSelected = selected === node.id;
           return (
             <button
@@ -89,6 +174,10 @@ export function NodeCanvas() {
               type="button"
               aria-label={`${node.label} node. Drag or use arrow keys to move.`}
               onPointerDown={(event) => {
+                if (linkFrom !== null) {
+                  startLink(node.id);
+                  return;
+                }
                 event.currentTarget.setPointerCapture(event.pointerId);
                 setDragging(node.id);
                 setSelected(node.id);

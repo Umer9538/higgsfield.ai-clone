@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Copy, Download } from "lucide-react";
 import { PLUGINS } from "@/lib/sections/content";
+import { useToast } from "@/components/ui/Toast";
 
 export function PluginDirectory() {
   const [host, setHost] = useState(PLUGINS.hosts[1].id);
@@ -11,6 +12,7 @@ export function PluginDirectory() {
   );
   const [client, setClient] = useState(PLUGINS.bridge.clients[0]);
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const active = PLUGINS.hosts.find((h) => h.id === host) ?? PLUGINS.hosts[0];
 
@@ -41,6 +43,10 @@ export function PluginDirectory() {
         </h1>
         <button
           type="button"
+          onClick={() => {
+            if (!installed.includes(active.id)) toggle(active.id);
+            toast(`${active.name} plugin installed`);
+          }}
           className="mt-6 flex items-center gap-2 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
         >
           <Download className="size-4" aria-hidden strokeWidth={2} />

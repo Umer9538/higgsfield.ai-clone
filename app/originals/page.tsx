@@ -3,6 +3,7 @@ import { Bell, Play, Trophy } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { SiteFooter } from "@/components/marketing/SiteFooter";
 import { MediaTile, RailHeading, tile } from "@/components/sections/Shared";
+import { ActionButton } from "@/components/ui/ActionButton";
 import { ORIGINALS } from "@/lib/sections/content";
 
 export const metadata: Metadata = {
@@ -23,13 +24,13 @@ export default function OriginalsPage() {
                 {ORIGINALS.hero.title}
               </h1>
               <p className="mt-3 max-w-xl text-sm text-hf-muted">{ORIGINALS.hero.sub}</p>
-              <button
-                type="button"
-                className="mt-5 flex w-fit items-center gap-2 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              <ActionButton
+                message="Opening the Originals player"
+                className="mt-5 flex w-fit items-center gap-2"
               >
                 <Play className="size-4" aria-hidden fill="currentColor" strokeWidth={0} />
                 {ORIGINALS.hero.cta}
-              </button>
+              </ActionButton>
             </div>
           </div>
         </section>
@@ -62,13 +63,15 @@ export default function OriginalsPage() {
               <li key={film} className="rounded-xl border border-hf-border bg-hf-surface p-3">
                 <MediaTile src={tile(index + 9)} />
                 <p className="mt-2 truncate text-xs font-medium text-white">{film}</p>
-                <button
-                  type="button"
-                  className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-hf-border px-2 py-1.5 text-[11px] text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+                <ActionButton
+                  variant="outline"
+                  message={`You'll be notified when ${film} is released`}
+                  toggleLabel="Notifying"
+                  className="mt-2 flex w-full items-center justify-center gap-1.5 !px-2 !py-1.5 !text-[11px]"
                 >
                   <Bell className="size-3" aria-hidden strokeWidth={1.75} />
                   {ORIGINALS.comingSoon.cta}
-                </button>
+                </ActionButton>
               </li>
             ))}
           </ul>
@@ -109,12 +112,9 @@ export default function OriginalsPage() {
             {ORIGINALS.promo.title}
           </h2>
           <p className="mt-2 text-sm text-hf-muted">{ORIGINALS.promo.sub}</p>
-          <button
-            type="button"
-            className="mt-5 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
-          >
+          <ActionButton message="Seedance 2.5 added to your workspace" className="mt-5">
             {ORIGINALS.promo.cta}
-          </button>
+          </ActionButton>
         </section>
       </main>
       <SiteFooter />

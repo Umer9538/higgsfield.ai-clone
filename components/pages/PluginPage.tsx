@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowUpRight, Code2, Tag } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 
 const CLIENTS = ["ChatGPT", "Claude", "Grok Bot", "Cursor", "Claude Code", "OpenClaw", "Hermes"];
 const TRANSPORTS = ["MCP", "CLI"];
@@ -29,6 +30,7 @@ const HOW_IT_WORKS = [
 export function PluginPage() {
   const [client, setClient] = useState(CLIENTS[0]);
   const [transport, setTransport] = useState(TRANSPORTS[0]);
+  const { toast } = useToast();
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-14">
@@ -113,6 +115,9 @@ export function PluginPage() {
               </div>
               <button
                 type="button"
+                onClick={() =>
+                  toast(index === 0 ? `Higgsfield plugin added to ${client}` : "Opening your workspace")
+                }
                 className="mt-8 flex w-fit items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
               >
                 {step.cta}

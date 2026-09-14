@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { PROMO_BAR } from "@/lib/marketing/content";
+import { useToast } from "@/components/ui/Toast";
 
 function pad(value: number) {
   return value.toString().padStart(2, "0");
@@ -12,6 +13,7 @@ export function PromoBar() {
   // Seeded from config so server and client render the same first frame.
   const [remaining, setRemaining] = useState(PROMO_BAR.durationSeconds);
   const [dismissed, setDismissed] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -47,6 +49,7 @@ export function PromoBar() {
 
         <button
           type="button"
+          onClick={() => toast("54% discount applied at checkout")}
           className="hidden shrink-0 rounded-full bg-black px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85 lg:block"
         >
           {PROMO_BAR.cta}

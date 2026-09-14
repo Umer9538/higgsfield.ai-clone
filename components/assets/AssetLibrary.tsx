@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { downloadAsset } from "@/lib/ui/download";
+import { useToast } from "@/components/ui/Toast";
 import {
   Check,
   Copy,
@@ -36,11 +39,13 @@ function AssetCard({
   asset,
   onDelete,
   onCopy,
+  onDownload,
   copied,
 }: {
   asset: Asset;
   onDelete: (id: string) => void;
   onCopy: (asset: Asset) => void;
+  onDownload: (asset: Asset) => void;
   copied: boolean;
 }) {
   return (
@@ -71,6 +76,7 @@ function AssetCard({
             type="button"
             aria-label={`Download ${asset.title}`}
             title="Download"
+            onClick={() => onDownload(asset)}
             className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-white/25"
           >
             <Download className="size-4" aria-hidden strokeWidth={1.75} />
@@ -88,14 +94,14 @@ function AssetCard({
               <Copy className="size-4" aria-hidden strokeWidth={1.75} />
             )}
           </button>
-          <button
-            type="button"
+          <Link
+            href={`/ai/${asset.kind === "audio" ? "audio" : asset.kind}?prompt=${encodeURIComponent(asset.prompt)}`}
             aria-label={`Open ${asset.title} in Studio`}
             title="Open in Studio"
             className="flex size-8 items-center justify-center rounded-lg bg-hf-lime text-black transition-colors hover:bg-hf-lime-deep"
           >
             <Wand2 className="size-4" aria-hidden strokeWidth={1.75} />
-          </button>
+          </Link>
           <button
             type="button"
             aria-label={`Delete ${asset.title}`}
@@ -124,6 +130,7 @@ export function AssetLibrary() {
   const [sort, setSort] = useState<Sort>("newest");
   const [deleted, setDeleted] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -143,12 +150,19 @@ export function AssetLibrary() {
       );
   }, [tab, query, sort, deleted]);
 
+  const download = async (asset: Asset) => {
+    const filename = asset.src.split("/").pop() ?? `${asset.id}.jpg`;
+    const ok = await downloadAsset(asset.src, filename);
+    toast(ok ? `Downloaded ${filename}` : `Opened ${filename}`);
+  };
+
   const copyPrompt = async (asset: Asset) => {
     try {
       await navigator.clipboard.writeText(asset.prompt);
     } catch {
       // Clipboard can be blocked; the confirmation below still reflects intent.
     }
+    toast("Prompt copied to clipboard");
     setCopiedId(asset.id);
     setTimeout(() => setCopiedId((current) => (current === asset.id ? null : current)), 1500);
   };
@@ -218,6 +232,11 @@ export function AssetLibrary() {
             <li key={folder.id}>
               <button
                 type="button"
+                onClick={() => {
+                  setTab("all");
+                  setQuery("");
+                  toast(`Opened ${folder.name}`);
+                }}
                 className="flex w-full items-center gap-3 rounded-xl border border-hf-border bg-hf-surface p-4 text-left transition-colors hover:border-hf-lime/40 hover:bg-hf-surface-3"
               >
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-hf-surface-4 text-hf-lime">
@@ -243,6 +262,7 @@ export function AssetLibrary() {
               asset={asset}
               onDelete={(id) => setDeleted((prev) => [...prev, id])}
               onCopy={copyPrompt}
+              onDownload={download}
               copied={copiedId === asset.id}
             />
           ))}

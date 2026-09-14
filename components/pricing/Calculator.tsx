@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Check, Info, Plus, X } from "lucide-react";
 import { CALCULATOR, PLANS } from "@/lib/pricing/content";
 import { BillingToggle, type Billing } from "./BillingToggle";
+import { useToast } from "@/components/ui/Toast";
 
 /** Cheapest plan whose monthly credit ceiling covers the estimate. */
 function recommendPlan(credits: number) {
@@ -22,6 +23,7 @@ export function Calculator() {
   );
   const [features, setFeatures] = useState<string[]>(CALCULATOR.features.map((f) => f.id));
   const [billing, setBilling] = useState<Billing>("annual");
+  const { toast } = useToast();
 
   const credits = useMemo(
     () =>
@@ -242,6 +244,7 @@ export function Calculator() {
 
             <button
               type="button"
+              onClick={() => toast(`${plan.name} plan added to your cart`)}
               className="mt-3 w-full rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
             >
               Get {plan.name}

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { BookOpen, ChevronLeft, ChevronRight, Folder } from "lucide-react";
 import type { Content } from "@/lib/workspace/types";
@@ -57,53 +60,7 @@ export function ContentPane({ content }: { content: Content }) {
   }
 
   if (content.kind === "carousel") {
-    return (
-      <div className="mx-auto max-w-3xl text-center">
-        <Tile src="/media/presets/1.jpg" className="aspect-video w-full" sizes="768px" />
-        <h1 className="mt-6 font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
-          {content.headline}
-        </h1>
-        <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-hf-muted">{content.sub}</p>
-
-        <div className="mt-6 flex items-center justify-center gap-3">
-          <button
-            type="button"
-            aria-label="Previous preset"
-            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:text-white"
-          >
-            <ChevronLeft className="size-4" aria-hidden strokeWidth={1.75} />
-          </button>
-
-          <div className="flex items-center gap-2 overflow-x-auto">
-            {content.slides.map((slide, index) => (
-              <span
-                key={slide.title}
-                title={slide.title}
-                className={`relative size-11 shrink-0 overflow-hidden rounded-full border ${
-                  index === 0 ? "border-hf-lime" : "border-hf-border"
-                }`}
-              >
-                <Image
-                  src={`/media/library/${(index % 5) + 1}.jpg`}
-                  alt=""
-                  fill
-                  sizes="44px"
-                  className="object-cover"
-                />
-              </span>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            aria-label="Next preset"
-            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:text-white"
-          >
-            <ChevronRight className="size-4" aria-hidden strokeWidth={1.75} />
-          </button>
-        </div>
-      </div>
-    );
+    return <CarouselPane content={content} />;
   }
 
   if (content.kind === "library") {
@@ -152,23 +109,95 @@ export function ContentPane({ content }: { content: Content }) {
 }
 
 export function ContentTabs() {
+  const [active, setActive] = useState("How it works");
+
   return (
-    <div className="mb-6 flex items-center gap-1.5">
+    <div role="tablist" aria-label="Workspace view" className="mb-6 flex items-center gap-1.5">
       {[
         { label: "History", icon: Folder },
         { label: "How it works", icon: BookOpen },
-      ].map(({ label, icon: LucideIcon }, index) => (
+      ].map(({ label, icon: LucideIcon }) => (
         <button
           key={label}
           type="button"
+          role="tab"
+          aria-selected={active === label}
+          onClick={() => setActive(label)}
           className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-            index === 1 ? "bg-hf-surface-3 text-white" : "text-hf-muted hover:text-white"
+            active === label ? "bg-hf-surface-3 text-white" : "text-hf-muted hover:text-white"
           }`}
         >
           <LucideIcon className="size-4" aria-hidden strokeWidth={1.75} />
           {label}
         </button>
       ))}
+    </div>
+  );
+}
+
+/** Preset carousel with a selectable thumbnail strip. */
+function CarouselPane({
+  content,
+}: {
+  content: Extract<Content, { kind: "carousel" }>;
+}) {
+  const [index, setIndex] = useState(0);
+  const slide = content.slides[index];
+  const step = (delta: number) =>
+    setIndex((prev) => (prev + delta + content.slides.length) % content.slides.length);
+
+  return (
+    <div className="mx-auto max-w-3xl text-center">
+      <Tile src={`/media/library/${(index % 5) + 1}.jpg`} className="aspect-video w-full" sizes="768px" />
+
+      <h1 className="mt-6 font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+        {slide.title}
+      </h1>
+      <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-hf-muted">{slide.caption}</p>
+
+      <div className="mt-6 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          aria-label="Previous preset"
+          onClick={() => step(-1)}
+          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:border-hf-lime/50 hover:text-white"
+        >
+          <ChevronLeft className="size-4" aria-hidden strokeWidth={1.75} />
+        </button>
+
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {content.slides.map((item, i) => (
+            <button
+              key={item.title}
+              type="button"
+              title={item.title}
+              aria-label={item.title}
+              aria-current={i === index ? "true" : undefined}
+              onClick={() => setIndex(i)}
+              className={`relative size-11 shrink-0 overflow-hidden rounded-full border transition-colors ${
+                i === index ? "border-hf-lime" : "border-hf-border hover:border-hf-lime/50"
+              }`}
+            >
+              <Image
+                src={`/media/library/${(i % 5) + 1}.jpg`}
+                alt=""
+                fill
+                sizes="44px"
+                className="object-cover"
+              />
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          aria-label="Next preset"
+          onClick={() => step(1)}
+          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:border-hf-lime/50 hover:text-white"
+        >
+          <ChevronRight className="size-4" aria-hidden strokeWidth={1.75} />
+        </button>
+      </div>
     </div>
   );
 }

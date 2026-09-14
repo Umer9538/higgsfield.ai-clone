@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Bell, Diamond, Search, Sparkles } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 import { Logo } from "./Logo";
 
 type Badge = "New" | "Free";
@@ -53,8 +57,11 @@ function NavBadge({ tone }: { tone: Badge }) {
 }
 
 export function AppHeader({ activeNav }: { activeNav?: string }) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const { toast } = useToast();
+
   return (
-    <header className="sticky top-0 z-50 h-header border-b border-hf-border bg-hf-black/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-hf-border bg-hf-black/95 backdrop-blur">
       <div className="flex h-header items-center gap-4 px-4">
         <Link
           href="/"
@@ -110,6 +117,8 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
           <button
             type="button"
             aria-label="Search"
+            aria-expanded={searchOpen}
+            onClick={() => setSearchOpen((prev) => !prev)}
             className="text-hf-muted transition-colors hover:text-white"
           >
             <Search className="size-4" aria-hidden strokeWidth={1.75} />
@@ -154,6 +163,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
           <button
             type="button"
             aria-label="Notifications"
+            onClick={() => toast("No new notifications", "info")}
             className="hidden text-hf-muted transition-colors hover:text-white sm:block"
           >
             <Bell className="size-4" aria-hidden strokeWidth={1.75} />
@@ -162,10 +172,25 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
           <button
             type="button"
             aria-label="Account"
+            onClick={() => toast("Account menu is not part of this rebuild", "info")}
             className="size-7 shrink-0 rounded-full bg-hf-surface-4 ring-2 ring-hf-lime"
           />
         </div>
       </div>
+
+      {searchOpen ? (
+        <div className="border-t border-hf-border px-4 py-3">
+          <label className="mx-auto block max-w-xl">
+            <span className="sr-only">Search Higgsfield</span>
+            <input
+              type="search"
+              autoFocus
+              placeholder="Search models, presets and creators"
+              className="w-full rounded-lg border border-hf-border bg-hf-surface px-3 py-2 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+            />
+          </label>
+        </div>
+      ) : null}
     </header>
   );
 }

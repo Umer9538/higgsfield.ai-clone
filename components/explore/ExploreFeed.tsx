@@ -198,12 +198,12 @@ export function ExploreFeed() {
                 <p className="mt-1.5 text-sm text-hf-muted">{rail.sub}</p>
               </div>
               {rail.cta ? (
-                <button
-                  type="button"
+                <Link
+                  href="/ai/effects"
                   className="shrink-0 rounded-lg bg-hf-lime px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
                 >
                   {rail.cta}
-                </button>
+                </Link>
               ) : null}
             </div>
 

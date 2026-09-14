@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, ChevronDown, X, Zap } from "lucide-react";
 import { COMPARISON, PLANS } from "@/lib/pricing/content";
 import { BillingToggle, type Billing } from "./BillingToggle";
+import { useToast } from "@/components/ui/Toast";
 
 function Cell({ value }: { value: string | boolean }) {
   if (value === true) {
@@ -18,6 +19,7 @@ function Cell({ value }: { value: string | boolean }) {
 export function ComparisonMatrix() {
   const [expanded, setExpanded] = useState(false);
   const [billing, setBilling] = useState<Billing>("annual");
+  const { toast } = useToast();
 
   // Collapsed shows the first group only, matching the faded cut-off on the real page.
   const groups = expanded ? COMPARISON : COMPARISON.slice(0, 1);
@@ -63,6 +65,7 @@ export function ComparisonMatrix() {
 
                       <button
                         type="button"
+                        onClick={() => toast(`${plan.name} plan added to your cart`)}
                         className={`mt-3 w-full rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${
                           plan.bestValue
                             ? "bg-hf-lime text-black hover:bg-hf-lime-deep"

@@ -4,12 +4,17 @@ import { useState } from "react";
 import { Sparkles } from "lucide-react";
 import { ArrowUpRight } from "lucide-react";
 import { PLANS, PLAN_FOOTNOTES } from "@/lib/pricing/content";
+import type { Plan } from "@/lib/pricing/content";
+import { Modal } from "@/components/ui/Modal";
+import { useToast } from "@/components/ui/Toast";
 import { BillingToggle, type Billing } from "./BillingToggle";
 import { PlanCard } from "./PlanCard";
 
 export function PlanGrid() {
+  const { toast } = useToast();
   const [billing, setBilling] = useState<Billing>("annual");
   const [audience, setAudience] = useState<"individual" | "business">("individual");
+  const [chosen, setChosen] = useState<Plan | null>(null);
 
   return (
     <section className="mt-12">
@@ -61,18 +66,18 @@ export function PlanGrid() {
             Seat-based pricing, shared asset libraries, SSO and invoicing. Talk to the team for a
             quote built around your volume.
           </p>
-          <button
-            type="button"
-            className="mt-5 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+          <a
+            href="/enterprise#contact-sales"
+            className="mt-5 inline-block rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
           >
             Contact sales
-          </button>
+          </a>
         </div>
       ) : (
         <>
           <div role="list" aria-label="Plans" className="mt-6 grid gap-4 lg:grid-cols-3">
             {PLANS.map((plan) => (
-              <PlanCard key={plan.id} plan={plan} billing={billing} />
+              <PlanCard key={plan.id} plan={plan} billing={billing} onSelect={setChosen} />
             ))}
           </div>
 
@@ -98,6 +103,27 @@ export function PlanGrid() {
           </div>
         </>
       )}
+
+      <Modal open={chosen !== null} onClose={() => setChosen(null)} title={`${chosen?.name ?? ""} plan selected`}>
+        {chosen ? (
+          <>
+            <p className="text-sm leading-relaxed text-hf-muted">
+              {chosen.name} at ${billing === "annual" ? chosen.annual : chosen.monthly}/month, billed{" "}
+              {billing === "annual" ? "annually" : "monthly"}.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                toast(`${chosen.name} plan added to your cart`);
+                setChosen(null);
+              }}
+              className="mt-5 w-full rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+            >
+              Continue to checkout
+            </button>
+          </>
+        ) : null}
+      </Modal>
     </section>
   );
 }

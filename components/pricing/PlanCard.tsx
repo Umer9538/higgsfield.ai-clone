@@ -59,9 +59,18 @@ function Row({ row, dimmed }: { row: FeatureRow; dimmed?: boolean }) {
   );
 }
 
-export function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
+export function PlanCard({
+  plan,
+  billing,
+  onSelect,
+}: {
+  plan: Plan;
+  billing: Billing;
+  onSelect?: (plan: Plan) => void;
+}) {
   const steps = plan.credits.steps ?? [];
   const [stepIndex, setStepIndex] = useState(0);
+  const [showMore, setShowMore] = useState(false);
   const theme = THEME[plan.id];
 
   const price = billing === "annual" ? plan.annual : plan.monthly;
@@ -154,6 +163,7 @@ export function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
 
       <button
         type="button"
+        onClick={() => onSelect?.(plan)}
         className={`mt-4 w-full rounded-xl px-5 py-3 text-sm font-semibold transition-colors ${theme.cta}`}
       >
         Get {plan.name}
@@ -184,11 +194,28 @@ export function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
         {plan.unlimitedMore ? (
           <button
             type="button"
+            onClick={() => setShowMore((prev) => !prev)}
+            aria-expanded={showMore}
             className="mt-1.5 flex w-full items-center gap-1 text-[11px] font-medium text-hf-lime"
           >
-            + {plan.unlimitedMore}
-            <ChevronRight className="ml-auto size-3.5" aria-hidden strokeWidth={2} />
+            {showMore ? "\u2212" : "+"} {plan.unlimitedMore}
+            <ChevronRight
+              className={`ml-auto size-3.5 transition-transform ${showMore ? "rotate-90" : ""}`}
+              aria-hidden
+              strokeWidth={2}
+            />
           </button>
+        ) : null}
+        {showMore ? (
+          <ul className="mt-2 space-y-1 border-t border-hf-border pt-2">
+            {["Wan 3.0", "Grok Imagine 1.5", "MiniMax H3", "Seedream 5.0", "Recraft V4.1", "FLUX.2", "Z-Image"].map(
+              (model) => (
+                <li key={model} className="text-[11px] text-hf-muted">
+                  {model}
+                </li>
+              ),
+            )}
+          </ul>
         ) : null}
       </section>
 

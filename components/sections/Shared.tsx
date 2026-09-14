@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ActionButton } from "@/components/ui/ActionButton";
 
 export function PageHeading({
   eyebrow,
@@ -21,12 +22,9 @@ export function PageHeading({
       </h1>
       {sub ? <p className="mt-3 max-w-2xl text-sm text-hf-muted sm:text-base">{sub}</p> : null}
       {cta ? (
-        <button
-          type="button"
-          className="mt-6 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
-        >
+        <ActionButton message={`${cta} — opening your workspace`} className="mt-6">
           {cta}
-        </button>
+        </ActionButton>
       ) : null}
     </div>
   );
