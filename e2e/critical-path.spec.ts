@@ -232,8 +232,8 @@ test("header is the signed-in app shell on every public page", async ({ page }) 
 
     await expect(header.getByRole("button", { name: "Search" })).toBeVisible();
     await expect(header.getByRole("link", { name: /Pricing/ })).toBeVisible();
-    await expect(header.getByRole("button", { name: "Enterprise" })).toBeVisible();
-    await expect(header.getByRole("button", { name: "Assets" })).toBeVisible();
+    await expect(header.getByRole("link", { name: "Enterprise" })).toBeVisible();
+    await expect(header.getByRole("link", { name: "Assets" })).toBeVisible();
     await expect(header.getByRole("button", { name: "Notifications" })).toBeVisible();
     await expect(header.getByRole("button", { name: "Account" })).toBeVisible();
 
@@ -276,4 +276,80 @@ test("lime renders as #d1fe17 on the active link, New badge and Generate", async
   const generate = page.getByRole("button", { name: /^Generate/ });
   await expect(generate).toHaveCSS("background-color", LIME);
   await expect(generate).toHaveCSS("color", "rgb(0, 0, 0)");
+});
+
+test("enterprise route covers the positioning the brief asks for", async ({ page }) => {
+  const response = await page.goto("/enterprise");
+  expect(response?.status()).toBe(200);
+
+  await expect(
+    page.getByRole("heading", { name: /The AI-native creative suite built for enterprise/i }),
+  ).toBeVisible();
+
+  // Shared workspace, pooled credits, seats, SSO and admin control
+  await expect(page.getByText("Shared team workspace with approvals & comments")).toBeVisible();
+  await expect(page.getByText("Credit pooling & allocation across teams")).toBeVisible();
+  await expect(page.getByText("Unlimited number of seats").first()).toBeVisible();
+  await expect(page.getByText("SSO / SAML & role-based access control")).toBeVisible();
+
+  // Security and compliance
+  await expect(page.getByText(/SOC 2 & ISO 42001 aligned/)).toBeVisible();
+  await expect(page.getByText("No training on your data")).toBeVisible();
+
+  // Contact Sales with selectable credit volume
+  const scale = page.getByRole("button", { name: /Scale/ });
+  await expect(scale).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: /^Custom/ }).click();
+  await expect(page.getByRole("button", { name: /^Custom/ })).toHaveAttribute("aria-pressed", "true");
+
+  // Header link marks itself active
+  await expect(
+    page.getByRole("banner").getByRole("link", { name: "Enterprise" }),
+  ).toHaveAttribute("aria-current", "page");
+});
+
+test("assets library filters, searches, sorts and deletes", async ({ page }) => {
+  const response = await page.goto("/assets");
+  expect(response?.status()).toBe(200);
+
+  const tabs = page.getByRole("tablist", { name: "Asset type" });
+  for (const label of ["All", "Videos", "Images", "Audio", "Folders"]) {
+    await expect(tabs.getByRole("tab", { name: label })).toBeVisible();
+  }
+
+  const countLine = page.getByText(/\d+ assets$/);
+  await expect(countLine).toBeVisible();
+  const initial = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
+
+  // Filtering narrows the grid
+  await tabs.getByRole("tab", { name: "Audio" }).click();
+  const audioCount = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
+  expect(audioCount).toBeGreaterThan(0);
+  expect(audioCount).toBeLessThan(initial);
+
+  // Folders tab swaps to folder cards
+  await tabs.getByRole("tab", { name: "Folders" }).click();
+  await expect(page.getByText("Q4 Campaigns")).toBeVisible();
+
+  // Search narrows results
+  await tabs.getByRole("tab", { name: "All" }).click();
+  await page.getByPlaceholder("Search assets").fill("motorcycle");
+  const searched = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
+  expect(searched).toBeLessThan(initial);
+
+  // Sorting is available both ways
+  await page.getByPlaceholder("Search assets").fill("");
+  await page.getByLabel("Sort assets").selectOption("oldest");
+  await expect(page.getByLabel("Sort assets")).toHaveValue("oldest");
+
+  // Hover actions exist, and delete actually removes the card
+  const first = page.getByRole("listitem").first();
+  await first.hover();
+  await expect(first.getByRole("button", { name: /^Download/ })).toBeVisible();
+  await expect(first.getByRole("button", { name: /^Copy prompt/ })).toBeVisible();
+  await expect(first.getByRole("button", { name: /Open .* in Studio/ })).toBeVisible();
+  await first.getByRole("button", { name: /^Delete/ }).click();
+
+  const afterDelete = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
+  expect(afterDelete).toBe(initial - 1);
 });

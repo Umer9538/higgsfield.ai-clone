@@ -122,21 +122,27 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
             </span>
           </Link>
 
-          <button
-            type="button"
-            className="hidden items-center gap-1.5 text-sm text-hf-muted transition-colors hover:text-white lg:flex"
+          <Link
+            href="/enterprise"
+            aria-current={activeNav === "enterprise" ? "page" : undefined}
+            className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
+              activeNav === "enterprise" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+            }`}
           >
             <Sparkles className="size-3.5" aria-hidden strokeWidth={1.75} />
             Enterprise
-          </button>
+          </Link>
 
-          <button
-            type="button"
-            className="hidden items-center gap-1.5 text-sm text-hf-muted transition-colors hover:text-white lg:flex"
+          <Link
+            href="/assets"
+            aria-current={activeNav === "assets" ? "page" : undefined}
+            className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
+              activeNav === "assets" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+            }`}
           >
             <span className="size-4 rounded bg-hf-lime/70" aria-hidden />
             Assets
-          </button>
+          </Link>
 
           <span className="hidden h-5 w-px bg-hf-border sm:block" aria-hidden />
 
