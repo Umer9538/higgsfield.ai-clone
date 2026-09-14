@@ -223,37 +223,131 @@ test("genjutsu and effects use the panel shell; studios use the dock", async ({ 
 
 const LIME = "rgb(209, 254, 23)";
 
-test("header is the signed-in app shell on every public page", async ({ page }) => {
+test("header shows signed-out controls by default on every public page", async ({ page }) => {
   for (const route of ["/", "/pricing", "/ai/video", "/mcp", "/supercomputer"]) {
     await page.goto(route);
-
-    // Scoped to the header: the footer also links to Pricing.
     const header = page.getByRole("banner");
 
     await expect(header.getByRole("button", { name: "Search" })).toBeVisible();
     await expect(header.getByRole("link", { name: /Pricing/ })).toBeVisible();
-    await expect(header.getByRole("link", { name: "Enterprise" })).toBeVisible();
-    await expect(header.getByRole("link", { name: "Assets" })).toBeVisible();
-    await expect(header.getByRole("button", { name: "Notifications" })).toBeVisible();
-    await expect(header.getByRole("button", { name: "Account" })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Sign up" })).toBeVisible();
 
-    // The real mark, not a text wordmark
+    // Signed-in chrome must not leak while signed out
+    await expect(header.getByRole("button", { name: "Account" })).toHaveCount(0);
+
     await expect(header.getByRole("img", { name: "Higgsfield" })).toBeVisible();
   }
 });
 
-test("no auth wall: every page is reachable with no sign-in controls", async ({ page }) => {
-  for (const route of ["/", "/pricing", "/ai/video", "/ai/genjutsu", "/mcp", "/supercomputer"]) {
+test("no auth wall: every route renders while signed out, never redirecting to login", async ({
+  page,
+}) => {
+  for (const route of ["/", "/pricing", "/ai/video", "/ai/genjutsu", "/assets", "/canvas", "/mcp"]) {
     const response = await page.goto(route);
     expect(response?.status(), `${route} should return 200`).toBe(200);
 
-    // Nothing in the page may gate access behind an account
-    await expect(page.getByRole("button", { name: "Sign up" })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Log in" })).toHaveCount(0);
-
-    // Page content actually rendered rather than redirecting to a login
-    expect(page.url()).toContain(route === "/" ? "/" : route);
+    // The page itself renders — no gate, no bounce to /login
+    expect(new URL(page.url()).pathname).toBe(route);
+    await expect(page.getByRole("banner")).toBeVisible();
+    await expect(page.locator("main, aside").first()).toBeVisible();
   }
+});
+
+test("signing in swaps the header to the app shell and out again", async ({ page }) => {
+  await page.goto("/");
+
+  // Log in (not Sign up): signing up routes on to the chrome-less onboarding
+  // quiz, while signing in lands on /explore where the header is present.
+  await page.getByRole("banner").getByRole("button", { name: "Log in" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+
+  await dialog.getByRole("button", { name: "Continue with Google" }).click();
+  await expect(page).toHaveURL(/\/explore$/);
+  await expect(page.locator("[data-toast]").last()).toContainText(/Successfully signed in as/);
+
+  // Signed-in chrome appears, signed-out controls go
+  const header = page.getByRole("banner");
+  await expect(header.getByRole("button", { name: "Account" })).toBeVisible();
+  await expect(header.getByRole("button", { name: "Sign up" })).toHaveCount(0);
+
+  // Avatar menu exposes the documented destinations
+  await header.getByRole("button", { name: "Account" }).click();
+  const menu = page.getByRole("menu", { name: "Account menu" });
+  for (const label of ["Profile", "Settings", "Onboarding Quiz"]) {
+    await expect(menu.getByRole("menuitem", { name: label })).toBeVisible();
+  }
+
+  await menu.getByRole("menuitem", { name: "Sign out" }).click();
+  await expect(header.getByRole("button", { name: "Sign up" })).toBeVisible();
+  await expect(header.getByRole("button", { name: "Account" })).toHaveCount(0);
+});
+
+test("auth page supports email sign-in and the forgot-password code flow", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+
+  // Forgot password -> 6 digit code
+  await page.getByRole("button", { name: "Forgot password?" }).click();
+  await page.getByLabel("Email").fill("creator@studio.com");
+  await page.getByRole("button", { name: "Send code" }).click();
+
+  const group = page.getByRole("group", { name: "Verification code" });
+  await expect(group).toBeVisible();
+  const verify = page.getByRole("button", { name: "Verify and continue" });
+  await expect(verify).toBeDisabled();
+
+  for (let i = 1; i <= 6; i++) await page.getByLabel(`Digit ${i}`).fill(String(i));
+  await expect(verify).toBeEnabled();
+  await verify.click();
+
+  // The "code sent" toast is still on screen, so assert against the newest one
+  await expect(page.locator("[data-toast]").last()).toContainText(/Successfully signed in/);
+});
+
+test("signup route toggles to sign-in mode", async ({ page }) => {
+  await page.goto("/signup");
+  await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+});
+
+test("welcome quiz walks three steps and lands in a personalised workspace", async ({ page }) => {
+  await page.goto("/welcome-quiz");
+
+  const next = page.getByRole("button", { name: "Continue" });
+  await expect(next).toBeDisabled();
+
+  // Step 1: role
+  await page.getByRole("radio", { name: /AI Filmmaker/ }).click();
+  await expect(next).toBeEnabled();
+  await next.click();
+
+  // Step 2: level + at least one model. Picking an image model steers the surface.
+  await expect(next).toBeDisabled();
+  await page.getByRole("radio", { name: /Advanced/ }).click();
+  await page.getByRole("checkbox", { name: /Nano Banana Pro/ }).click();
+  await expect(next).toBeEnabled();
+  await next.click();
+
+  // Step 3: goal + discount
+  const finish = page.getByRole("button", { name: "Finish and start creating" });
+  await expect(finish).toBeDisabled();
+  await page.getByRole("radio", { name: /Ship more, faster/ }).click();
+  await page.getByRole("button", { name: /Claim your 54% sign-up discount/ }).click();
+  await expect(page.locator("[data-toast]")).toContainText("54% sign-up discount claimed");
+
+  await finish.click();
+
+  // Personalised redirect: Nano Banana Pro is an image model
+  await expect(page).toHaveURL(/\/ai\/image$/);
+
+  const saved = await page.evaluate(() => window.localStorage.getItem("hf.onboarding"));
+  expect(saved).toBeTruthy();
+  const parsed = JSON.parse(saved!);
+  expect(parsed.role).toBe("filmmaker");
+  expect(parsed.models).toContain("nano-banana-pro");
+  expect(parsed.claimedDiscount).toBe(true);
 });
 
 test("lime renders as #d1fe17 on the active link, New badge and Generate", async ({ page }) => {
@@ -302,10 +396,9 @@ test("enterprise route covers the positioning the brief asks for", async ({ page
   await page.getByRole("button", { name: /^Custom/ }).click();
   await expect(page.getByRole("button", { name: /^Custom/ })).toHaveAttribute("aria-pressed", "true");
 
-  // Header link marks itself active
-  await expect(
-    page.getByRole("banner").getByRole("link", { name: "Enterprise" }),
-  ).toHaveAttribute("aria-current", "page");
+  // Enterprise is signed-in-only header chrome, so it is absent while signed
+  // out. The route itself stays public, which the no-auth-wall test covers.
+  await expect(page.getByRole("banner").getByRole("link", { name: "Enterprise" })).toHaveCount(0);
 });
 
 test("assets library filters, searches, sorts and deletes", async ({ page }) => {
@@ -360,6 +453,9 @@ test("assets library filters, searches, sorts and deletes", async ({ page }) => 
 const ALL_ROUTES = [
   "/",
   "/explore",
+  "/login",
+  "/signup",
+  "/welcome-quiz",
   "/pricing",
   "/enterprise",
   "/assets",
@@ -402,7 +498,12 @@ test("every route returns 200 and logs no console errors", async ({ page }) => {
   for (const route of ALL_ROUTES) {
     const response = await page.goto(route);
     expect(response?.status(), `${route} should return 200`).toBe(200);
-    await expect(page.getByRole("banner")).toBeVisible();
+    // The onboarding quiz is intentionally full-screen with no header.
+    if (route === "/welcome-quiz") {
+      await expect(page.getByRole("radiogroup", { name: "Primary workflow" })).toBeVisible();
+    } else {
+      await expect(page.getByRole("banner")).toBeVisible();
+    }
   }
 
   expect(problems, problems.join("\n")).toEqual([]);
@@ -578,4 +679,12 @@ test("community follow toggles and plugin install toggles", async ({ page }) => 
   const install = page.getByRole("button", { name: /^Install Premiere Pro/ });
   await install.click();
   await expect(page.getByRole("button", { name: /^Uninstall Premiere Pro/ })).toBeVisible();
+});
+
+test("signing up routes straight into the onboarding quiz", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("banner").getByRole("button", { name: "Sign up" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Continue with Apple" }).click();
+  await expect(page).toHaveURL(/\/welcome-quiz$/);
+  await expect(page.getByRole("radiogroup", { name: "Primary workflow" })).toBeVisible();
 });

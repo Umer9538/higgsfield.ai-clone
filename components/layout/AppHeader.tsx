@@ -5,6 +5,10 @@ import Link from "next/link";
 import { Bell, Diamond, Menu, Search, Sparkles } from "lucide-react";
 import { MobileNav } from "./MobileNav";
 import { useToast } from "@/components/ui/Toast";
+import { useAuth } from "@/lib/auth/context";
+import { AuthModal } from "@/components/auth/AuthModal";
+import type { AuthMode } from "@/components/auth/AuthForm";
+import { UserMenu } from "./UserMenu";
 import { Logo } from "./Logo";
 
 type Badge = "New" | "Free";
@@ -61,6 +65,8 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const [authMode, setAuthMode] = useState<AuthMode | null>(null);
 
   return (
     <>
@@ -149,45 +155,61 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
             </span>
           </Link>
 
-          <Link
-            href="/enterprise"
-            aria-current={activeNav === "enterprise" ? "page" : undefined}
-            className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
-              activeNav === "enterprise" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
-            }`}
-          >
-            <Sparkles className="size-3.5" aria-hidden strokeWidth={1.75} />
-            Enterprise
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/enterprise"
+                aria-current={activeNav === "enterprise" ? "page" : undefined}
+                className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
+                  activeNav === "enterprise" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+                }`}
+              >
+                <Sparkles className="size-3.5" aria-hidden strokeWidth={1.75} />
+                Enterprise
+              </Link>
 
-          <Link
-            href="/assets"
-            aria-current={activeNav === "assets" ? "page" : undefined}
-            className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
-              activeNav === "assets" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
-            }`}
-          >
-            <span className="size-4 rounded bg-hf-lime/70" aria-hidden />
-            Assets
-          </Link>
+              <Link
+                href="/assets"
+                aria-current={activeNav === "assets" ? "page" : undefined}
+                className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
+                  activeNav === "assets" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+                }`}
+              >
+                <span className="size-4 rounded bg-hf-lime/70" aria-hidden />
+                Assets
+              </Link>
 
-          <span className="hidden h-5 w-px bg-hf-border sm:block" aria-hidden />
+              <span className="hidden h-5 w-px bg-hf-border sm:block" aria-hidden />
 
-          <button
-            type="button"
-            aria-label="Notifications"
-            onClick={() => toast("No new notifications", "info")}
-            className="hidden text-hf-muted transition-colors hover:text-white sm:block"
-          >
-            <Bell className="size-4" aria-hidden strokeWidth={1.75} />
-          </button>
+              <button
+                type="button"
+                aria-label="Notifications"
+                onClick={() => toast("No new notifications", "info")}
+                className="hidden size-11 items-center justify-center text-hf-muted transition-colors hover:text-white sm:flex"
+              >
+                <Bell className="size-4" aria-hidden strokeWidth={1.75} />
+              </button>
 
-          <button
-            type="button"
-            aria-label="Account"
-            onClick={() => toast("Account menu is not part of this rebuild", "info")}
-            className="size-7 shrink-0 rounded-full bg-hf-surface-4 ring-2 ring-hf-lime"
-          />
+              <UserMenu />
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setAuthMode("signin")}
+                className="hidden min-h-11 items-center text-sm text-hf-muted transition-colors hover:text-white sm:flex"
+              >
+                Log in
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthMode("signup")}
+                className="flex min-h-11 items-center rounded-full bg-hf-lime px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              >
+                Sign up
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -208,6 +230,12 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
 
       {/* Rendered outside <header>: its backdrop-filter would otherwise become
           the containing block for this fixed overlay. */}
+      <AuthModal
+        open={authMode !== null}
+        mode={authMode ?? "signin"}
+        onClose={() => setAuthMode(null)}
+      />
+
       <MobileNav
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
