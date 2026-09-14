@@ -59,3 +59,23 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Touch ergonomics. Below the md breakpoint every interactive control gets a
+ * 44px minimum hit area. Range inputs are excluded (their thumb is the target
+ * and growing the track distorts the layout), as are toast controls.
+ */
+@media (max-width: 767px) {
+  button:not([data-toast] button),
+  select,
+  [role="tab"],
+  input:not([type="range"]),
+  a[role="button"] {
+    min-height: 44px;
+  }
+
+  /* Icon-only controls need width too */
+  button:not([data-toast] button):has(> svg:only-child) {
+    min-width: 44px;
+  }
+}

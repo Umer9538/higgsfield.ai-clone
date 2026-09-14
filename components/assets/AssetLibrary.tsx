@@ -71,13 +71,13 @@ function AssetCard({
         </span>
 
         {/* Hover actions */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-1.5 bg-black/65 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 motion-reduce:transition-none">
+        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/65 transition-opacity md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:opacity-100 motion-reduce:transition-none">
           <button
             type="button"
             aria-label={`Download ${asset.title}`}
             title="Download"
             onClick={() => onDownload(asset)}
-            className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-white/25"
+            className="flex size-11 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-white/25 md:size-8"
           >
             <Download className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
@@ -86,7 +86,7 @@ function AssetCard({
             aria-label={`Copy prompt for ${asset.title}`}
             title="Copy Prompt"
             onClick={() => onCopy(asset)}
-            className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-white/25"
+            className="flex size-11 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-white/25 md:size-8"
           >
             {copied ? (
               <Check className="size-4 text-hf-lime" aria-hidden strokeWidth={2.5} />
@@ -98,7 +98,7 @@ function AssetCard({
             href={`/ai/${asset.kind === "audio" ? "audio" : asset.kind}?prompt=${encodeURIComponent(asset.prompt)}`}
             aria-label={`Open ${asset.title} in Studio`}
             title="Open in Studio"
-            className="flex size-8 items-center justify-center rounded-lg bg-hf-lime text-black transition-colors hover:bg-hf-lime-deep"
+            className="flex size-11 items-center justify-center rounded-lg bg-hf-lime text-black transition-colors hover:bg-hf-lime-deep md:size-8"
           >
             <Wand2 className="size-4" aria-hidden strokeWidth={1.75} />
           </Link>
@@ -107,7 +107,7 @@ function AssetCard({
             aria-label={`Delete ${asset.title}`}
             title="Delete"
             onClick={() => onDelete(asset.id)}
-            className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-hf-pink"
+            className="flex size-11 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-hf-pink md:size-8"
           >
             <Trash2 className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
@@ -227,7 +227,7 @@ export function AssetLibrary() {
       </div>
 
       {tab === "folders" ? (
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {FOLDERS.map((folder) => (
             <li key={folder.id}>
               <button
@@ -255,7 +255,7 @@ export function AssetLibrary() {
           No assets match that search.
         </p>
       ) : (
-        <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {visible.map((asset) => (
             <AssetCard
               key={asset.id}

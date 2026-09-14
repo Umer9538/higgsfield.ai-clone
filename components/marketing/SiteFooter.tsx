@@ -24,7 +24,7 @@ export function SiteFooter() {
                   <ul className="mt-3 space-y-2.5">
                     {column.links.map((link) => (
                       <li key={link}>
-                        <a href="#" className="text-sm font-medium hover:underline">
+                        <a href="#" className="inline-flex min-h-11 items-center text-sm font-medium hover:underline md:min-h-0">
                           {link}
                         </a>
                       </li>
@@ -40,7 +40,10 @@ export function SiteFooter() {
             <ul className="flex flex-wrap items-center gap-5">
               {FOOTER.socials.map((social) => (
                 <li key={social}>
-                  <a href="#" className="font-medium hover:underline">
+                  <a
+                    href="#"
+                    className="inline-flex min-h-11 items-center font-medium hover:underline md:min-h-0"
+                  >
                     {social}
                   </a>
                 </li>
@@ -56,7 +59,7 @@ export function SiteFooter() {
           <ul className="flex flex-wrap items-center gap-4">
             {FOOTER.legal.map((item) => (
               <li key={item}>
-                <a href="#" className="font-medium transition-colors hover:text-white">
+                <a href="#" className="inline-flex min-h-11 items-center font-medium transition-colors hover:text-white md:min-h-0">
                   {item}
                 </a>
               </li>

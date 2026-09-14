@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, Diamond, Search, Sparkles } from "lucide-react";
+import { Bell, Diamond, Menu, Search, Sparkles } from "lucide-react";
+import { MobileNav } from "./MobileNav";
 import { useToast } from "@/components/ui/Toast";
 import { Logo } from "./Logo";
 
@@ -58,6 +59,7 @@ function NavBadge({ tone }: { tone: Badge }) {
 
 export function AppHeader({ activeNav }: { activeNav?: string }) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { toast } = useToast();
 
   return (
@@ -66,14 +68,14 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
         <Link
           href="/"
           aria-label="Higgsfield home"
-          className="shrink-0 text-white transition-opacity hover:opacity-80"
+          className="flex min-h-11 shrink-0 items-center text-white transition-opacity hover:opacity-80"
         >
           <Logo />
         </Link>
 
         <nav
           aria-label="Main"
-          className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="hidden min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm whitespace-nowrap md:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {NAV.map((item) => {
             const active = item.key === activeNav;
@@ -113,13 +115,23 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
           })}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="ml-auto flex shrink-0 items-center gap-3 md:ml-0">
+          <button
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen(true)}
+            className="flex size-11 items-center justify-center rounded-lg text-hf-muted transition-colors hover:text-white md:hidden"
+          >
+            <Menu className="size-5" aria-hidden strokeWidth={2} />
+          </button>
+
           <button
             type="button"
             aria-label="Search"
             aria-expanded={searchOpen}
             onClick={() => setSearchOpen((prev) => !prev)}
-            className="text-hf-muted transition-colors hover:text-white"
+            className="hidden size-11 items-center justify-center text-hf-muted transition-colors hover:text-white md:flex"
           >
             <Search className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
@@ -177,6 +189,13 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
           />
         </div>
       </div>
+
+      <MobileNav
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        items={NAV}
+        activeNav={activeNav}
+      />
 
       {searchOpen ? (
         <div className="border-t border-hf-border px-4 py-3">

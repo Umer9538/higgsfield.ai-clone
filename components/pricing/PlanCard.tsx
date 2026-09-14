@@ -196,7 +196,7 @@ export function PlanCard({
             type="button"
             onClick={() => setShowMore((prev) => !prev)}
             aria-expanded={showMore}
-            className="mt-1.5 flex w-full items-center gap-1 text-[11px] font-medium text-hf-lime"
+            className="mt-1.5 flex min-h-11 w-full items-center gap-1 text-[11px] font-medium text-hf-lime md:min-h-0"
           >
             {showMore ? "\u2212" : "+"} {plan.unlimitedMore}
             <ChevronRight

@@ -58,7 +58,7 @@ export function CommunityFeed() {
       {rails.map((rail, railIndex) => (
         <section key={rail.id} className="mt-12">
           <RailHeading title={rail.title} link={rail.link} />
-          <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {Array.from({ length: 5 }).map((_, index) => (
               <li key={index}>
                 <MediaTile
@@ -124,7 +124,7 @@ export function CommunityFeed() {
             <li key={social}>
               <a
                 href="#"
-                className={`inline-block rounded-lg px-4 py-2 text-sm transition-colors ${
+                className={`inline-flex min-h-11 items-center rounded-lg px-4 py-2 text-sm transition-colors md:min-h-0 ${
                   social === "Discord"
                     ? "bg-hf-lime font-semibold text-black hover:bg-hf-lime-deep"
                     : "border border-hf-border text-white hover:border-hf-lime/50"

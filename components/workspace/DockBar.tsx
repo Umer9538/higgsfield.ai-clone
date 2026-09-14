@@ -29,7 +29,7 @@ export function DockBar({ surface }: { surface: Surface }) {
     <div className="sticky bottom-0 px-4 pb-4">
       {/* Setting tiles above the composer, as in Cinema Studio */}
       {setup ? (
-        <div className="mx-auto mb-2.5 flex max-w-4xl flex-wrap gap-2 rounded-2xl border border-hf-border bg-hf-surface-2 p-2">
+        <div className="mx-auto mb-2.5 hidden max-w-4xl flex-wrap gap-2 rounded-2xl border border-hf-border bg-hf-surface-2 p-2 sm:flex">
           {setup.map((item) => (
             <button
               key={item.label}
@@ -49,17 +49,17 @@ export function DockBar({ surface }: { surface: Surface }) {
         </div>
       ) : null}
 
-      <div className="mx-auto flex max-w-4xl items-stretch gap-2.5">
+      <div className="mx-auto flex max-w-4xl flex-col items-stretch gap-2.5 sm:flex-row">
         {/* Mode rail beside the composer */}
         {rail ? (
-          <div className="flex shrink-0 flex-col gap-1 rounded-2xl border border-hf-border bg-hf-surface-2 p-1.5">
+          <div className="flex shrink-0 flex-row gap-1 rounded-2xl border border-hf-border bg-hf-surface-2 p-1.5 sm:flex-col">
             {rail.map((item) => (
               <button
                 key={item.label}
                 type="button"
                 aria-pressed={mode === item.label}
                 onClick={() => setMode(item.label)}
-                className={`flex w-16 flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-[11px] transition-colors ${
+                className={`flex flex-1 flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-[11px] transition-colors sm:w-16 sm:flex-none ${
                   mode === item.label ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
                 }`}
               >
@@ -133,7 +133,7 @@ export function DockBar({ surface }: { surface: Surface }) {
           ) : null}
 
           {slots ? (
-            <span className="ml-auto flex gap-2">
+            <span className="flex w-full gap-2 sm:ml-auto sm:w-auto">
               {slots.map((slot) => (
                 <button
                   key={slot}

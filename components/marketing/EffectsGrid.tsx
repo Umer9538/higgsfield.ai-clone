@@ -7,7 +7,7 @@ export function EffectsGrid() {
     <section id="effects" aria-label={EFFECTS.heading} className="scroll-mt-20 px-4 pt-14">
       <SectionHeading title={EFFECTS.heading} sub={EFFECTS.sub} cta={EFFECTS.cta} />
 
-      <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3">
+      <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         {EFFECTS.presets.map((preset) => (
           <li key={preset.name}>
             <a href="#" className="group relative block overflow-hidden rounded-xl border border-hf-border">
@@ -27,7 +27,7 @@ export function EffectsGrid() {
                   {preset.name}
                 </h3>
                 {/* Revealed on hover, and always readable for keyboard users */}
-                <span className="shrink-0 rounded-full bg-hf-lime px-2.5 py-1 text-[11px] font-semibold text-black opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none">
+                <span className="flex min-h-11 shrink-0 items-center rounded-full bg-hf-lime px-3 py-1 text-[11px] font-semibold text-black transition-opacity md:min-h-0 md:opacity-0 md:group-hover:opacity-100 md:group-focus-visible:opacity-100 motion-reduce:transition-none">
                   Recreate
                 </span>
               </div>

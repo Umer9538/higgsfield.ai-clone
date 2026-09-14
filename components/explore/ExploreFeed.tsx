@@ -20,7 +20,7 @@ function FeedCard({ item }: { item: FeedItem }) {
       </div>
 
       {/* Author + likes, revealed on hover like the real cards */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none">
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 motion-reduce:transition-none">
         <span className="flex items-center gap-1.5 rounded-full bg-black/65 py-1 pr-2.5 pl-1 text-[11px] text-white backdrop-blur">
           <span className="flex size-5 items-center justify-center rounded-full bg-hf-lime text-[9px] font-bold text-black uppercase">
             {item.author.slice(0, 1)}
@@ -34,7 +34,7 @@ function FeedCard({ item }: { item: FeedItem }) {
       </div>
 
       {/* Prompt, model badge, spec and Remix */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 motion-reduce:transition-none">
         <p className="line-clamp-3 text-[11px] leading-relaxed text-white">{item.prompt}</p>
 
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -51,7 +51,7 @@ function FeedCard({ item }: { item: FeedItem }) {
 
         <Link
           href={`/ai/video?prompt=${encodeURIComponent(item.prompt)}`}
-          className="pointer-events-auto mt-2.5 flex items-center justify-center gap-1.5 rounded-lg bg-hf-lime px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+          className="pointer-events-auto mt-2.5 flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-hf-lime px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-lime-deep md:min-h-0"
         >
           <Wand2 className="size-3.5" aria-hidden strokeWidth={2} />
           Remix
@@ -208,7 +208,7 @@ export function ExploreFeed() {
             </div>
 
             {/* CSS columns give real masonry with the varied card heights */}
-            <div className="mt-4 columns-2 gap-3 sm:columns-3 lg:columns-4">
+            <div className="mt-4 columns-1 gap-3 sm:columns-2 md:columns-3 lg:columns-4">
               {rail.items.map((item) => (
                 <FeedCard key={item.id} item={item} />
               ))}
@@ -226,7 +226,7 @@ export function ExploreFeed() {
             <li key={item}>
               <a
                 href="#"
-                className="inline-block rounded-lg bg-hf-surface-3 px-3 py-2 text-sm text-white transition-colors hover:bg-hf-surface-4 hover:text-hf-lime"
+                className="inline-flex min-h-11 items-center rounded-lg bg-hf-surface-3 px-3 py-2 text-sm text-white transition-colors hover:bg-hf-surface-4 hover:text-hf-lime md:min-h-0"
               >
                 {item}
               </a>
