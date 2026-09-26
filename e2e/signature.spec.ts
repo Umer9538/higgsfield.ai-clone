@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { settle } from "./helpers";
 
 /** A generated result is on screen in the Video studio. */
 async function generateVideo(page: Page) {
@@ -35,6 +36,7 @@ test.describe("node canvas", () => {
 
   test("nodes drag by their header and travel exactly with the pointer", async ({ page }) => {
     await page.goto("/canvas");
+    await settle(page);
     const node = page.locator('[data-node="n-video"]');
     const before = (await node.boundingBox())!;
 

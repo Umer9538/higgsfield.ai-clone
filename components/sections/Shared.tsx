@@ -62,13 +62,13 @@ export function MediaTile({
 }) {
   return (
     <div className="group">
-      <div className={`relative w-full overflow-hidden rounded-2xl border border-hf-border ${className}`}>
+      <div className={`hover-glow relative w-full overflow-hidden rounded-2xl border border-hf-border ${className}`}>
         <Image
           src={src}
           alt=""
           fill
           sizes="(max-width: 640px) 50vw, 25vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
       </div>

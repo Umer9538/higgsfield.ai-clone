@@ -60,7 +60,7 @@ export function Inspector({
         aria-label="Settings"
         className={`flex-col bg-hf-surface ${
           sheetOpen
-            ? "animate-reveal fixed inset-x-0 bottom-0 z-[70] flex max-h-[85dvh] rounded-t-[var(--radius-panel)] border-t border-hf-border"
+            ? "animate-sheet fixed inset-x-0 bottom-0 z-[70] flex max-h-[85dvh] rounded-t-[var(--radius-panel)] border-t border-hf-border"
             : "hidden"
         } lg:static lg:z-auto lg:max-h-none lg:w-[340px] lg:shrink-0 lg:rounded-none lg:border-t-0 lg:border-l lg:border-hf-border ${
           collapsed ? "lg:hidden" : "lg:flex"

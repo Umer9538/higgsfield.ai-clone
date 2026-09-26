@@ -56,6 +56,7 @@ export function VideoStage({ src, poster }: { src: string; poster?: string }) {
   const [hover, setHover] = useState<{ x: number; time: number; width: number } | null>(null);
   const [compare, setCompare] = useState(false);
   const [split, setSplit] = useState(50);
+  const [loaded, setLoaded] = useState(false);
   const fps = useMeasuredFps(videoRef);
   const strip = useFilmstrip(src);
 
@@ -102,12 +103,17 @@ export function VideoStage({ src, poster }: { src: string; poster?: string }) {
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
     const onTime = () => setCurrent(video.currentTime);
-    const onMeta = () => setDuration(video.duration);
+    const onMeta = () => {
+      setDuration(video.duration);
+      setLoaded(true);
+    };
     video.addEventListener("play", onPlay);
     video.addEventListener("pause", onPause);
     video.addEventListener("timeupdate", onTime);
     video.addEventListener("seeked", onTime);
     video.addEventListener("loadedmetadata", onMeta);
+    // Metadata may already be in by the time this runs
+    if (video.readyState >= 1) queueMicrotask(onMeta);
     return () => {
       video.removeEventListener("play", onPlay);
       video.removeEventListener("pause", onPause);
@@ -118,6 +124,7 @@ export function VideoStage({ src, poster }: { src: string; poster?: string }) {
   }, []);
 
   const progress = duration > 0 ? (current / duration) * 100 : 0;
+  const overlayHidden = playing || compare;
   const previewIndex =
     hover && duration > 0 ? Math.min(strip.frames - 1, Math.floor((hover.time / duration) * strip.frames)) : 0;
   const PREVIEW_W = 144;
@@ -151,18 +158,29 @@ export function VideoStage({ src, poster }: { src: string; poster?: string }) {
         {compare ? <CompareLayer source={videoRef} split={split} onSplit={setSplit} /> : null}
       </div>
 
-      {!playing && !compare ? (
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label="Play"
-          className="absolute inset-0 flex items-center justify-center bg-black/30"
+      {!loaded ? <div aria-hidden data-skeleton className="skeleton absolute inset-0 overflow-hidden" /> : null}
+
+      {/* Always mounted so it can fade and settle rather than pop; while
+          hidden it leaves the accessibility tree and the tab order. */}
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label="Play"
+        aria-hidden={overlayHidden || undefined}
+        tabIndex={overlayHidden ? -1 : undefined}
+        data-play-overlay={overlayHidden ? "hidden" : "shown"}
+        className={`absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity duration-200 ${
+          overlayHidden ? "pointer-events-none opacity-0" : "opacity-100"
+        }`}
+      >
+        <span
+          className={`flex size-14 items-center justify-center rounded-full bg-hf-accent text-black transition-transform duration-300 ease-[var(--ease-lift)] ${
+            overlayHidden ? "scale-75" : "scale-100"
+          }`}
         >
-          <span className="flex size-14 items-center justify-center rounded-full bg-hf-accent text-black">
-            <Play className="size-6 translate-x-0.5" aria-hidden fill="currentColor" strokeWidth={0} />
-          </span>
-        </button>
-      ) : null}
+          <Play className="size-6 translate-x-0.5" aria-hidden fill="currentColor" strokeWidth={0} />
+        </span>
+      </button>
 
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-3 pt-8 pb-3">
         {/* Scrubber: a native range for input and accessibility, drawn over a

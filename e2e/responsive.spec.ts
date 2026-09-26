@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { settle } from "./helpers";
 
 const ROUTES = [
   "/", "/explore", "/pricing", "/assets", "/enterprise", "/canvas", "/academy",
@@ -139,6 +140,7 @@ test("mobile: primary controls meet a 44px touch target", async ({ page }) => {
 
   for (const route of ["/ai/video", "/assets", "/canvas", "/academy"]) {
     await page.goto(route);
+    await settle(page); // entry animations scale items by 0.98 on the way in
     const tooSmall = await page.evaluate(() => {
       const bad: string[] = [];
       document.querySelectorAll<HTMLElement>("button, select, [role=tab]").forEach((el) => {
@@ -175,6 +177,7 @@ test("explore rails terminate with a fade and a straddling CTA, with no dead gap
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/explore");
+  await settle(page);
 
   const rail = page.locator("section").filter({ hasText: "Visual Effects" }).first();
   const grid = rail.locator("div.grid").first();

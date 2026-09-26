@@ -79,7 +79,7 @@ export function TabBar() {
             role="dialog"
             aria-modal="true"
             aria-label="Create"
-            className="animate-reveal absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-[var(--radius-panel)] border-t border-hf-border bg-hf-surface"
+            className="animate-sheet absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-[var(--radius-panel)] border-t border-hf-border bg-hf-surface"
           >
             <div className="flex items-center justify-between px-4 pt-3 pb-2">
               <p className="font-display text-lg font-bold tracking-[-0.025em] text-white">

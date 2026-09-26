@@ -31,8 +31,17 @@ export function GenerateButton({
       } ${className}`}
     >
       {busy ? (
-        // While running, a band of light sweeps the button: the render is developing.
-        <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 -z-10 w-1/3 animate-sweep bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+        // While running, the button breathes (a gradient light pulsing behind
+        // the label) and a band of light sweeps across: the render is
+        // developing. Both are opacity/transform only.
+        <>
+          <span
+            aria-hidden
+            data-generate-pulse
+            className="pointer-events-none absolute inset-0 -z-10 animate-glow-pulse bg-[radial-gradient(ellipse_at_50%_120%,color-mix(in_srgb,var(--color-hf-accent-soft)_90%,transparent),transparent_70%),linear-gradient(90deg,var(--color-hf-accent),var(--color-hf-accent-soft),var(--color-hf-accent))]"
+          />
+          <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 -z-10 w-1/3 animate-sweep bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+        </>
       ) : null}
       {busy ? "Generating…" : "Generate"}
       {busy ? null : badge ? (

@@ -10,13 +10,22 @@ import { FeedMedia } from "./FeedMedia";
  * One generation in the feed. Remix normally opens the video studio with the
  * prompt; on the home page `onRemix` loads it into the composer instead.
  */
-export function FeedCard({ item, onRemix }: { item: FeedItem; onRemix?: (item: FeedItem) => void }) {
+export function FeedCard({
+  item,
+  onRemix,
+  index = 0,
+}: {
+  item: FeedItem;
+  onRemix?: (item: FeedItem) => void;
+  /** Position in its grid, for the staggered entry */
+  index?: number;
+}) {
   const remixClass =
     "pointer-events-auto mt-2.5 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-deep md:min-h-0";
   return (
     <article
-      style={{ gridRowEnd: `span ${item.span}` }}
-      className="hover-glow group relative block overflow-hidden rounded-[var(--radius-media)] border border-hf-border"
+      style={{ gridRowEnd: `span ${item.span}`, "--i": index } as React.CSSProperties}
+      className="hover-glow animate-rise group relative block overflow-hidden rounded-[var(--radius-media)] border border-hf-border"
     >
       <div className="relative size-full">
         <FeedMedia item={item} />
@@ -243,8 +252,8 @@ export function ExploreFeed() {
                   rail.items.length > 6 && focused === null ? "max-h-[32rem] overflow-hidden" : ""
                 }`}
               >
-                {rail.items.map((item) => (
-                  <FeedCard key={item.id} item={item} />
+                {rail.items.map((item, index) => (
+                  <FeedCard key={item.id} item={item} index={index} />
                 ))}
               </div>
 

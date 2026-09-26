@@ -157,7 +157,7 @@ export function SideRail() {
             id="create-catalog"
             role="dialog"
             aria-label="Create"
-            className="animate-reveal absolute top-0 left-full z-10 flex h-full w-[42rem] flex-col border-r border-hf-border bg-hf-surface p-6 shadow-[24px_0_60px_-30px_rgb(0_0_0/0.8)]"
+            className="animate-flyout absolute top-0 left-full z-10 flex h-full w-[42rem] flex-col border-r border-hf-border bg-hf-surface p-6 shadow-[24px_0_60px_-30px_rgb(0_0_0/0.8)]"
           >
             <p className="font-display text-xl font-bold tracking-[-0.025em] text-white">
               What are you making?

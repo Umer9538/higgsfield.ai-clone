@@ -72,7 +72,9 @@ function AssetCard({
   onCopy,
   onDownload,
   copied,
+  index,
 }: {
+  index: number;
   asset: Asset;
   onDelete: (id: string) => void;
   onCopy: (asset: Asset) => void;
@@ -80,7 +82,10 @@ function AssetCard({
   copied: boolean;
 }) {
   return (
-    <li className="group relative overflow-hidden rounded-2xl border border-hf-border bg-hf-surface">
+    <li
+      style={{ "--i": index } as React.CSSProperties}
+      className="hover-glow animate-rise group relative overflow-hidden rounded-2xl border border-hf-border bg-hf-surface"
+    >
       <div className="relative aspect-video w-full bg-hf-surface-3">
         {asset.kind === "audio" ? (
           <span className="flex h-full items-center justify-center text-hf-dim">
@@ -357,9 +362,10 @@ export function AssetLibrary() {
         </p>
       ) : (
         <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {visible.map((asset) => (
+          {visible.map((asset, index) => (
             <AssetCard
               key={asset.id}
+              index={index}
               asset={asset}
               onDelete={(id) => setDeleted((prev) => [...prev, id])}
               onCopy={copyPrompt}

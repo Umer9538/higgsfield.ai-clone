@@ -65,7 +65,7 @@ export function CommunityFeed() {
           <RailHeading title={rail.title} link={rail.link} />
           <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {Array.from({ length: 5 }).map((_, index) => (
-              <li key={index}>
+              <li key={index} className="animate-rise" style={{ "--i": index } as React.CSSProperties}>
                 <MediaTile
                   src={tile(railIndex * 5 + index)}
                   label={`Project ${railIndex * 5 + index + 1}`}

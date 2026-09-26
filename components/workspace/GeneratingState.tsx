@@ -9,7 +9,16 @@ export function GeneratingState() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <div className="rounded-3xl border border-hf-border bg-hf-surface p-6 sm:p-8">
+      <div className="relative rounded-3xl border border-hf-border bg-hf-surface p-6 sm:p-8">
+        {/* Ambient edge light that brightens as the run nears completion.
+            Squared, so it stays quiet early and gathers at the end. Only its
+            opacity changes; the glow itself is static. */}
+        <div
+          aria-hidden
+          data-progress-glow
+          className="pointer-events-none absolute -inset-px rounded-3xl shadow-[0_0_0_1px_color-mix(in_srgb,var(--color-hf-cyan)_70%,transparent),0_0_48px_-6px_color-mix(in_srgb,var(--color-hf-cyan)_55%,transparent)] transition-opacity duration-300"
+          style={{ opacity: (progress / 100) ** 2 }}
+        />
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="flex items-center gap-2 text-sm font-medium text-white">
@@ -42,8 +51,11 @@ export function GeneratingState() {
             style={{ opacity: 0.15 + (progress / 100) * 0.85 }}
           />
           <div className="absolute inset-y-0 left-0 w-1/3 animate-sweep bg-gradient-to-r from-transparent via-hf-accent-soft/35 to-transparent" />
-          <span className="absolute bottom-3 left-3 text-[11px] text-hf-muted tabular-nums">
-            Frame {Math.max(1, Math.round((progress / 100) * 120))} of 120
+          <span
+            data-frame-counter
+            className="absolute right-3 bottom-3 rounded-md bg-black/60 px-2 py-1 font-mono text-[11px] text-white tabular-nums backdrop-blur"
+          >
+            Frame {String(Math.max(1, Math.round((progress / 100) * 120))).padStart(3, "0")} / 120
           </span>
         </div>
 
@@ -61,8 +73,9 @@ export function GeneratingState() {
             className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-hf-surface-4"
           >
             <div
-              className="h-full rounded-full bg-hf-accent transition-[width] duration-100 ease-linear"
-              style={{ width: `${percent}%` }}
+              // scaleX, not width: a width change relayouts every tick
+              className="h-full origin-left rounded-full bg-hf-accent transition-transform duration-100 ease-linear"
+              style={{ transform: `scaleX(${percent / 100})` }}
             />
           </div>
         </div>

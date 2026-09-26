@@ -11,7 +11,7 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <SideRail />
-      <div className="pb-tabbar md:pb-0 md:pl-rail">
+      <div className="overflow-x-clip pb-tabbar md:pb-0 md:pl-rail">
         <TopBar />
         {children}
       </div>

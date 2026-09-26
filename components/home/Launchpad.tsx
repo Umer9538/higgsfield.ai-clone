@@ -190,8 +190,8 @@ export function Launchpad() {
         </div>
 
         <div className="mt-4 grid auto-rows-[12px] grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
-          {matching.slice(0, FEED_LIMIT).map((item) => (
-            <FeedCard key={item.id} item={item} onRemix={remix} />
+          {matching.slice(0, FEED_LIMIT).map((item, index) => (
+            <FeedCard key={item.id} item={item} onRemix={remix} index={index} />
           ))}
         </div>
 

@@ -107,6 +107,21 @@ export function FeedMedia({ item }: { item: FeedItem }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [streaming, setStreaming] = useState(false);
+  // Until the still (image or poster) has loaded, a glass shimmer holds the
+  // card; the still then fades in over it and the shimmer is removed, so no
+  // infinite animation keeps running under loaded cards.
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!item.poster) return;
+    // The browser shares this request with the <video>'s own poster fetch
+    const probe = new window.Image();
+    probe.onload = probe.onerror = () => setReady(true);
+    probe.src = item.poster;
+    return () => {
+      probe.onload = probe.onerror = null;
+    };
+  }, [item.poster]);
 
   useEffect(() => {
     const node = wrapRef.current;
@@ -143,20 +158,28 @@ export function FeedMedia({ item }: { item: FeedItem }) {
     }
   }, [streaming]);
 
+  const skeleton = ready ? null : <div aria-hidden data-skeleton className="skeleton absolute inset-0 overflow-hidden" />;
+  const fade = `transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`;
+
   if (!item.video) {
     return (
-      <Image
-        src={item.src}
-        alt=""
-        fill
-        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-        className="object-cover"
-      />
+      <>
+        {skeleton}
+        <Image
+          src={item.src}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+          onLoad={() => setReady(true)}
+          className={`object-cover ${fade}`}
+        />
+      </>
     );
   }
 
   return (
     <div ref={wrapRef} className="absolute inset-0">
+      {skeleton}
       <video
         ref={videoRef}
         data-feed-video
@@ -167,7 +190,7 @@ export function FeedMedia({ item }: { item: FeedItem }) {
         playsInline
         preload="none"
         aria-label={item.prompt}
-        className="size-full object-cover"
+        className={`relative size-full object-cover ${fade}`}
       />
     </div>
   );

@@ -405,6 +405,67 @@ preview, the split by keyboard and pointer, looks, prompt copy via the real
 clipboard, the JSON contents, the HUD shortcut's typing guard, and real
 `/api` latency in the HUD.
 
+## Motion system
+
+**CSS, not Framer Motion.** Every animation here runs as a CSS animation or
+transition on `transform` and `opacity`, so the compositor runs it off the
+main thread and it keeps going while React is busy. Framer Motion would add
+tens of kilobytes of JavaScript and drive its springs from the main thread.
+The one thing a library usually brings, real spring physics, is done here by
+solving the spring numerically and sampling it into CSS `linear()` easing:
+
+| Token | Spring | Behaviour |
+|---|---|---|
+| `--ease-spring` | stiffness 300, damping 30 (as specified) | ζ 0.87, 0.4% overshoot, settles in 460 ms |
+| `--ease-lift` | stiffness 420, damping 24 | ζ 0.59, 10% overshoot, settles in 560 ms |
+
+**What moves:**
+
+- **Route entry:** each page fades and rises 10 px (`app/(shell)/template.tsx`,
+  which re-mounts per navigation). It is filled `backwards`, not `both`: a
+  finished animation leaving `transform` behind would make the page the
+  containing block for fixed dialogs.
+- **Staggered grids:** Explore, the home feed, Assets and Community rise in
+  sequence, 45 ms apart, capped at 12 so long grids don't make you wait.
+- **Media cards:** lift to 1.02 on the lift spring, with a violet edge glow.
+  The glow is pre-rendered on `::after` and faded in; it used to animate
+  `border-color` and `box-shadow`, which repaint every frame. There is no
+  lift on touch screens, where hover would stick. The video Play overlay now
+  fades and settles instead of popping, and leaves the accessibility tree
+  while hidden.
+- **Generate:** presses to 0.98. While working, a gradient light breathes
+  behind the label under the existing sweep.
+- **Create catalog and phone sheets:** slide in on the specified spring.
+- **Loading:** a glass shimmer holds each feed card and the result player
+  until the still has loaded. The media then fades in and the shimmer
+  unmounts, so no infinite animation keeps running under loaded content.
+- **Generation progress:** the frame counter reads `Frame 051 / 120`, and an
+  ambient cyan edge brightens with the square of progress, quiet early and
+  gathering near completion. The progress bar now grows by `scaleX`; it used
+  to animate `width`, which relaid out every tick.
+
+**Rules, enforced by tests (`e2e/motion.spec.ts`):** a test inspects
+`document.getAnimations()` across Explore, a live generation and the Create
+flyout, and fails if any keyframe animation touches a property other than
+`transform` or `opacity`. Others check the stagger delays, the 1.02 hover
+settle, the 0.98 press, the pulse, the brightening glow, spring easing on
+sheets, and the shimmer being removed. The one deliberate exception is
+short colour fades on hover and state changes (`transition-colors`): a
+single repaint of one small element, not continuous motion. The canvas's
+flowing cable dashes animate `stroke-dashoffset`, which has no compositor
+equivalent.
+
+**Reduced motion.** One global rule sets animation and transition durations
+to near zero, and now also zeroes `animation-delay`, without which staggered
+items would sit invisible for their delay. A test checks it.
+
+**Measured** (headless Chromium, HUD frame meter): Explore holds **60 fps**
+through the staggered entry with video blocked, and **CLS stays 0.003**.
+With its four clips streaming it runs at 30 fps both on this branch and on
+the pre-change production build, so that is headless software video
+decoding, not the motion. Geometry tests now wait for entry motion to
+settle before measuring (`e2e/helpers.ts`).
+
 ## QA audit of the live site
 
 A scripted browser audit of the production deployment, measuring rather
@@ -442,7 +503,7 @@ it 276 px too low.
 
 ## How it is verified
 
-89 Playwright tests run against both the local build and the live
+96 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.
