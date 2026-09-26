@@ -4,6 +4,8 @@ import type { NewGeneration } from "@/lib/server/types";
 
 /** Reads and writes hit Firestore, so never serve a cached response. */
 export const dynamic = "force-dynamic";
+/** firebase-admin uses Node APIs; it cannot run on the edge runtime. */
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const limit = Number(new URL(request.url).searchParams.get("limit") ?? 50);

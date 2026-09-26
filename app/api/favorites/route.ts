@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { createFavorite, isFirebaseConfigured, listFavorites } from "@/lib/server/repository";
+import { isFirebaseConfigured, listFavorites, toggleFavorite } from "@/lib/server/repository";
 import type { NewFavorite } from "@/lib/server/types";
 
 export const dynamic = "force-dynamic";
+/** firebase-admin uses Node APIs; it cannot run on the edge runtime. */
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const owner = new URL(request.url).searchParams.get("owner") ?? undefined;
@@ -31,14 +33,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const item = await createFavorite({
+    const { item, removed } = await toggleFavorite({
       itemId: body.itemId,
       title: body.title ?? body.itemId,
       owner: body.owner ?? "anonymous",
     });
+    // POST toggles: 201 when a favourite is created, 200 when it is removed.
     return NextResponse.json(
-      { item, source: isFirebaseConfigured ? "firestore" : "memory" },
-      { status: 201 },
+      { item, removed, source: isFirebaseConfigured ? "firestore" : "memory" },
+      { status: removed ? 200 : 201 },
     );
   } catch (error) {
     return NextResponse.json(

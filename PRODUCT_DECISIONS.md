@@ -68,6 +68,12 @@ then POSTs to the API. The result card shows where it actually landed —
 *Synced to cloud*, *Saved · session* or *Saved on device* — instead of just
 "done".
 
+Firestore is reached through **`firebase-admin` with a service account**, not
+the browser SDK. The browser SDK in an API route would have needed Firestore
+security rules open to public writes. The service-account credentials are
+server-only: no `NEXT_PUBLIC_` prefix, and `lib/firebase-admin.ts` imports
+`server-only`, so pulling it into a client component fails the build.
+
 With no credentials the same API serves an in-memory store behind the same
 interface, so a fresh clone, CI and the test suite all run without secrets.
 

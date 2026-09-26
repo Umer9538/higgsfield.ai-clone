@@ -1,21 +1,12 @@
-import {
-  addDoc,
-  collection,
-  getDocs,
-  limit as fsLimit,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
-import { getDb, isFirebaseConfigured } from "@/lib/firebase";
+import "server-only";
+import { getAdminDb, isFirebaseConfigured } from "@/lib/firebase-admin";
 import type { FavoriteRecord, GenerationRecord, NewFavorite, NewGeneration } from "./types";
 
 /**
- * Firestore-backed repository with an in-memory fallback.
+ * Firestore (via firebase-admin) with an in-memory fallback.
  *
- * The fallback is not a stub for tests to special-case: it is the same
- * interface, so every route, test and build behaves identically whether or not
- * credentials are present. Only durability differs.
+ * Both paths implement the same behaviour, so routes, tests and builds act
+ * identically with or without credentials. Only durability differs.
  */
 const memory = globalThis as unknown as {
   __hfGenerations?: GenerationRecord[];
@@ -29,94 +20,110 @@ function newId(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 }
 
+/**
+ * One favourite per owner per item. A deterministic id makes POST a toggle
+ * without a lookup query, and keeps the two stores in step: the client-SDK
+ * version appended duplicates in Firestore while memory toggled.
+ */
+function favoriteId(owner: string, itemId: string) {
+  return `${owner}__${itemId}`.replace(/[/\s]/g, "_");
+}
+
 /* -------------------------------- generations ------------------------------- */
 
 export async function listGenerations(max = 50): Promise<GenerationRecord[]> {
-  const db = getDb();
-  if (!db) {
-    return memory.__hfGenerations!.slice(0, max);
-  }
+  const db = getAdminDb();
+  if (!db) return memory.__hfGenerations!.slice(0, max);
 
-  const snapshot = await getDocs(
-    query(collection(db, "generations"), orderBy("createdAt", "desc"), fsLimit(max)),
-  );
+  const snapshot = await db
+    .collection("generations")
+    .orderBy("createdAt", "desc")
+    .limit(max)
+    .get();
+
   return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<GenerationRecord, "id">) }));
 }
 
 export async function createGeneration(input: NewGeneration): Promise<GenerationRecord> {
-  const record: GenerationRecord = {
-    ...input,
-    id: newId("gen"),
-    createdAt: new Date().toISOString(),
-  };
+  const createdAt = new Date().toISOString();
+  const db = getAdminDb();
 
-  const db = getDb();
   if (!db) {
+    const record: GenerationRecord = { ...input, id: newId("gen"), createdAt };
     memory.__hfGenerations!.unshift(record);
     memory.__hfGenerations = memory.__hfGenerations!.slice(0, 200);
     return record;
   }
 
-  // Firestore assigns the id, so it is not part of the stored document.
-  const ref = await addDoc(collection(db, "generations"), {
-    prompt: record.prompt,
-    model: record.model,
-    surface: record.surface,
-    kind: record.kind,
-    src: record.src,
-    poster: record.poster ?? null,
-    spec: record.spec,
-    createdAt: record.createdAt,
+  // Firestore rejects undefined values, so optional fields become null.
+  const ref = await db.collection("generations").add({
+    prompt: input.prompt,
+    model: input.model,
+    surface: input.surface,
+    kind: input.kind,
+    src: input.src,
+    poster: input.poster ?? null,
+    spec: input.spec,
+    createdAt,
   });
-  return { ...record, id: ref.id };
+
+  return { ...input, id: ref.id, createdAt };
 }
 
 /* --------------------------------- favorites -------------------------------- */
 
 export async function listFavorites(owner?: string): Promise<FavoriteRecord[]> {
-  const db = getDb();
+  const db = getAdminDb();
   if (!db) {
     const all = memory.__hfFavorites!;
     return owner ? all.filter((item) => item.owner === owner) : all;
   }
 
-  const base = collection(db, "favorites");
-  const snapshot = await getDocs(
-    owner
-      ? query(base, where("owner", "==", owner), orderBy("createdAt", "desc"))
-      : query(base, orderBy("createdAt", "desc")),
-  );
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<FavoriteRecord, "id">) }));
+  // Filter in Firestore, sort here. where(owner) + orderBy(createdAt) on
+  // different fields needs a composite index, and without one the query
+  // fails with FAILED_PRECONDITION on a freshly created project.
+  const base = db.collection("favorites");
+  const snapshot = owner ? await base.where("owner", "==", owner).get() : await base.get();
+
+  return snapshot.docs
+    .map((doc) => ({ id: doc.id, ...(doc.data() as Omit<FavoriteRecord, "id">) }))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export async function createFavorite(input: NewFavorite): Promise<FavoriteRecord> {
-  const record: FavoriteRecord = {
-    ...input,
-    id: newId("fav"),
-    createdAt: new Date().toISOString(),
-  };
+export interface ToggleResult {
+  item: FavoriteRecord;
+  removed: boolean;
+}
 
-  const db = getDb();
+export async function toggleFavorite(input: NewFavorite): Promise<ToggleResult> {
+  const id = favoriteId(input.owner, input.itemId);
+  const record: FavoriteRecord = { ...input, id, createdAt: new Date().toISOString() };
+  const db = getAdminDb();
+
   if (!db) {
-    // Toggling off is a second POST of the same item, so de-duplicate here.
-    const existing = memory.__hfFavorites!.findIndex(
-      (item) => item.itemId === record.itemId && item.owner === record.owner,
-    );
-    if (existing >= 0) {
-      memory.__hfFavorites!.splice(existing, 1);
-      return record;
+    const index = memory.__hfFavorites!.findIndex((item) => item.id === id);
+    if (index >= 0) {
+      memory.__hfFavorites!.splice(index, 1);
+      return { item: record, removed: true };
     }
     memory.__hfFavorites!.unshift(record);
-    return record;
+    return { item: record, removed: false };
   }
 
-  const ref = await addDoc(collection(db, "favorites"), {
+  const ref = db.collection("favorites").doc(id);
+  const existing = await ref.get();
+  if (existing.exists) {
+    await ref.delete();
+    return { item: record, removed: true };
+  }
+
+  await ref.set({
     itemId: record.itemId,
     title: record.title,
     owner: record.owner,
     createdAt: record.createdAt,
   });
-  return { ...record, id: ref.id };
+  return { item: record, removed: false };
 }
 
 export { isFirebaseConfigured };

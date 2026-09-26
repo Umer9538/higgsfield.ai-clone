@@ -59,6 +59,27 @@ test("favorites persist per owner", async ({ request }) => {
   expect(missing.status()).toBe(400);
 });
 
+test("favoriting the same item twice toggles it off, never duplicates", async ({ request }) => {
+  const owner = unique("toggler").replace(/\s/g, "-");
+  const body = { itemId: "gen-toggle", title: "Toggle me", owner };
+
+  const on = await request.post("/api/favorites", { data: body });
+  expect(on.status()).toBe(201);
+  expect((await on.json()).removed).toBe(false);
+
+  const off = await request.post("/api/favorites", { data: body });
+  expect(off.status()).toBe(200);
+  expect((await off.json()).removed).toBe(true);
+
+  const list = await (await request.get(`/api/favorites?owner=${owner}`)).json();
+  expect(list.items.filter((item: { itemId: string }) => item.itemId === "gen-toggle")).toHaveLength(0);
+
+  // And on again, exactly once
+  await request.post("/api/favorites", { data: body });
+  const again = await (await request.get(`/api/favorites?owner=${owner}`)).json();
+  expect(again.items.filter((item: { itemId: string }) => item.itemId === "gen-toggle")).toHaveLength(1);
+});
+
 test("a finished generation reports where it was persisted", async ({ page }) => {
   await page.goto("/ai/video");
   await page.getByRole("button", { name: /^Generate/ }).click();
