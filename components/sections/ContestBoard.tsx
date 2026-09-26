@@ -43,15 +43,14 @@ export function ContestBoard() {
 
   return (
     <>
-      <div role="tablist" aria-label="Contest sections" className="flex flex-wrap gap-1">
+      <div role="group" aria-label="Contest sections" className="flex flex-wrap gap-1">
         {CONTESTS.tabs.map((item) => {
           const active = tab === item;
           return (
             <button
               key={item}
               type="button"
-              role="tab"
-              aria-selected={active}
+              aria-pressed={active}
               onClick={() => setTab(item)}
               className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                 active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
@@ -129,7 +128,9 @@ export function ContestBoard() {
 
             <div className="mt-6">
               <p className="text-xs text-hf-dim">Submissions close in</p>
-              <div className="mt-2 flex flex-wrap gap-2" aria-live="polite">
+              {/* Not a live region: it changes every second, and announcing it
+                  that often drowned out everything else for screen readers */}
+              <div className="mt-2 flex flex-wrap gap-2">
                 <Segment value={days} unit="days" />
                 <Segment value={hours} unit="hours" />
                 <Segment value={minutes} unit="minutes" />

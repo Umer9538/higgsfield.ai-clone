@@ -16,7 +16,7 @@ const MEDIA = /^\/media\/[a-z0-9][a-z0-9/_.-]*\.(mp4|webm|jpe?g|png|webp)$/i;
  * before validation existed, and tightening that would break its callers.
  */
 export const OWNER = /^[a-z0-9:._-]{1,80}$/i;
-const ITEM_ID = /^[a-z0-9:_.-]{1,120}$/i;
+export const ITEM_ID = /^[a-z0-9:_.-]{1,120}$/i;
 const KINDS = new Set(["video", "image", "audio"]);
 
 function text(value: unknown, field: string, max: number, required = true): Result<string | undefined> {

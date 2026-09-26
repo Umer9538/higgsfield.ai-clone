@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { settle } from "./helpers";
 
 const ROUTES = [
@@ -309,17 +310,18 @@ test("explore video cards autoplay, are lazy, and keep overlays on top", async (
 test("leaving the feed is not blocked by streaming video", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/explore");
-  await page.waitForTimeout(1500);
+  // Sync on the condition under test, not a fixed sleep: video is streaming
+  await expect(page.locator("main video[src]").first()).toBeAttached({ timeout: 15_000 });
 
-  // Streaming video used to hold the browser's per-host connections open and
-  // starve navigation. Remixing must stay responsive.
+  // Streaming video used to starve navigation (measured 9.0 s to leave Explore
+  // on the deployment). The budget sits well under that regression.
   const card = page.locator("article").first();
   await card.hover();
 
   const started = Date.now();
   await card.getByRole("link", { name: "Remix" }).click();
   await page.waitForURL(/\/ai\/video\?prompt=/, { timeout: 15_000 });
-  expect(Date.now() - started).toBeLessThan(10_000);
+  expect(Date.now() - started).toBeLessThan(4_000);
 });
 
 test("leaving the home page is not blocked by its video feed", async ({ page }) => {

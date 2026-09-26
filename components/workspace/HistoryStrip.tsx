@@ -28,7 +28,7 @@ export function HistoryStrip() {
     <div className="mt-2.5 hidden h-12 items-center gap-2 overflow-x-auto [scrollbar-width:none] sm:flex">
       <span className="shrink-0 pr-1 text-[11px] font-medium text-hf-dim">Recent</span>
       {recent.length === 0 ? (
-        <span className="text-xs text-hf-dim/80">Your generations will line up here.</span>
+        <span className="text-xs text-hf-dim">Your generations will line up here.</span>
       ) : (
         <ul aria-label="Recent generations" className="flex gap-2">
           {recent.map((asset) => (

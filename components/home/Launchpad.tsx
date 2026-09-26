@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowUpRight, Clapperboard, Image as ImageIcon, Video } from "lucide-react";
 import { FeedCard } from "@/components/explore/ExploreFeed";
+import { FeedVideoToggle } from "@/components/explore/FeedMedia";
 import { useToast } from "@/components/ui/Toast";
 import { CATEGORIES, RAILS, type FeedItem } from "@/lib/explore/content";
+import { prefersReducedMotion } from "@/lib/ui/preferences";
 
 const MODES = [
   { id: "image", label: "Image", href: "/ai/image", icon: ImageIcon },
@@ -61,7 +63,7 @@ export function Launchpad() {
   const remix = (item: FeedItem) => {
     setPrompt(item.prompt);
     setMode(item.kind === "video" ? "video" : "image");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
     composer.current?.focus({ preventScroll: true });
     toast("Prompt loaded — press Create to open the studio", "info");
   };
@@ -99,6 +101,7 @@ export function Launchpad() {
             id="launch-prompt"
             ref={composer}
             rows={3}
+            maxLength={2000}
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}
             onKeyDown={(event) => {
@@ -171,13 +174,14 @@ export function Launchpad() {
           <h2 id="feed-title" className="font-display text-xl font-bold tracking-[-0.025em] text-white">
             Made with Higgsfield
           </h2>
-          <div role="tablist" aria-label="Feed filter" className="flex gap-1">
+          <div className="flex flex-wrap items-center gap-2">
+          <FeedVideoToggle />
+          <div role="group" aria-label="Feed filter" className="flex gap-1">
             {CATEGORIES.map((item) => (
               <button
                 key={item}
                 type="button"
-                role="tab"
-                aria-selected={category === item}
+                aria-pressed={category === item}
                 onClick={() => setCategory(item)}
                 className={`flex min-h-11 items-center rounded-lg px-3 text-sm transition-colors sm:min-h-9 ${
                   category === item ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
@@ -186,6 +190,7 @@ export function Launchpad() {
                 {item}
               </button>
             ))}
+          </div>
           </div>
         </div>
 

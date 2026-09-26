@@ -105,13 +105,12 @@ export function SuperComposer() {
         connectors, and automation
       </h2>
 
-      <div role="tablist" aria-label="Showcase filter" className="mt-6 flex flex-wrap justify-center gap-2">
+      <div role="group" aria-label="Showcase filter" className="mt-6 flex flex-wrap justify-center gap-2">
         {SUPERCOMPUTER_FILTERS.map((item) => (
           <button
             key={item}
             type="button"
-            role="tab"
-            aria-selected={filter === item}
+            aria-pressed={filter === item}
             onClick={() => setFilter(item)}
             className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
               filter === item ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"

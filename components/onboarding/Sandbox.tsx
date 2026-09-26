@@ -23,6 +23,7 @@ import {
   type SandboxAnswers,
 } from "@/lib/onboarding/sandbox";
 import { RenderPreview } from "./RenderPreview";
+import { usePreferences } from "@/lib/ui/preferences";
 
 const STEPS = ["Medium", "Prompt", "Render", "Open"];
 
@@ -37,7 +38,14 @@ const SPRING = { type: "spring", stiffness: 300, damping: 30 } as const;
  */
 export function Sandbox() {
   const router = useRouter();
-  const reduce = useReducedMotion();
+  // Motion's hook reads only the OS setting, and its springs run in JS where
+  // the global CSS rule cannot reach; the in-app Settings toggle counts too
+  const osReduce = useReducedMotion();
+  const { reducedMotion } = usePreferences();
+  const reduce = Boolean(osReduce || reducedMotion);
+  // Spoken on tag changes only; the prompt itself is not a live region,
+  // which re-read the whole prompt on every keystroke
+  const [announcement, setAnnouncement] = useState("");
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [mediumId, setMediumId] = useState<MediumId | null>(null);
@@ -182,6 +190,7 @@ export function Sandbox() {
                     <span className="mb-1.5 block text-xs font-medium text-hf-dim">What&apos;s in the shot?</span>
                     <input
                       value={subject}
+                      maxLength={300}
                       onChange={(event) => {
                         setSubject(event.target.value);
                         setSubjectEdited(true);
@@ -195,6 +204,7 @@ export function Sandbox() {
                       const next = surprise(medium);
                       setSubject(next.subject);
                       setPicks(next.picks);
+                      setAnnouncement(`Prompt filled: ${buildPrompt(next.subject, next.picks)}`);
                     }}
                     className="press flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-hf-accent/40 bg-hf-accent/10 px-4 text-sm font-medium text-hf-accent-soft hover:bg-hf-accent/20"
                   >
@@ -219,7 +229,10 @@ export function Sandbox() {
                               role="radio"
                               aria-checked={on}
                               // Tapping the chosen tag again clears the group
-                              onClick={() => setPicks((prev) => ({ ...prev, [group.id]: on ? undefined : tag.id }))}
+                              onClick={() => {
+                                setPicks((prev) => ({ ...prev, [group.id]: on ? undefined : tag.id }));
+                                setAnnouncement(on ? `Removed ${tag.label}` : `Added ${tag.label}: ${tag.words}`);
+                              }}
                               className={`press flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors sm:min-h-9 ${
                                 on
                                   ? "border-hf-cyan bg-hf-cyan/15 text-white"
@@ -237,7 +250,10 @@ export function Sandbox() {
 
                 <div className="gradient-border mt-6 rounded-[var(--radius-panel)] p-4">
                   <p className="text-xs font-medium text-hf-dim">Live prompt</p>
-                  <output data-live-prompt aria-live="polite" className="mt-1.5 block text-base leading-relaxed text-white">
+                  <p role="status" className="sr-only">
+                    {announcement}
+                  </p>
+                  <output data-live-prompt className="mt-1.5 block text-base leading-relaxed text-white">
                     {promptParts(subject, picks).map((part, index) => (
                       <span key={index}>
                         {index > 0 ? <span className="text-hf-dim">, </span> : null}

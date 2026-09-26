@@ -6,6 +6,8 @@ const EXTERNAL = process.env.BASE_URL;
 
 export default defineConfig({
   testDir: "./e2e",
+  // Deletes what the run wrote to the shared library (see e2e/fixtures.ts)
+  globalTeardown: "./e2e/global-teardown.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

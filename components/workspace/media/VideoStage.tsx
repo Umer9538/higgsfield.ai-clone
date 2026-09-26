@@ -273,7 +273,7 @@ export function VideoStage({ src, poster }: { src: string; poster?: string }) {
             onClick={() => stepFrames(-1)}
             aria-label="Previous frame"
             title="Previous frame ( , )"
-            className="flex size-8 items-center justify-center text-white transition-opacity hover:opacity-80"
+            className="hidden size-8 sm:flex items-center justify-center text-white transition-opacity hover:opacity-80"
           >
             <StepBack className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
@@ -282,7 +282,7 @@ export function VideoStage({ src, poster }: { src: string; poster?: string }) {
             onClick={() => stepFrames(1)}
             aria-label="Next frame"
             title="Next frame ( . )"
-            className="flex size-8 items-center justify-center text-white transition-opacity hover:opacity-80"
+            className="hidden size-8 sm:flex items-center justify-center text-white transition-opacity hover:opacity-80"
           >
             <StepForward className="size-4" aria-hidden strokeWidth={1.75} />
           </button>
@@ -306,7 +306,9 @@ export function VideoStage({ src, poster }: { src: string; poster?: string }) {
 
           <span data-timecode className="ml-1 font-mono text-[11px] text-white/85 tabular-nums">
             {timecode(current, fps)}
-            <span className="text-white/45"> / {timecode(duration, fps)}</span>
+            {/* Phones: the row fits 358px only without the duration and frame
+                steps, which the , and . keys still cover */}
+            <span className="hidden text-white/70 sm:inline"> / {timecode(duration, fps)}</span>
           </span>
           <span className="ml-1.5 hidden rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70 sm:inline" title="Measured from presented frames">
             {fps} fps

@@ -78,7 +78,8 @@ export function PromptField({
         rows={bare ? 2 : 3}
         aria-label={bare ? (label ?? placeholder) : undefined}
         value={value}
-        maxLength={maxLength}
+        // The API accepts prompts up to 2000 characters; never let one be typed that it would reject
+        maxLength={maxLength ?? 2000}
         placeholder={placeholder}
         onChange={(event) => setValue(event.target.value)}
         className="mt-1.5 w-full resize-none bg-transparent text-sm leading-relaxed text-white placeholder:text-hf-dim focus:outline-none"

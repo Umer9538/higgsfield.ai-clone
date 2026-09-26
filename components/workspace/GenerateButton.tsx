@@ -22,6 +22,14 @@ export function GenerateButton({
       disabled={inactive}
       onClick={start}
       aria-busy={busy}
+      // Spoken as words: the visible "80 45" read as "Generate 80 45"
+      aria-label={
+        busy
+          ? "Generating…"
+          : badge
+            ? `Generate, ${badge}`
+            : `Generate, ${cost} credits${originalCost ? `, was ${originalCost}` : ""}`
+      }
       // background-color stays the flat accent (tests and forced-colors read
       // it); the gradient and highlight sit on top as background-image.
       className={`press relative isolate flex w-full items-center justify-center gap-2 overflow-hidden rounded-[var(--radius-control)] px-5 py-3.5 text-base font-semibold text-black ${
@@ -52,7 +60,8 @@ export function GenerateButton({
       ) : (
         <span className="flex items-center gap-1.5 text-sm font-medium">
           <Sparkles className="size-4" aria-hidden strokeWidth={2} />
-          {originalCost ? <s className="opacity-50">{originalCost}</s> : null}
+          {/* Full opacity: at 50% the struck price fell to 2.6:1 */}
+          {originalCost ? <s>{originalCost}</s> : null}
           {cost}
         </span>
       )}

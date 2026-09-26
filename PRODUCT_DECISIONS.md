@@ -91,9 +91,11 @@ reference and earlier passes, each doing a job the system already covers:
 
 **Depth without colour noise.** Glass (translucent obsidian + blur + a
 white 6% top highlight) is only for things that float: dialogs, the
-palette, popovers. Gradient borders are only on the two composers: violet
-light fading out at rest, turning cyan while you type, with a second pixel
-of outline so the surface itself is a 2px focus indicator. The one ambient
+palette, popovers. Gradient borders mark the one focal surface of a screen
+(the home composer, the studio prompt bar, onboarding's live prompt, the
+profile's starting preset): violet light fading out at rest, turning cyan
+while you type, with a second pixel of outline so the surface itself is a
+2px focus indicator. The one ambient
 glow is the violet light behind the home composer.
 
 | | Reference | Ours |
@@ -209,9 +211,9 @@ the light source, and the chrome stays dark and quiet around it.
   from a token, so nesting always steps outward and nothing looks
   accidentally mismatched.
 - **Effects are rationed.** The gradient border marks only the focal surface
-  on a screen — the home composer and the studio prompt bar. Hover glows are a soft
-  violet shadow under the card with a tinted edge, on media cards only;
-  controls get a press-in scale instead. Glass is for things that float:
+  of a screen (see *Visual identity*). Media cards lift to 1.02 on a spring
+  with an inset violet edge drawn on `::after`; controls get a press-in scale
+  instead. Glass is for things that float:
   dialogs, the palette, popovers.
 
 ### Generate is the signature moment
@@ -219,7 +221,7 @@ the light source, and the chrome stays dark and quiet around it.
 Everything else is restrained so this can be loud:
 
 - The button is a lit gradient with a violet glow, and it presses in
-  (`scale 0.97`) on click. While busy, a band of light sweeps across it.
+  (`scale 0.98`) on click. While busy, a band of light sweeps across it.
 - The waiting state became a **developing frame**: a 16:9 plate whose violet
   light rises with progress, a scanning band, and a frame counter — instead
   of a spinner beside a list.
@@ -319,6 +321,86 @@ listboxes use proper ARIA roles.
 
 ---
 
+## Audit loop: independent review, fix, re-review
+
+Four review agents audited the finished product in parallel, each owning
+one area (backend and data integrity; UI state and overlays; accessibility,
+motion and performance; test integrity and whether this document is true).
+They were read-only and had to report verified findings with a concrete
+failure scenario. Round 1 returned **41**. Each was checked against the code
+before fixing. Round 2 re-audits the changed areas, and the loop repeats
+until a round comes back clean.
+
+**Round 1, fixed:**
+
+- **Menus reopened by themselves.** A route-scoped menu remembered the page
+  it was opened on, so leaving with it open and returning later reopened it.
+  It now also forgets on any route change. The palette, JSON inspector and
+  sign-in dialog, which live in layouts that outlive navigation, close on
+  route change too.
+- **Stacked dialogs.** ⌘K no longer opens over a form dialog, where one
+  Escape closed both and lost what was typed. The palette now uses the
+  shared dialog behaviour: Escape from anywhere inside, Tab contained, focus
+  returned. Modals take a stable close callback, so a parent re-render no
+  longer pulls focus back to them.
+- **Favourites could lose data.** A failed load looked "ready and empty", so
+  the next click deleted a saved favourite. A double-click raced the
+  server's read-then-write toggle. A slow failure rolled back a newer
+  success. Now: POST takes the desired state (idempotent); the legacy toggle
+  runs in a Firestore transaction; each item settles on its own and only for
+  its owner; buttons are disabled while their request is in flight; a failed
+  load stays not-ready and retries. Document ids moved to a collision-free
+  `f|owner|item` scheme (the old `owner__item` could collide across owners
+  or hit Firestore's reserved `__…__` names), and old ids are still cleaned up.
+- **Privacy and bounds.** `GET /api/favorites` without an owner returned
+  everyone's favourites; owner is now required. `DELETE` validates `itemId`.
+- **Deleting after signing in or out.** Records made signed out belong to
+  the device. Deletes now offer both identities, and anything that cannot be
+  deleted remotely is hidden instead of resurrected by the sync pill.
+- **Blocked storage.** The "keep it in memory" fallback in the asset and
+  auth stores re-read empty storage and discarded itself, so sign-in silently
+  failed with site data blocked. They now switch to memory mode.
+- **Prompts the server would reject** (over 2,000 characters, or only
+  whitespace) could be typed and silently failed to sync. Every prompt field
+  now enforces the API's limit, and the client trims as the server does.
+- **Video and motion.** Feed videos honour the in-app Reduce motion setting
+  and can be paused (WCAG 2.2.2), from the feed or Settings. On touch, a
+  scroll swipe no longer freezes the feed: stream suspension waits for a real
+  tap. Onboarding's springs honour the in-app setting, and smooth scrolling
+  honours reduced motion.
+- **Screen readers.** The contest countdown was a live region announcing
+  every second. The onboarding prompt re-read itself on every keystroke and
+  now announces tag changes only. Generate reads "Generate, 45 credits, was
+  80" instead of "Generate 80 45". Fourteen filter and choice groups used tab
+  roles with no tab panels; they are now labelled groups of pressed/unpressed
+  buttons. "View all" hands focus to "Back to all models" instead of dropping
+  it. The heart has one label, with `aria-pressed` carrying the state.
+- **Contrast and layout on phones.** The struck price (2.6:1), the video
+  duration (4.4:1 at best) and the empty-history hint (3.8:1) now pass AA.
+  The video controls overflowed a 390 px screen, clipping Fullscreen. The
+  44 px touch rule stretched every switch into a pill; switches now keep
+  their shape and get the target from an invisible hit area, and their knobs
+  move by transform instead of animating `left`.
+- **Tests that could not fail, or cleaned up nothing.** Runs against
+  production left permanent records in the live shared library; test
+  browsers now act as tagged devices and a global teardown deletes what a run
+  wrote. A persistence test accepted the failure state as a pass. The
+  navigation-speed test's 10 s budget would have passed the 9 s regression it
+  guards (now 4 s, synced on streaming rather than a sleep). Clicks could land
+  before hydration; the shared fixture now waits for it on every navigation.
+  Three comments claimed checks the tests did not make, and now the tests
+  make them.
+- **This document and the README** had drifted. The README still described
+  the lime-accent skeleton. This file overclaimed axe coverage and "zero"
+  layout shift, gave two different press scales, and still said favourites
+  were missing. All corrected.
+
+**Not changed, on purpose:** preview deployments keep the in-memory
+fallback (production refuses without a database). Ownership stays advisory
+while sign-in is mocked. Generations made by earlier test runs before owners
+existed have no owner, so the public API cannot delete them; they need a
+one-off admin cleanup.
+
 ## Real Backend & Persistence Architecture
 
 **Shape.** Next.js route handlers (`app/api/*`, Node runtime, never cached)
@@ -349,7 +431,7 @@ project does not have.
 | `GET /api/favorites?owner=` | 200 `{ items, source }` | 400, 500, 503 |
 | `POST /api/favorites` (toggle) | 201 `{ item, removed: false }` / 200 `{ item, removed: true }` | 400, 500, 503 |
 | `DELETE /api/favorites?owner=&itemId=` | 204, idempotent | 400, 500, 503 |
-| `GET /api/health` | 200 `{ status, database, durable, latencyMs }` | 503 degraded |
+| `GET /api/health` | 200 `{ status: "ok", database: "firestore", durable: true, latencyMs }`; without credentials outside production, 200 `{ status: "ok", database: "memory", durable: false, missing }` | 503 `degraded` (production without a database, or Firestore unreachable) |
 
 Success bodies are unchanged from the original contract; every error is
 `{ error, code }`. Other methods get the framework's 405.
@@ -396,11 +478,12 @@ Success bodies are unchanged from the original contract; every error is
   into one. A local generation now stores the Firestore id the POST returns,
   and the library matches on it.
 
-**Proven by tests (`e2e/persistence.spec.ts`):** each test writes through the
-UI or API, **wipes the browser's own storage and hard-reloads**, and asserts
-the record comes back from the server. That covers a generation from the
-studio (with a real 20-character Firestore id), a favourite, and a delete that
-stays deleted. Run against the live URL, the suite also asserts via
+**Proven by tests (`e2e/persistence.spec.ts`):** the generation and
+favourite tests write through the UI, **wipe the browser's own storage and
+hard-reload**, and assert the record comes back from the server (a
+generation from the studio carries a real 20-character Firestore id). The
+delete test confirms through the API that the record is gone after a
+reload. Run against the live URL, the suite also asserts via
 `/api/health` that the store is Firestore. A contract test covers each 400,
 the 403/404 ownership paths, idempotent deletes, the page bound and 405.
 
@@ -409,8 +492,10 @@ the 403/404 ownership paths, idempotent deletes, the page bound and 405.
 Audited by tools, not by re-reading my own code.
 
 - **Accessibility: 0 axe violations** (WCAG 2.2 A/AA) across all 29 routes
-  and 13 interactive states: open overlays, modals, sheets, results,
-  compare mode, the HUD and onboarding steps. The audit found, and this pass
+  and 13 interactive states in the audit: open overlays, modals, sheets,
+  results, compare mode, the HUD and onboarding steps. The permanent tests
+  re-check every route and five key states (catalog, palette, result with
+  compare, JSON inspector, onboarding builder). The audit found, and this pass
   fixed:
   - **Hover contrast.** Every primary button darkened to `#7C3AED` on
     hover, and black text on it is 3.7:1, which fails AA in the hovered state
@@ -455,9 +540,9 @@ footer links went nowhere or to the wrong place.
 **Profile (`/profile`)** shows only real data: an editable display name
 (saved with the account); counts of generations, videos and images saved on
 this device; your onboarding preset with **Open this preset**, which lands in
-the studio with it applied; and recent generations. A favourites count was
-left out on purpose: nothing in the UI writes favourites yet, so it would
-always read 0.
+the studio with it applied; recent generations; and your favourites, count
+and list, read from the database. (The first version left favourites out
+because nothing in the UI wrote them yet; the heart on feed cards now does.)
 
 **Settings (`/settings`)** has controls that do something. Account: display
 name, email, plan, sign out. Preferences: **Reduce motion**, now a
@@ -568,7 +653,7 @@ catch immediately.
 playback with the comparison layer redrawing every frame held **60 fps**
 with a worst frame of **17 ms**.
 
-**Tests:** ten new ones. They cover bezier geometry and settling, reduced
+**Tests:** eleven (one added later for dragging by the header). They cover bezier geometry and settling, reduced
 motion, badge arithmetic, frame stepping to the exact frame, the filmstrip
 preview, the split by keyboard and pointer, looks, prompt copy via the real
 clipboard, the JSON contents, the HUD shortcut's typing guard, and real
@@ -735,7 +820,7 @@ it 276 px too low.
 
 ## How it is verified
 
-149 Playwright tests run against both the local build and the live
-deployment: route health, no console errors or failed requests, zero layout
-shift, 44 px touch targets, no horizontal overflow at phone and tablet
+150 Playwright tests run against both the local build and the live
+deployment: route health, no console errors or failed requests, layout shift
+under 0.1 on every route (measured 0.003), 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

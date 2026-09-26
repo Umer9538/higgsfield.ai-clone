@@ -88,7 +88,9 @@ export function GenerationProvider({
         if (result) {
           const promptField = surface?.fields.find((field) => field.kind === "prompt");
           // Dock studios keep their prompt under a fixed key rather than a field
-          const prompt = String(values[promptField ? promptField.id : dockKey.prompt] ?? "");
+          // Trimmed and bounded exactly as the API validates it, so a
+          // whitespace-only or oversized prompt cannot fail the sync silently
+          const prompt = String(values[promptField ? promptField.id : dockKey.prompt] ?? "").trim().slice(0, 2000);
           const model = result.meta.find((m) => m.label === "Model")?.value ?? surface.label;
           const spec = result.meta
             .filter((m) => m.label !== "Model")

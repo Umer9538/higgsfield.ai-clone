@@ -131,13 +131,12 @@ export function PluginDirectory() {
           {PLUGINS.bridge.title}
         </h2>
 
-        <div role="tablist" aria-label="Agent client" className="mt-4 flex gap-1">
+        <div role="group" aria-label="Agent client" className="mt-4 flex gap-1">
           {PLUGINS.bridge.clients.map((name) => (
             <button
               key={name}
               type="button"
-              role="tab"
-              aria-selected={client === name}
+              aria-pressed={client === name}
               onClick={() => setClient(name)}
               className={`rounded-lg px-3.5 py-2 text-sm transition-colors ${
                 client === name ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
@@ -206,8 +205,8 @@ export function PluginDirectory() {
             }`}
           >
             <span
-              className={`absolute top-0.5 size-5 rounded-full bg-white transition-[left] ${
-                connected ? "left-[22px]" : "left-0.5"
+              className={`absolute top-0.5 size-5 rounded-full bg-white left-0.5 transition-transform ${
+                connected ? "translate-x-5" : "translate-x-0"
               }`}
             />
           </button>

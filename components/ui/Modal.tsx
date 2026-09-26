@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { X } from "lucide-react";
-import { useScrollLock } from "./overlay";
+import { useDialogFocus, useScrollLock } from "./overlay";
 
 export function Modal({
   open,
@@ -15,46 +15,19 @@ export function Modal({
   title: string;
   children: React.ReactNode;
 }) {
-  const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   useScrollLock(open);
 
+  // A stable close for the shared focus hook: callers often pass an inline
+  // arrow, and an effect keyed on it re-ran on every parent render, pulling
+  // focus back to the close button (e.g. away from the palette above it).
+  const onCloseRef = useRef(onClose);
   useEffect(() => {
-    if (!open) return;
-    closeRef.current?.focus();
-
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      // Focus trap: cycle within the dialog rather than escaping to the page
-      // behind it, which is still scroll-locked and inert to the reader.
-      const panel = panelRef.current;
-      if (!panel) return;
-      const focusable = panel.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      );
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement;
-
-      if (event.shiftKey && (active === first || !panel.contains(active))) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+    onCloseRef.current = onClose;
+  });
+  const close = useCallback(() => onCloseRef.current(), []);
+  // Focus in, Tab contained, Escape closes, focus returns to the opener
+  useDialogFocus(panelRef, open, close);
 
   if (!open) return null;
 
@@ -71,6 +44,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        data-modal
         className="glass animate-reveal relative z-10 max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-[var(--radius-panel)] p-6"
       >
         <div className="flex items-start justify-between gap-4">
@@ -78,7 +52,6 @@ export function Modal({
             {title}
           </h2>
           <button
-            ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Close"

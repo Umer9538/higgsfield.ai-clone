@@ -11,15 +11,14 @@ export function CommunityFeed() {
 
   return (
     <>
-      <div role="tablist" aria-label="Community view" className="flex flex-wrap gap-1">
+      <div role="group" aria-label="Community view" className="flex flex-wrap gap-1">
         {COMMUNITY.tabs.map((item) => {
           const active = tab === item;
           return (
             <button
               key={item}
               type="button"
-              role="tab"
-              aria-selected={active}
+              aria-pressed={active}
               onClick={() => setTab(item)}
               className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                 active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"

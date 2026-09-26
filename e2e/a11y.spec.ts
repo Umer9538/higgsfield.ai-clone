@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import AxeBuilder from "@axe-core/playwright";
 import { settle } from "./helpers";
 
@@ -148,5 +149,24 @@ test("overlays close when the viewport leaves their breakpoint, releasing the pa
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+});
+
+test("phone switches keep their shape and still get a 44px touch target", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/settings");
+  const toggle = page.getByRole("switch", { name: "Reduce motion" });
+  const box = (await toggle.boundingBox())!;
+  // The global 44px rule used to stretch the 28px track into a pill
+  expect(box.height).toBeLessThan(32);
+  const hitArea = await toggle.evaluate((el) => {
+    const style = getComputedStyle(el, "::before");
+    return { position: style.position, top: parseFloat(style.top), bottom: parseFloat(style.bottom) };
+  });
+  expect(hitArea.position).toBe("absolute");
+  expect(box.height - hitArea.top - hitArea.bottom).toBeGreaterThanOrEqual(44);
+
+  // Knobs move by transform, not by animating left
+  const knob = toggle.locator("span").first();
+  expect(await knob.evaluate((el) => getComputedStyle(el).transitionProperty)).toContain("transform");
 });
 

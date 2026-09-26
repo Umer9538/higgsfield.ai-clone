@@ -45,15 +45,14 @@ export function CourseGrid() {
           />
         </label>
 
-        <div role="tablist" aria-label="Course category" className="mt-4 flex flex-wrap gap-1">
+        <div role="group" aria-label="Course category" className="mt-4 flex flex-wrap gap-1">
           {categories.map((item) => {
             const active = category === item;
             return (
               <button
                 key={item}
                 type="button"
-                role="tab"
-                aria-selected={active}
+                aria-pressed={active}
                 onClick={() => setCategory(item)}
                 className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                   active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"

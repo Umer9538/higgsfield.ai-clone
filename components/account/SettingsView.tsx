@@ -52,7 +52,7 @@ const BUTTON =
 
 export function SettingsView() {
   const { user, signOut, updateProfile } = useAuth();
-  const { reducedMotion } = usePreferences();
+  const { reducedMotion, pauseVideo } = usePreferences();
   const generations = useSyncExternalStore(subscribeGenerated, getGeneratedSnapshot, getGeneratedServerSnapshot);
   const [name, setName] = useState<string | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
@@ -133,6 +133,20 @@ export function SettingsView() {
             <span
               data-knob
               className={`absolute top-1 left-0 size-5 rounded-full bg-white transition-transform ${reducedMotion ? "translate-x-6" : "translate-x-1"}`}
+            />
+          </button>
+        </Row>
+        <Row label="Autoplay feed videos" hint="Explore and Home play short muted clips. Off shows stills.">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={!pauseVideo}
+            aria-label="Autoplay feed videos"
+            onClick={() => setPreference("pauseVideo", !pauseVideo)}
+            className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${!pauseVideo ? "bg-hf-cyan" : "bg-hf-surface-4"}`}
+          >
+            <span
+              className={`absolute top-1 left-0 size-5 rounded-full bg-white transition-transform ${!pauseVideo ? "translate-x-6" : "translate-x-1"}`}
             />
           </button>
         </Row>

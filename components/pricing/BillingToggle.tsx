@@ -28,8 +28,8 @@ export function BillingToggle({
         }`}
       >
         <span
-          className={`absolute top-0.5 size-4 rounded-full bg-white transition-[left] ${
-            annual ? "left-[18px]" : "left-0.5"
+          className={`absolute top-0.5 size-4 rounded-full bg-white left-0.5 transition-transform ${
+            annual ? "translate-x-4" : "translate-x-0"
           }`}
         />
       </button>

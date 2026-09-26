@@ -21,11 +21,17 @@ function newId(prefix: string) {
 }
 
 /**
- * One favourite per owner per item. A deterministic id makes POST a toggle
- * without a lookup query, and keeps the two stores in step: the client-SDK
- * version appended duplicates in Firestore while memory toggled.
+ * One favourite per owner per item, with a deterministic id so writes need
+ * no lookup query and duplicates are impossible. "|" is a separator neither
+ * owner nor item ids may contain, so ids cannot collide across owners, and
+ * the "f|" prefix keeps them clear of Firestore's reserved __name__ form.
+ * The first scheme joined with "__", which both could contain.
  */
 function favoriteId(owner: string, itemId: string) {
+  return `f|${owner}|${itemId}`;
+}
+/** The earlier scheme, still cleaned up so old records cannot linger. */
+function legacyFavoriteId(owner: string, itemId: string) {
   return `${owner}__${itemId}`.replace(/[/\s]/g, "_");
 }
 
@@ -73,13 +79,13 @@ export async function createGeneration(input: NewGeneration): Promise<Generation
 
 export type DeleteOutcome = "deleted" | "not_found" | "forbidden";
 
-/** Only the owner that created a generation can delete it. */
-export async function deleteGeneration(id: string, owner: string): Promise<DeleteOutcome> {
+/** Only the owner that created a generation can delete it; `owners` are the caller's identities. */
+export async function deleteGeneration(id: string, owners: string[]): Promise<DeleteOutcome> {
   const db = getAdminDb();
   if (!db) {
     const index = memory.__hfGenerations!.findIndex((item) => item.id === id);
     if (index < 0) return "not_found";
-    if (memory.__hfGenerations![index].owner !== owner) return "forbidden";
+    if (!owners.includes(memory.__hfGenerations![index].owner ?? "")) return "forbidden";
     memory.__hfGenerations!.splice(index, 1);
     return "deleted";
   }
@@ -87,7 +93,7 @@ export async function deleteGeneration(id: string, owner: string): Promise<Delet
   const ref = db.collection("generations").doc(id);
   const snapshot = await ref.get();
   if (!snapshot.exists) return "not_found";
-  if (snapshot.get("owner") !== owner) return "forbidden";
+  if (!owners.includes(snapshot.get("owner") ?? "")) return "forbidden";
   await ref.delete();
   return "deleted";
 }
@@ -132,19 +138,44 @@ export async function toggleFavorite(input: NewFavorite): Promise<ToggleResult> 
     return { item: record, removed: false };
   }
 
+  // A transaction, so two concurrent toggles cannot both read "absent" and
+  // both write (a double-click used to end up saved instead of unchanged)
   const ref = db.collection("favorites").doc(id);
-  const existing = await ref.get();
-  if (existing.exists) {
-    await ref.delete();
+  const legacy = db.collection("favorites").doc(legacyFavoriteId(input.owner, input.itemId));
+  return db.runTransaction(async (tx) => {
+    const [existing, old] = await Promise.all([tx.get(ref), tx.get(legacy)]);
+    if (existing.exists || old.exists) {
+      if (existing.exists) tx.delete(ref);
+      if (old.exists) tx.delete(legacy);
+      return { item: record, removed: true };
+    }
+    tx.set(ref, { itemId: record.itemId, title: record.title, owner: record.owner, createdAt: record.createdAt });
+    return { item: record, removed: false };
+  });
+}
+
+/**
+ * Idempotent: make it a favourite (or not) regardless of the current state.
+ * What the app uses, so retries and double-clicks are harmless.
+ */
+export async function setFavorite(input: NewFavorite, favorite: boolean): Promise<ToggleResult> {
+  const id = favoriteId(input.owner, input.itemId);
+  const record: FavoriteRecord = { ...input, id, createdAt: new Date().toISOString() };
+  if (!favorite) {
+    await removeFavorite(input.owner, input.itemId);
     return { item: record, removed: true };
   }
-
-  await ref.set({
-    itemId: record.itemId,
-    title: record.title,
-    owner: record.owner,
-    createdAt: record.createdAt,
-  });
+  const db = getAdminDb();
+  if (!db) {
+    if (!memory.__hfFavorites!.some((item) => item.id === id)) memory.__hfFavorites!.unshift(record);
+    return { item: record, removed: false };
+  }
+  // Only written when absent, so the original createdAt is kept
+  const ref = db.collection("favorites").doc(id);
+  const existing = await ref.get();
+  if (!existing.exists) {
+    await ref.set({ itemId: record.itemId, title: record.title, owner: record.owner, createdAt: record.createdAt });
+  }
   return { item: record, removed: false };
 }
 
@@ -156,7 +187,10 @@ export async function removeFavorite(owner: string, itemId: string): Promise<voi
     memory.__hfFavorites = memory.__hfFavorites!.filter((item) => item.id !== id);
     return;
   }
-  await db.collection("favorites").doc(id).delete();
+  const batch = db.batch();
+  batch.delete(db.collection("favorites").doc(id));
+  batch.delete(db.collection("favorites").doc(legacyFavoriteId(owner, itemId)));
+  await batch.commit();
 }
 
 /** A real round trip, for /api/health: configured is not the same as reachable. */

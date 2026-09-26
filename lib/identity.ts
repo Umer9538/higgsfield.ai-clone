@@ -39,3 +39,16 @@ export function useOwner(): string | null {
   if (user) return `user:${clean(user.handle)}`;
   return device ? `device:${device}` : null;
 }
+
+/**
+ * Every identity this browser can act as: the signed-in user and the device.
+ * A generation made signed-out is owned by the device; after signing in it is
+ * still yours to delete, so deletes offer both.
+ */
+export function useOwners(): string[] {
+  const { user } = useAuth();
+  const device = useSyncExternalStore(noopSubscribe, deviceId, () => null);
+  return [user ? `user:${clean(user.handle)}` : null, device ? `device:${device}` : null].filter(
+    (owner): owner is string => owner !== null,
+  );
+}

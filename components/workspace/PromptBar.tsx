@@ -88,6 +88,7 @@ function DockComposer({ surface }: { surface: Surface }) {
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder={dock.placeholder}
+          maxLength={2000}
           aria-label={dock.placeholder}
           className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-hf-dim focus:outline-none"
         />

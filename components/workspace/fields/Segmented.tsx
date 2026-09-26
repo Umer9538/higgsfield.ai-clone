@@ -16,15 +16,15 @@ export function Segmented({
   const [value, setValue] = useField<string>(id, defaultValue);
 
   return (
-    <div role="tablist" className="flex gap-1 rounded-2xl bg-hf-surface-3 p-1">
+    // A single choice between toggle buttons (these were tabs with no panels)
+    <div role="group" aria-label={id.charAt(0).toUpperCase() + id.slice(1)} className="flex gap-1 rounded-2xl bg-hf-surface-3 p-1">
       {options.map((option) => {
         const active = option.value === value;
         return (
           <button
             key={option.value}
             type="button"
-            role="tab"
-            aria-selected={active}
+            aria-pressed={active}
             onClick={() => setValue(option.value)}
             className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               active

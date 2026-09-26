@@ -20,7 +20,15 @@ function readRaw(): string | null {
   }
 }
 
+/*
+ * Set once a write to localStorage fails (site data blocked). From then on
+ * the in-memory list is the source of truth for this tab: re-reading storage
+ * would return nothing and discard it, which is what the first version did.
+ */
+let memoryOnly = false;
+
 export function getGeneratedSnapshot(): Asset[] {
+  if (memoryOnly) return cachedList;
   const raw = readRaw();
   if (raw === cachedRaw) return cachedList;
   cachedRaw = raw;
@@ -52,7 +60,7 @@ function write(next: Asset[]) {
     window.localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
     // Blocked storage: keep it in memory so this session still shows it.
-    cachedRaw = JSON.stringify(next);
+    memoryOnly = true;
     cachedList = next;
   }
   window.dispatchEvent(new Event(EVENT));
@@ -102,7 +110,7 @@ export function clearGeneratedAssets(): void {
   try {
     window.localStorage.removeItem(KEY);
   } catch {
-    cachedRaw = null;
+    memoryOnly = true;
     cachedList = EMPTY;
   }
   window.dispatchEvent(new Event(EVENT));

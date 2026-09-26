@@ -89,13 +89,12 @@ export function PluginPage() {
 
       <section className="mt-10 overflow-hidden rounded-3xl border border-hf-border bg-hf-surface">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hf-border p-3">
-          <div role="tablist" aria-label="Client" className="flex flex-wrap gap-1">
+          <div role="group" aria-label="Client" className="flex flex-wrap gap-1">
             {CLIENTS.map((name) => (
               <button
                 key={name}
                 type="button"
-                role="tab"
-                aria-selected={client === name}
+                aria-pressed={client === name}
                 onClick={() => setClient(name)}
                 className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
                   client === name ? "bg-white text-black" : "text-hf-muted hover:text-white"
@@ -106,13 +105,12 @@ export function PluginPage() {
             ))}
           </div>
 
-          <div role="tablist" aria-label="Transport" className="flex gap-1">
+          <div role="group" aria-label="Transport" className="flex gap-1">
             {TRANSPORTS.map((name) => (
               <button
                 key={name}
                 type="button"
-                role="tab"
-                aria-selected={transport === name}
+                aria-pressed={transport === name}
                 onClick={() => setTransport(name)}
                 className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
                   transport === name ? "bg-hf-surface-4 text-white" : "text-hf-dim hover:text-white"

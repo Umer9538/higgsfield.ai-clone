@@ -37,7 +37,11 @@ function readRaw(): string | null {
   }
 }
 
+/** Set when storage writes fail; then memory is the truth for this tab. */
+let memoryOnly = false;
+
 function getSnapshot(): AuthUser | null {
+  if (memoryOnly) return cachedUser;
   const raw = readRaw();
   if (raw === cachedRaw) return cachedUser;
   cachedRaw = raw;
@@ -67,8 +71,10 @@ function write(user: AuthUser | null) {
     if (user) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     else window.localStorage.removeItem(STORAGE_KEY);
   } catch {
-    // Blocked storage: the change still propagates for this tab via the event.
-    cachedRaw = user ? JSON.stringify(user) : null;
+    // Blocked storage: keep it in memory so sign-in still works in this tab.
+    // (Setting cachedRaw alone did not: the next read found storage empty and
+    // reset the user to null.)
+    memoryOnly = true;
     cachedUser = user;
   }
   window.dispatchEvent(new Event(EVENT));

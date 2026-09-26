@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Copy, CornerDownLeft, Search } from "lucide-react";
 import { COMMANDS, matches, type CommandItem } from "@/lib/commands/registry";
-import { useExclusiveOverlay, useScrollLock } from "./overlay";
+import { useDialogFocus, useExclusiveOverlay, useRouteChanged, useScrollLock } from "./overlay";
 import { useAuth } from "@/lib/auth/context";
 import { useToast } from "./Toast";
 import { clearGeneratedAssets } from "@/lib/assets/store";
@@ -34,6 +34,16 @@ export function CommandPalette() {
   const { toast } = useToast();
   const studio = useStudioContext();
   const [inspecting, setInspecting] = useState<Record<string, unknown> | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Focus in, Tab contained, Escape from anywhere inside, focus back to the opener
+  useDialogFocus(dialogRef, open, closePalette);
+
+  // It lives in the root layout, so navigation does not unmount it: close it,
+  // and the inspector, in the render the route changes
+  if (useRouteChanged()) {
+    if (open) setOpen(false);
+    if (inspecting) setInspecting(null);
+  }
 
   // In a studio, its own commands come first: they act on what is on screen.
   const studioCommands = useMemo<CommandItem[]>(() => {
@@ -88,6 +98,9 @@ export function CommandPalette() {
     const onKey = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
+        // Never on top of a form dialog: one Escape would close both and
+        // lose what was typed into it
+        if (document.querySelector("[data-modal]")) return;
         setOpen((prev) => !prev);
         setQuery("");
         setActive(0);
@@ -199,6 +212,7 @@ export function CommandPalette() {
       />
 
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
@@ -230,8 +244,6 @@ export function CommandPalette() {
               } else if (event.key === "Enter") {
                 event.preventDefault();
                 if (results[active]) run(results[active]);
-              } else if (event.key === "Escape") {
-                setOpen(false);
               }
             }}
             placeholder="Search routes, tools and actions"

@@ -9,11 +9,13 @@ import { useSyncExternalStore } from "react";
 export interface Preferences {
   /** Forces the app's reduced-motion mode even if the OS does not ask for it */
   reducedMotion: boolean;
+  /** Stops feed videos autoplaying (WCAG 2.2.2: moving content can be paused) */
+  pauseVideo: boolean;
 }
 
 const KEY = "hf.prefs";
 const EVENT = "hf-prefs-change";
-const DEFAULTS: Preferences = { reducedMotion: false };
+const DEFAULTS: Preferences = { reducedMotion: false, pauseVideo: false };
 
 let cachedRaw: string | null | undefined;
 let cached: Preferences = DEFAULTS;
@@ -57,4 +59,16 @@ export function setPreference<K extends keyof Preferences>(key: K, value: Prefer
 
 export function usePreferences(): Preferences {
   return useSyncExternalStore(subscribe, read, () => DEFAULTS);
+}
+
+/**
+ * True when motion should be avoided: the OS asks for it, or the viewer
+ * turned it on in Settings. For JS-driven motion (smooth scroll, JS springs)
+ * that the global CSS rule cannot reach.
+ */
+export function prefersReducedMotion(): boolean {
+  return (
+    document.documentElement.classList.contains("reduce-motion") ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }

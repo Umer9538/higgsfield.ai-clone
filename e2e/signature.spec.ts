@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { settle } from "./helpers";
 
 /** A generated result is on screen in the Video studio. */
@@ -73,6 +74,8 @@ test.describe("node canvas", () => {
     await expect.poll(() => cable.getAttribute("d")).not.toBe(rest);
     await page.waitForTimeout(50);
     const landed = await cable.getAttribute("d");
+    // Not synchronisation: this window IS the assertion. A springing cable
+    // would change its path during it; a snapped one must not.
     await page.waitForTimeout(200);
     expect(await cable.getAttribute("d")).toBe(landed);
   });

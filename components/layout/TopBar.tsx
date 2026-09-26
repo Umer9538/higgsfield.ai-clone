@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth/context";
 import { AuthModal } from "@/components/auth/AuthModal";
 import type { AuthMode } from "@/components/auth/AuthForm";
 import { UserMenu } from "./UserMenu";
+import { useRouteChanged } from "@/components/ui/overlay";
 import { Logo } from "./Logo";
 
 /**
@@ -19,6 +20,9 @@ export function TopBar() {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
+  // The top bar outlives navigation; a route change (e.g. the back gesture)
+  // closes the sign-in dialog instead of leaving it over the previous page
+  if (useRouteChanged() && authMode !== null) setAuthMode(null);
 
   return (
     <>

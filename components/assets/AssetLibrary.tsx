@@ -58,7 +58,7 @@ function readHidden(): string[] {
     return [];
   }
 }
-import { useOwner } from "@/lib/identity";
+import { useOwners } from "@/lib/identity";
 import {
   removeGeneratedAsset,
   getGeneratedServerSnapshot,
@@ -188,7 +188,7 @@ export function AssetLibrary() {
   // Items you cannot delete (samples, other people's shared work) are hidden
   // for you instead, and that sticks across reloads.
   const [deleted, setDeleted] = useState<string[]>([]);
-  const owner = useOwner();
+  const owners = useOwners();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -268,10 +268,12 @@ export function AssetLibrary() {
   const remove = async (asset: Asset) => {
     const key = identity(asset);
     const local = generated.find((item) => item.id === asset.id || (asset.remoteId && item.remoteId === asset.remoteId));
-    const mine = Boolean(asset.remoteId && owner && (asset.owner ?? local?.owner) === owner);
+    const recordOwner = asset.owner ?? local?.owner;
+    const mine = Boolean(asset.remoteId && recordOwner && owners.includes(recordOwner));
 
     if (mine) {
-      const response = await fetch(`/api/generations/${encodeURIComponent(asset.remoteId!)}?owner=${encodeURIComponent(owner!)}`, {
+      const query = owners.map((owner) => `owner=${encodeURIComponent(owner)}`).join("&");
+      const response = await fetch(`/api/generations/${encodeURIComponent(asset.remoteId!)}?${query}`, {
         method: "DELETE",
       }).catch(() => null);
       // 404 means it is already gone, which is the goal
@@ -284,8 +286,14 @@ export function AssetLibrary() {
     }
     if (local) removeGeneratedAsset(local.id);
 
-    if (mine || local) {
-      toast(mine ? "Deleted everywhere" : "Deleted from this device");
+    if (mine) {
+      toast("Deleted everywhere");
+      return;
+    }
+    // A local copy of something whose shared copy we cannot delete: remove
+    // it here and hide the shared one, or the sync pill brings it straight back
+    if (local && !asset.remoteId) {
+      toast("Deleted from this device");
       return;
     }
     const next = [...deleted, key];
@@ -373,15 +381,14 @@ export function AssetLibrary() {
         </button>
       ) : null}
 
-      <div role="tablist" aria-label="Asset type" className="mt-6 flex flex-wrap gap-1">
+      <div role="group" aria-label="Asset type" className="mt-6 flex flex-wrap gap-1">
         {TABS.map((item) => {
           const active = tab === item.id;
           return (
             <button
               key={item.id}
               type="button"
-              role="tab"
-              aria-selected={active}
+              aria-pressed={active}
               onClick={() => setTab(item.id)}
               className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                 active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"

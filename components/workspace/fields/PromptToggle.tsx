@@ -42,8 +42,8 @@ export function PromptToggle({
         }`}
       >
         <span
-          className={`absolute top-0.5 size-5 rounded-full bg-white transition-[left] ${
-            on ? "left-[22px]" : "left-0.5"
+          className={`absolute top-0.5 size-5 rounded-full bg-white left-0.5 transition-transform ${
+            on ? "translate-x-5" : "translate-x-0"
           }`}
         />
       </button>

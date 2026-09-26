@@ -1,9 +1,10 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /**
- * Smoke coverage of the critical user path only.
- * Deliberately not a broad suite: homepage renders, workspace renders,
- * and a generation run completes and produces a playable result.
+ * Critical user paths across every page: navigation, the home composer,
+ * studios and generation, pricing, auth, onboarding, assets, the palette and
+ * the canvas. Specialised suites live alongside: a11y, motion, persistence,
+ * responsive, signature, account and onboarding.
  */
 
 test("homepage leads with a composer, then one feed", async ({ page }) => {
@@ -62,7 +63,7 @@ test("remixing on the home page loads the prompt into the composer instead of le
 test("home feed imagery actually loads", async ({ page }) => {
   await page.goto("/");
   // The feed opens on video; the Image filter surfaces the stills
-  await page.getByRole("tablist", { name: "Feed filter" }).getByRole("tab", { name: "Image" }).click();
+  await page.getByRole("group", { name: "Feed filter" }).getByRole("button", { name: "Image", exact: true }).click();
 
   const hero = page.locator("main img").first();
   await expect(hero).toBeVisible();
@@ -150,6 +151,10 @@ test("the inspector collapses on desktop and hands the canvas the width", async 
   await page.goto("/ai/video");
   const canvas = page.getByRole("region", { name: /canvas$/ });
   const before = (await canvas.boundingBox())!.width;
+  // Change a setting first, so the round trip can prove it survives
+  const pill = page.getByRole("button", { name: /^5s setting/ });
+  await pill.click();
+  await expect(pill).toContainText("8s");
 
   await page.getByRole("button", { name: "Hide settings" }).click();
   await expect(page.getByRole("complementary", { name: "Settings" })).toBeHidden();
@@ -158,6 +163,7 @@ test("the inspector collapses on desktop and hands the canvas the width", async 
   // Field state survives the round trip: the inspector stays mounted
   await page.getByRole("button", { name: "Show settings" }).click();
   await expect(page.getByRole("complementary", { name: "Settings" })).toBeVisible();
+  await expect(pill).toContainText("8s");
 });
 
 test("pricing page renders plans, toggles billing, and expands an FAQ", async ({ page }) => {
@@ -527,9 +533,9 @@ test("assets library filters, searches, sorts and deletes", async ({ page }) => 
   const response = await page.goto("/assets");
   expect(response?.status()).toBe(200);
 
-  const tabs = page.getByRole("tablist", { name: "Asset type" });
+  const tabs = page.getByRole("group", { name: "Asset type" });
   for (const label of ["All", "Videos", "Images", "Audio", "Folders"]) {
-    await expect(tabs.getByRole("tab", { name: label })).toBeVisible();
+    await expect(tabs.getByRole("button", { name: label, exact: true })).toBeVisible();
   }
 
   const countLine = page.getByText(/\d+ assets$/);
@@ -537,17 +543,17 @@ test("assets library filters, searches, sorts and deletes", async ({ page }) => 
   const initial = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
 
   // Filtering narrows the grid
-  await tabs.getByRole("tab", { name: "Audio" }).click();
+  await tabs.getByRole("button", { name: "Audio", exact: true }).click();
   const audioCount = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
   expect(audioCount).toBeGreaterThan(0);
   expect(audioCount).toBeLessThan(initial);
 
   // Folders tab swaps to folder cards
-  await tabs.getByRole("tab", { name: "Folders" }).click();
+  await tabs.getByRole("button", { name: "Folders", exact: true }).click();
   await expect(page.getByText("Q4 Campaigns")).toBeVisible();
 
   // Search narrows results
-  await tabs.getByRole("tab", { name: "All" }).click();
+  await tabs.getByRole("button", { name: "All", exact: true }).click();
   await page.getByPlaceholder("Search assets").fill("motorcycle");
   const searched = Number((await countLine.textContent())?.match(/\d+/)?.[0]);
   expect(searched).toBeLessThan(initial);
@@ -665,12 +671,12 @@ test("explore feed filters, searches and sorts", async ({ page }) => {
   expect(initial).toBeGreaterThan(0);
 
   // Category tabs narrow the rails
-  await page.getByRole("tab", { name: "Image" }).click();
+  await page.getByRole("button", { name: "Image", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visual Effects" })).toBeHidden();
   await expect(page.getByRole("heading", { name: "Higgsfield Soul 2.0" })).toBeVisible();
 
   // Search narrows further
-  await page.getByRole("tab", { name: "All" }).click();
+  await page.getByRole("button", { name: "All", exact: true }).click();
   await page.getByPlaceholder("Search prompts, models, creators").fill("skater");
   const searched = Number((await count.textContent())?.match(/\d+/)?.[0]);
   expect(searched).toBeLessThan(initial);
@@ -776,11 +782,11 @@ test("academy filters courses and opens a detail modal", async ({ page }) => {
   const count = page.getByText(/\d+ courses/);
   const initial = Number((await count.textContent())?.match(/\d+/)?.[0]);
 
-  await page.getByRole("tab", { name: "Automate & Agents" }).click();
+  await page.getByRole("group", { name: "Course category" }).getByRole("button", { name: "Automate & Agents", exact: true }).click();
   const filtered = Number((await count.textContent())?.match(/\d+/)?.[0]);
   expect(filtered).toBeLessThan(initial);
 
-  await page.getByRole("tab", { name: "All" }).click();
+  await page.getByRole("group", { name: "Course category" }).getByRole("button", { name: "All", exact: true }).click();
   await page.getByRole("button", { name: "View details" }).first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
 
@@ -908,7 +914,7 @@ test("a generation is persisted and appears in the asset library", async ({ page
   await expect(first).toContainText("Seedance 2.5");
 
   // And under the Videos tab
-  await page.getByRole("tab", { name: "Videos" }).click();
+  await page.getByRole("button", { name: "Videos", exact: true }).click();
   await expect(page.getByRole("main").getByRole("listitem").first()).toContainText(/Generation/);
 });
 
@@ -956,7 +962,7 @@ test("supercomputer tabs filter the showcase grid, not just the label", async ({
     ["Marketing", "marketing"],
     ["Explainer videos", "explainer videos"],
   ] as const) {
-    await page.getByRole("tab", { name: tab }).click();
+    await page.getByRole("button", { name: tab, exact: true }).click();
 
     const count = await cards.count();
     expect(count, `${tab} should narrow the grid`).toBeLessThan(all);
@@ -970,7 +976,7 @@ test("supercomputer tabs filter the showcase grid, not just the label", async ({
     expect(new Set(badges.map((b) => b.trim()))).toEqual(new Set([tab]));
   }
 
-  await page.getByRole("tab", { name: "All" }).click();
+  await page.getByRole("button", { name: "All", exact: true }).click();
   expect(await cards.count()).toBe(all);
 });
 
@@ -980,16 +986,16 @@ test("community tabs select real collections", async ({ page }) => {
 
   await expect(label).toContainText("4 collections in Explore");
 
-  await page.getByRole("tab", { name: "Shots" }).click();
+  await page.getByRole("button", { name: "Shots", exact: true }).click();
   await expect(label).toContainText("1 collection in Shots");
   await expect(page.getByRole("heading", { name: "Shots" })).toBeVisible();
 
   // Projects used to fall through and show everything
-  await page.getByRole("tab", { name: "Projects" }).click();
+  await page.getByRole("button", { name: "Projects", exact: true }).click();
   await expect(label).toContainText("2 collections in Projects");
   await expect(page.getByRole("heading", { name: "Originals by Higgsfield" })).toHaveCount(0);
 
-  await page.getByRole("tab", { name: "Originals" }).click();
+  await page.getByRole("button", { name: "Originals", exact: true }).click();
   await expect(label).toContainText("1 collection in Originals");
 });
 
@@ -1001,17 +1007,17 @@ test("marketing studio templates filter by category and media type", async ({ pa
   const all = await cards.count();
   expect(all).toBeGreaterThan(8);
 
-  await page.getByRole("tab", { name: "UGC" }).click();
+  await page.getByRole("button", { name: "UGC", exact: true }).click();
   const ugc = await cards.count();
   expect(ugc).toBeLessThan(all);
   await expect(label).toContainText(`Showing ${ugc} ugc templates`);
 
   // Media type narrows further and is reflected in the label
-  await page.getByRole("tab", { name: "Images" }).click();
+  await page.getByRole("button", { name: "Images", exact: true }).click();
   await expect(label).toContainText("images only");
 
-  await page.getByRole("tab", { name: "All", exact: true }).first().click();
-  await page.getByRole("tab", { name: "Videos" }).click();
+  await page.getByRole("button", { name: "All", exact: true }).first().click();
+  await page.getByRole("button", { name: "Videos", exact: true }).click();
   const videos = await cards.count();
   expect(videos).toBeGreaterThan(0);
   expect(videos).toBeLessThan(all);
@@ -1077,12 +1083,12 @@ test("MCP page: CLI toggle and platform tabs rewrite the steps", async ({ page }
   await expect(page.locator("[data-step-code]").first()).toContainText("bridge.higgsfield.ai/mcp");
 
   // Switching platform rewrites both steps
-  await page.getByRole("tab", { name: "Claude Code" }).click();
+  await page.getByRole("button", { name: "Claude Code", exact: true }).click();
   await expect(page.getByRole("heading", { name: /Add Higgsfield plugin to Claude Code/ })).toBeVisible();
   await expect(page.getByText(/ask Claude Code to generate/)).toBeVisible();
 
   // Switching transport swaps to shell setup
-  await page.getByRole("tab", { name: "CLI" }).click();
+  await page.getByRole("button", { name: "CLI", exact: true }).click();
   await expect(page.getByRole("heading", { name: /Install the CLI for Claude Code/ })).toBeVisible();
   const code = page.locator("[data-step-code]").first();
   await expect(code).toContainText("npm i -g @higgsfield/cli");
@@ -1090,7 +1096,7 @@ test("MCP page: CLI toggle and platform tabs rewrite the steps", async ({ page }
   await expect(page.locator("[data-step-code]").nth(1)).toContainText("higgsfield generate video");
 
   // And back
-  await page.getByRole("tab", { name: "MCP" }).click();
+  await page.getByRole("button", { name: "MCP", exact: true }).click();
   await expect(page.locator("[data-step-code]").first()).toContainText("bridge.higgsfield.ai/mcp");
 });
 
@@ -1188,11 +1194,10 @@ test("academy search filters the course list", async ({ page }) => {
   // whereas an immediate count() can read the pre-filter list.
   await expect(page.getByText(/\d+ courses/)).toContainText("1 courses");
   await expect(cards).toHaveCount(1);
-  expect(1).toBeLessThan(all);
 
   // Search composes with the category tabs
   await page.getByPlaceholder("Search courses").fill("");
-  await page.getByRole("tab", { name: "UGC & Social Content" }).click();
+  await page.getByRole("group", { name: "Course category" }).getByRole("button", { name: "UGC & Social Content", exact: true }).click();
   await expect.poll(async () => cards.count()).toBeLessThan(all);
 
   await page.getByPlaceholder("Search courses").fill("zzzznothing");

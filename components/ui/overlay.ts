@@ -11,13 +11,22 @@ import { usePathname } from "next/navigation";
  */
 
 /**
- * Open state scoped to the current route. Rather than an effect that resets
- * state after navigation (and can be forgotten, or run a frame late), the
- * menu remembers which pathname it was opened on and is only open there.
+ * Open state scoped to the current route: any navigation closes it, in the
+ * same render the new route appears (no effect running a frame late).
+ *
+ * An earlier version only compared the pathname it was opened on, so leaving
+ * with a menu open and later returning to that page reopened it by itself.
+ * Now a pathname change also forgets the menu (React's "adjust state when an
+ * input changes" pattern: set state during render, guarded by the change).
  */
 export function useRouteScopedOpen() {
   const pathname = usePathname();
   const [openOn, setOpenOn] = useState<string | null>(null);
+  const [seenPath, setSeenPath] = useState(pathname);
+  if (seenPath !== pathname) {
+    setSeenPath(pathname);
+    if (openOn !== null) setOpenOn(null);
+  }
   const open = openOn === pathname;
 
   const setOpen = useCallback((next: boolean) => setOpenOn(next ? pathname : null), [pathname]);
@@ -142,4 +151,18 @@ export function useCloseOutsideMedia(query: string, open: boolean, close: () => 
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
   }, [query, open, close]);
+}
+
+/**
+ * True during the render in which the pathname changed. For state that lives
+ * in components that persist across routes (the top bar, the palette), so
+ * they can close their overlays in that same render:
+ *   if (useRouteChanged() && open) setOpen(false);
+ */
+export function useRouteChanged(): boolean {
+  const pathname = usePathname();
+  const [seen, setSeen] = useState(pathname);
+  const changed = seen !== pathname;
+  if (changed) setSeen(pathname);
+  return changed;
 }

@@ -1,10 +1,13 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /**
  * Backend contract. Runs against whichever store is live: Firestore when the
- * NEXT_PUBLIC_FIREBASE_* variables are set, the in-memory fallback otherwise.
- * Tests use unique prompts because workers share one server.
+ * server-only FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY
+ * are set (never exposed to the browser), the in-memory fallback otherwise.
+ * Tests use unique prompts because workers share one server, and a tagged
+ * owner so the global teardown can delete what they wrote.
  */
+const OWNER = "device:e2e-api";
 
 const unique = (label: string) => `${label} ${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -14,7 +17,7 @@ test("POST /api/generations stores a record and GET returns it newest first", as
 
   for (const prompt of [first, second]) {
     const response = await request.post("/api/generations", {
-      data: { prompt, model: "Seedance 2.5", kind: "video", src: "/media/results/result.mp4", spec: "5s" },
+      data: { prompt, model: "Seedance 2.5", kind: "video", src: "/media/results/result.mp4", spec: "5s", owner: OWNER },
     });
     expect(response.status()).toBe(201);
     const body = await response.json();
@@ -45,7 +48,7 @@ test("POST /api/generations rejects incomplete or malformed bodies", async ({ re
 });
 
 test("favorites persist per owner", async ({ request }) => {
-  const owner = unique("owner").replace(/\s/g, "-");
+  const owner = `device:e2e-${unique("owner").replace(/\s/g, "-")}`;
 
   const created = await request.post("/api/favorites", {
     data: { itemId: "gen-demo", title: "Demo", owner },
@@ -57,10 +60,11 @@ test("favorites persist per owner", async ({ request }) => {
 
   const missing = await request.post("/api/favorites", { data: { title: "no id" } });
   expect(missing.status()).toBe(400);
+  expect((await request.delete(`/api/favorites?owner=${owner}&itemId=gen-demo`)).status()).toBe(204);
 });
 
 test("favoriting the same item twice toggles it off, never duplicates", async ({ request }) => {
-  const owner = unique("toggler").replace(/\s/g, "-");
+  const owner = `device:e2e-${unique("toggler").replace(/\s/g, "-")}`;
   const body = { itemId: "gen-toggle", title: "Toggle me", owner };
 
   const on = await request.post("/api/favorites", { data: body });
@@ -78,6 +82,7 @@ test("favoriting the same item twice toggles it off, never duplicates", async ({
   await request.post("/api/favorites", { data: body });
   const again = await (await request.get(`/api/favorites?owner=${owner}`)).json();
   expect(again.items.filter((item: { itemId: string }) => item.itemId === "gen-toggle")).toHaveLength(1);
+  expect((await request.delete(`/api/favorites?owner=${owner}&itemId=gen-toggle`)).status()).toBe(204);
 });
 
 test("a finished generation reports where it was persisted", async ({ page }) => {
@@ -87,17 +92,17 @@ test("a finished generation reports where it was persisted", async ({ page }) =>
 
   const badge = page.locator("[data-persistence]");
   await expect(badge).toBeVisible();
-  // Settles on a real destination, never stuck on "saving"
-  await expect
-    .poll(async () => badge.getAttribute("data-persistence"), { timeout: 15_000 })
-    .toMatch(/^(firestore|memory|local)$/);
+  // Settles on the store the server actually runs. "local" is the failure
+  // path (the POST did not land), so it must not count as a pass.
+  const { database } = await (await page.request.get("/api/health")).json();
+  await expect(badge).toHaveAttribute("data-persistence", database, { timeout: 15_000 });
 });
 
 test("synced generations wait behind a pill instead of shifting the grid", async ({ page, request }) => {
   // Seed the backend with something this browser has never seen
   const prompt = unique("synced");
   await request.post("/api/generations", {
-    data: { prompt, model: "Kling 3.0", kind: "video", src: "/media/results/result.mp4", spec: "8s" },
+    data: { prompt, model: "Kling 3.0", kind: "video", src: "/media/results/result.mp4", spec: "8s", owner: OWNER },
   });
 
   await page.goto("/assets");
@@ -154,8 +159,12 @@ test("mobile: cinema parameters live in the settings sheet, grouped into Look an
 
 test("keyboard focus draws the cyan ring", async ({ page }) => {
   await page.goto("/pricing");
-  // Tab until a control inside main takes focus
-  for (let i = 0; i < 12; i++) await page.keyboard.press("Tab");
+  // Tab until a control inside main takes focus (bounded)
+  for (let i = 0; i < 40; i++) {
+    await page.keyboard.press("Tab");
+    if (await page.evaluate(() => !!document.querySelector("main")?.contains(document.activeElement))) break;
+  }
+  expect(await page.evaluate(() => !!document.querySelector("main")?.contains(document.activeElement))).toBe(true);
 
   const focused = await page.evaluate(() => {
     const el = document.activeElement as HTMLElement | null;

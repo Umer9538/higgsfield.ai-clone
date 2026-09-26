@@ -26,13 +26,12 @@ export function PlanGrid() {
       </p>
 
       <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
-        <div role="tablist" className="flex gap-1 rounded-2xl border border-hf-border bg-hf-surface p-1">
+        <div role="group" aria-label="Plan type" className="flex gap-1 rounded-2xl border border-hf-border bg-hf-surface p-1">
           {(["individual", "business"] as const).map((option) => (
             <button
               key={option}
               type="button"
-              role="tab"
-              aria-selected={audience === option}
+              aria-pressed={audience === option}
               onClick={() => setAudience(option)}
               className={`rounded-lg px-4 py-2 text-sm font-medium capitalize transition-colors ${
                 audience === option

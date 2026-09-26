@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { Pause, Play } from "lucide-react";
 import type { FeedItem } from "@/lib/explore/content";
+import { setPreference, usePreferences } from "@/lib/ui/preferences";
 
 /**
  * Concurrency cap. Streaming video competes with navigation for the
@@ -69,8 +71,19 @@ function listenForIntent() {
   if (listening) return;
   listening = true;
   const target = (event: Event) => event.target as Element | null;
+  // Mouse and pen: suspend on press, the earliest signal. Touch: a press is
+  // also how every scroll swipe begins, and suspending then froze the feed
+  // while scrolling on phones, so touch waits for click (a real tap), which
+  // still runs, in capture, before the link's own navigation handler.
   document.addEventListener(
     "pointerdown",
+    (event) => {
+      if (event.pointerType !== "touch" && target(event)?.closest?.(NAVIGATES)) suspend();
+    },
+    true,
+  );
+  document.addEventListener(
+    "click",
     (event) => {
       if (target(event)?.closest?.(NAVIGATES)) suspend();
     },
@@ -107,6 +120,7 @@ export function FeedMedia({ item }: { item: FeedItem }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [streaming, setStreaming] = useState(false);
+  const { reducedMotion, pauseVideo } = usePreferences();
   // Until the still (image or poster) has loaded, a glass shimmer holds the
   // card; the still then fades in over it and the shimmer is removed, so no
   // infinite animation keeps running under loaded cards.
@@ -128,8 +142,10 @@ export function FeedMedia({ item }: { item: FeedItem }) {
     if (!node || !item.video) return;
 
     const id = item.id;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    // Stills only when the OS or the in-app setting asks for less motion, or
+    // the viewer paused feed video
+    const still = reducedMotion || pauseVideo || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (still) return;
 
     const observer = new IntersectionObserver(
       ([entry]) =>
@@ -142,7 +158,7 @@ export function FeedMedia({ item }: { item: FeedItem }) {
       observer.disconnect();
       exit(id);
     };
-  }, [item.video, item.id]);
+  }, [item.video, item.id, reducedMotion, pauseVideo]);
 
   // Play when a slot is granted; drop the source when it is taken away so the
   // connection and decoder are handed back.
@@ -193,5 +209,21 @@ export function FeedMedia({ item }: { item: FeedItem }) {
         className={`relative size-full object-cover ${fade}`}
       />
     </div>
+  );
+}
+
+/** Pause or resume every feed video; the choice is remembered. */
+export function FeedVideoToggle() {
+  const { pauseVideo } = usePreferences();
+  return (
+    <button
+      type="button"
+      aria-pressed={pauseVideo}
+      onClick={() => setPreference("pauseVideo", !pauseVideo)}
+      className="press flex min-h-11 items-center gap-1.5 rounded-lg border border-hf-border px-3 text-sm text-hf-muted transition-colors hover:text-white sm:min-h-9"
+    >
+      {pauseVideo ? <Play className="size-3.5" aria-hidden fill="currentColor" strokeWidth={0} /> : <Pause className="size-3.5" aria-hidden fill="currentColor" strokeWidth={0} />}
+      {pauseVideo ? "Play videos" : "Pause videos"}
+    </button>
   );
 }

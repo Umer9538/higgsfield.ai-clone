@@ -1,4 +1,5 @@
-import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
+import { type APIRequestContext, type Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /**
  * Real backend round trips. Every test writes through the API, reloads with
@@ -123,7 +124,7 @@ test("deleting your own generation deletes it in the backend", async ({ page }) 
 });
 
 test("API contract: validation, ownership, bounds and methods", async ({ request }) => {
-  const owner = "device:contract-test";
+  const owner = "device:e2e-contract";
   const valid = { prompt: unique("contract"), model: "Seedance 2.5", surface: "video", kind: "video", src: "/media/results/result.mp4", spec: "5s", owner };
 
   // 400s name the problem and never echo internals

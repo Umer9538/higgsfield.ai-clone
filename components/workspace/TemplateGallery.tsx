@@ -27,15 +27,14 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
       </h2>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <div role="tablist" aria-label="Template category" className="flex flex-wrap gap-1">
+        <div role="group" aria-label="Template category" className="flex flex-wrap gap-1">
           {templates.categories.map((item) => {
             const active = category === item;
             return (
               <button
                 key={item}
                 type="button"
-                role="tab"
-                aria-selected={active}
+                aria-pressed={active}
                 onClick={() => setCategory(item)}
                 className={`flex min-h-11 items-center rounded-lg px-3.5 text-sm font-medium transition-colors md:min-h-0 md:py-2 ${
                   active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
@@ -47,15 +46,14 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
           })}
         </div>
 
-        <div role="tablist" aria-label="Template media type" className="ml-auto flex gap-1 rounded-lg border border-hf-border p-1">
+        <div role="group" aria-label="Template media type" className="ml-auto flex gap-1 rounded-lg border border-hf-border p-1">
           {(["All", "Images", "Videos"] as Kind[]).map((item) => {
             const active = kind === item;
             return (
               <button
                 key={item}
                 type="button"
-                role="tab"
-                aria-selected={active}
+                aria-pressed={active}
                 onClick={() => setKind(item)}
                 className={`flex min-h-11 items-center rounded-md px-3 text-sm transition-colors md:min-h-0 md:py-1.5 ${
                   active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"

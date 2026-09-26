@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Heart, Play, Search, Wand2 } from "lucide-react";
 import { CATEGORIES, FEATURE_TAGS, RAILS, SORTS, TRENDING_PROMPTS, type FeedItem } from "@/lib/explore/content";
-import { FeedMedia } from "./FeedMedia";
+import { FeedMedia, FeedVideoToggle } from "./FeedMedia";
 import { useFavorites } from "@/lib/favorites";
+import { prefersReducedMotion } from "@/lib/ui/preferences";
 import { useToast } from "@/components/ui/Toast";
 
 /**
@@ -17,7 +18,7 @@ import { useToast } from "@/components/ui/Toast";
  * once saved, so you can see what you kept at a glance.
  */
 function FavoriteButton({ item }: { item: FeedItem }) {
-  const { isFavorite, toggle, ready } = useFavorites();
+  const { isFavorite, isPending, toggle, ready } = useFavorites();
   const { toast } = useToast();
   const saved = isFavorite(item.id);
 
@@ -26,8 +27,10 @@ function FavoriteButton({ item }: { item: FeedItem }) {
       type="button"
       data-favorite={item.id}
       aria-pressed={saved}
-      aria-label={saved ? `Remove ${item.model} by ${item.author} from favorites` : `Save ${item.model} by ${item.author} to favorites`}
-      disabled={!ready}
+      // One label; aria-pressed carries the state (swapping both read as
+      // "Remove from favorites, pressed")
+      aria-label={`Favorite ${item.model} by ${item.author}`}
+      disabled={!ready || isPending(item.id)}
       onClick={async () => {
         const result = await toggle(item.id, `${item.model} · ${item.author}`);
         if (result === null) toast("Couldn't save that — check your connection", "info");
@@ -117,6 +120,7 @@ export function ExploreFeed() {
   const [tag, setTag] = useState<string | null>(null);
   // Set by a rail's "View all" pill: focuses the feed on one model.
   const [focused, setFocused] = useState<string | null>(null);
+  const backRef = useRef<HTMLButtonElement>(null);
 
   const rails = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -151,15 +155,14 @@ export function ExploreFeed() {
       {/* Toolbar */}
       <div className="sticky top-header z-40 -mx-4 border-b border-hf-border bg-hf-black/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
-          <div role="tablist" aria-label="Category" className="flex flex-wrap gap-1">
+          <div role="group" aria-label="Category" className="flex flex-wrap gap-1">
             {CATEGORIES.map((item) => {
               const active = category === item;
               return (
                 <button
                   key={item}
                   type="button"
-                  role="tab"
-                  aria-selected={active}
+                  aria-pressed={active}
                   onClick={() => setCategory(item)}
                   className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                     active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
@@ -202,6 +205,7 @@ export function ExploreFeed() {
               ))}
             </select>
           </label>
+          <FeedVideoToggle />
         </div>
 
         {/* Trending prompt chips */}
@@ -238,6 +242,7 @@ export function ExploreFeed() {
         </p>
         {focused ? (
           <button
+            ref={backRef}
             type="button"
             onClick={() => setFocused(null)}
             className="flex min-h-11 items-center gap-1.5 rounded-full border border-hf-accent/50 px-3 text-xs text-hf-accent-soft transition-colors hover:bg-hf-accent/10 md:min-h-0 md:py-1.5"
@@ -306,7 +311,9 @@ export function ExploreFeed() {
                       data-rail-cta
                       onClick={() => {
                         setFocused(rail.id);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        // This button unmounts as the feed narrows; hand focus
+                        // to "Back to all models" instead of dropping it to <body>
+                        requestAnimationFrame(() => backRef.current?.focus());
                       }}
                       className="flex min-h-11 items-center gap-1.5 rounded-full bg-hf-accent px-5 text-sm font-semibold text-black shadow-lg transition-colors hover:bg-hf-accent-hover"
                     >
@@ -334,7 +341,7 @@ export function ExploreFeed() {
                   setFocused(null);
                   setCategory("All");
                   setQuery(item);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
                 }}
                 className="inline-flex min-h-11 items-center rounded-lg bg-hf-surface-3 px-3 py-2 text-sm text-white transition-colors hover:bg-hf-surface-4 hover:text-hf-accent-soft md:min-h-0"
               >
