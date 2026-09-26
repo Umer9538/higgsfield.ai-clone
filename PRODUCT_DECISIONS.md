@@ -347,6 +347,11 @@ catch immediately.
 - **Node badges.** Output nodes show their connected-input count and a
   credit estimate from the Video studio's published rate. The estimate is
   labelled "est." because it is arithmetic, not a measurement.
+- **Dragging.** The whole node header is the handle (grab cursor, lift
+  shadow while held), not just its 14 px grip — reported from the live
+  site, where grabbing a card by its title did nothing. The grab offset is
+  kept, so a node travels exactly with the pointer instead of jumping on
+  pickup. The grip remains the keyboard handle for arrow-key moves.
 - **Reduced motion:** springs snap to rest and the flowing dashes stop.
 
 ### 2. Cinematic media stage
@@ -437,7 +442,7 @@ it 276 px too low.
 
 ## How it is verified
 
-88 Playwright tests run against both the local build and the live
+89 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

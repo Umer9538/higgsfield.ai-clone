@@ -33,19 +33,46 @@ test.describe("node canvas", () => {
     await expect(page.locator("[data-cable-stats]")).toHaveAttribute("data-running", "false", { timeout: 5_000 });
   });
 
+  test("nodes drag by their header and travel exactly with the pointer", async ({ page }) => {
+    await page.goto("/canvas");
+    const node = page.locator('[data-node="n-video"]');
+    const before = (await node.boundingBox())!;
+
+    // Grab the title, where people actually reach for a card
+    const title = (await node.getByText("Video Output").boundingBox())!;
+    await page.mouse.move(title.x + 20, title.y + 8);
+    await page.mouse.down();
+    await page.mouse.move(title.x + 20 - 150, title.y + 8 + 60, { steps: 12 });
+    await page.mouse.up();
+
+    const after = (await node.boundingBox())!;
+    // No jump on pickup: the node moves the same distance as the pointer
+    expect(Math.abs(after.x - before.x - -150)).toBeLessThan(3);
+    expect(Math.abs(after.y - before.y - 60)).toBeLessThan(3);
+
+    // The delete button in the same header deletes rather than dragging
+    await node.getByRole("button", { name: "Delete Video Output node" }).click();
+    await expect(node).toHaveCount(0);
+  });
+
   test("with reduced motion the cable snaps instead of swinging", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/canvas");
     const cable = page.locator("[data-cable] path").first();
     await expect.poll(() => cable.getAttribute("d")).toMatch(/ C /);
 
+    const rest = await cable.getAttribute("d");
     const handle = page.getByRole("button", { name: "Move Video Output node" });
     await handle.focus();
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
-    const first = await cable.getAttribute("d");
-    await page.waitForTimeout(150);
-    expect(await cable.getAttribute("d")).toBe(first);
+
+    // Wait for the move to land (next frame), then it must not keep swinging
+    await expect.poll(() => cable.getAttribute("d")).not.toBe(rest);
+    await page.waitForTimeout(50);
+    const landed = await cable.getAttribute("d");
+    await page.waitForTimeout(200);
+    expect(await cable.getAttribute("d")).toBe(landed);
   });
 
   test("output node badges follow its inputs and duration", async ({ page }) => {

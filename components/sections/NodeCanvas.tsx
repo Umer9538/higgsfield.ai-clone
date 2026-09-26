@@ -113,12 +113,15 @@ export function NodeCanvas() {
   // per animation frame.
   const pending = useRef<{ id: string; x: number; y: number } | null>(null);
   const scheduled = useRef<number | null>(null);
+  // Where inside the node the pointer took hold, in board %, so the node
+  // travels with the pointer instead of jumping to re-anchor under it.
+  const grab = useRef({ dx: 0, dy: 0 });
   const move = useCallback((id: string, clientX: number, clientY: number) => {
     const board = boardRef.current;
     if (!board) return;
     const rect = board.getBoundingClientRect();
-    const x = Math.min(74, Math.max(0, ((clientX - rect.left) / rect.width) * 100 - 8));
-    const y = Math.min(66, Math.max(0, ((clientY - rect.top) / rect.height) * 100 - 5));
+    const x = Math.min(74, Math.max(0, ((clientX - rect.left) / rect.width) * 100 - grab.current.dx));
+    const y = Math.min(66, Math.max(0, ((clientY - rect.top) / rect.height) * 100 - grab.current.dy));
     pending.current = { id, x, y };
     if (scheduled.current !== null) return;
     scheduled.current = requestAnimationFrame(() => {
@@ -128,6 +131,22 @@ export function NodeCanvas() {
       setNodes((prev) => prev.map((node) => (node.id === next.id ? { ...node, x: next.x, y: next.y } : node)));
     });
   }, []);
+
+  /** The whole header is the drag handle; the delete button is excluded. */
+  const beginDrag = (event: React.PointerEvent<HTMLElement>, node: CanvasNode) => {
+    if (linkFrom !== null || event.button !== 0) return;
+    if ((event.target as HTMLElement).closest("[data-node-delete]")) return;
+    const rect = boardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    grab.current = {
+      dx: ((event.clientX - rect.left) / rect.width) * 100 - node.x,
+      dy: ((event.clientY - rect.top) / rect.height) * 100 - node.y,
+    };
+    setDragging(node.id);
+    setSelected(node.id);
+  };
 
   const nudge = (id: string, dx: number, dy: number) =>
     setNodes((prev) =>
@@ -305,9 +324,9 @@ export function NodeCanvas() {
                 if (linkFrom !== null) startLink(node.id);
                 else setSelected(node.id);
               }}
-              className={`absolute w-52 rounded-2xl border bg-hf-surface-2 ${
+              className={`absolute w-52 rounded-2xl border bg-hf-surface-2 transition-shadow ${
                 isSelected ? "border-hf-cyan" : "border-hf-border"
-              }`}
+              } ${dragging === node.id ? "z-10 shadow-[0_24px_48px_-12px_rgb(0_0_0/0.8)]" : ""}`}
               style={{ left: `${node.x}%`, top: `${node.y}%` }}
             >
               {/* Ports, on the header's centre line where cables attach */}
@@ -319,17 +338,18 @@ export function NodeCanvas() {
                 aria-hidden
                 className={`absolute top-[18px] -right-1 size-2 rounded-full border ${hasOut ? "border-hf-cyan bg-hf-cyan" : "border-hf-border bg-hf-surface"}`}
               />
-              <div className="flex items-center gap-1.5 border-b border-hf-border px-2 py-1.5">
+              <div
+                data-node-header
+                onPointerDown={(event) => beginDrag(event, node)}
+                onLostPointerCapture={() => setDragging(null)}
+                className={`flex touch-none items-center gap-1.5 border-b border-hf-border px-2 py-1.5 select-none ${
+                  linkFrom !== null ? "cursor-pointer" : dragging === node.id ? "cursor-grabbing" : "cursor-grab"
+                }`}
+              >
+                {/* Keyboard handle: focus it and use the arrow keys */}
                 <button
                   type="button"
                   aria-label={`Move ${type.label} node`}
-                  onPointerDown={(event) => {
-                    if (linkFrom !== null) return;
-                    event.stopPropagation();
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                    setDragging(node.id);
-                    setSelected(node.id);
-                  }}
                   onKeyDown={(event) => {
                     const step = 3;
                     if (event.key === "ArrowLeft") nudge(node.id, -step, 0);
@@ -339,7 +359,7 @@ export function NodeCanvas() {
                     else return;
                     event.preventDefault();
                   }}
-                  className="cursor-grab text-hf-dim active:cursor-grabbing"
+                  className="-m-1 flex size-6 shrink-0 items-center justify-center rounded text-hf-dim hover:text-white"
                 >
                   <GripVertical className="size-3.5" aria-hidden strokeWidth={2} />
                 </button>
@@ -354,6 +374,7 @@ export function NodeCanvas() {
                 <button
                   type="button"
                   aria-label={`Delete ${type.label} node`}
+                  data-node-delete
                   onClick={() => deleteNode(node.id)}
                   className="text-hf-dim transition-colors hover:text-hf-danger"
                 >
@@ -423,7 +444,7 @@ export function NodeCanvas() {
       </div>
 
       <p className="mt-3 text-xs text-hf-dim">
-        Drag by the handle, or focus it and use the arrow keys. Edit parameters inline; connections
+        Drag a node by its header, or focus its handle and use the arrow keys. Edit parameters inline; connections
         update live.
       </p>
     </div>
