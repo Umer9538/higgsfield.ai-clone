@@ -443,6 +443,32 @@ only as protected as a guessable handle while sign-in is mocked. Generations mad
 existed have no owner, so the public API cannot delete them; they need a
 one-off admin cleanup.
 
+## Refactor: splitting the largest files along their seams
+
+Several files had grown past 500 lines, one test file past 1,200, and each mixed
+data, logic and view. They were split where the code already had a seam, not to
+hit a line count:
+
+- **Data hooks out of views:** `useAssetLibrary` (fetch, merge, delete),
+  `useStudioCommands` (⌘K), `usePerfReadings` (HUD), `useMeasuredFps` (player).
+- **Components out of containers:** `FeedCard`, `AssetCard`, `NodeCard`, `Scrubber`,
+  `JsonInspector`, the inspector's `controls`, `PasswordRecovery`, and the
+  onboarding steps.
+- **Pure logic into `lib/`:** node definitions (`lib/canvas/nodes.ts`) and library
+  helpers (`lib/assets/library.ts`).
+- **Stylesheets:** `app/globals.css` is now an index over `app/styles/*`. The
+  compiled CSS was byte-identical before and after.
+- **Tests:** `critical-path.spec.ts` became one spec per area. The set of test names
+  was checked identical, and the whole suite passes unchanged.
+
+Every batch went through the same loop as the audit: split it, run `tsc`, lint,
+build and the full suite, then have an independent review compare behaviour
+before and after, and fix what it finds. The one deliberate behaviour change:
+going Back from password recovery and reopening it now clears the code digits,
+because asking for a new code invalidates the old one. No component file is over
+300 lines now. The largest files left are content tables (`lib/pricing/content.ts`)
+and the responsive spec, where length is data rather than tangled logic.
+
 ## Real Backend & Persistence Architecture
 
 **Shape.** Next.js route handlers (`app/api/*`, Node runtime, never cached)

@@ -71,7 +71,6 @@ export function BuilderStep({
                     type="button"
                     role="radio"
                     aria-checked={on}
-                    // Tapping the chosen tag again clears the group
                     onClick={() => onToggleTag(group, tag)}
                     className={`press flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors sm:min-h-9 ${
                       on

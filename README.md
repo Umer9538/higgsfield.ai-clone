@@ -77,10 +77,10 @@ what a run wrote to the shared library.
 
 | Path | What |
 |---|---|
-| `app/` | Routes: `(shell)/` pages share the rail and top bar; `api/` handlers |
-| `components/` | UI by area: `layout`, `workspace` (studios), `explore`, `onboarding`, `account`, `ui` |
-| `lib/` | Config and logic: `workspace/surfaces`, `server` (repository, validation), `nav`, stores |
-| `e2e/` | Playwright specs, fixtures and teardown |
+| `app/` | Routes: `(shell)/` pages share the rail and top bar; `api/` handlers; `styles/` holds tokens, base, surfaces and motion CSS |
+| `components/` | UI by area: `layout`, `workspace` (studios; `inspector/`, `media/`), `explore`, `assets`, `onboarding` (`steps/`), `auth`, `account`, `sections/canvas`, `ui` (`palette/`, `hud/`) |
+| `lib/` | Config and logic: `workspace/surfaces`, `server` (repository, validation), `canvas`, `assets`, `nav`, stores |
+| `e2e/` | Playwright specs (one per area), fixtures, global setup and teardown |
 | `docs/higgsfield-reference.md` | Notes on the reference product |
 | `recon/` | Screenshots of the reference product, by flow |
 | `public/media/` | Stock stills and clips served locally for the demo |
