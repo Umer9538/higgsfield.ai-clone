@@ -7,7 +7,7 @@ import type { Content } from "@/lib/workspace/types";
 
 function Headline({ text, highlight }: { text: string; highlight?: string }) {
   return (
-    <h1 className="font-display text-3xl leading-[1.05] font-bold tracking-tight text-white uppercase sm:text-4xl lg:text-5xl">
+    <h1 className="font-display text-3xl leading-[1.05] font-bold tracking-[-0.025em] text-white sm:text-4xl lg:text-5xl">
       {text}
       {highlight ? (
         <>
@@ -41,7 +41,7 @@ export function ContentPane({ content }: { content: Content }) {
           {content.steps.map((step, index) => (
             <div key={step.title}>
               <Tile src={`/media/steps/${index + 1}.jpg`} className="aspect-[4/3] w-full" />
-              <p className="mt-3 font-display text-sm font-bold tracking-tight text-white uppercase">
+              <p className="mt-3 font-display text-sm font-bold tracking-[-0.025em] text-white">
                 {step.title}
               </p>
               <p className="mt-1 text-sm leading-relaxed text-hf-muted">{step.caption}</p>
@@ -150,7 +150,7 @@ function CarouselPane({
     <div className="mx-auto max-w-3xl text-center">
       <Tile src={`/media/library/${(index % 5) + 1}.jpg`} className="aspect-video w-full" sizes="768px" />
 
-      <h1 className="mt-6 font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+      <h1 className="mt-6 font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
         {slide.title}
       </h1>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-hf-muted">{slide.caption}</p>

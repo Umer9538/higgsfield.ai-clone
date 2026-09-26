@@ -17,9 +17,9 @@ export function PageHeading({
   return (
     <div>
       {eyebrow ? (
-        <p className="text-xs tracking-widest text-hf-muted uppercase">{eyebrow}</p>
+        <p className="text-xs text-hf-muted">{eyebrow}</p>
       ) : null}
-      <h1 className="mt-3 font-display text-3xl leading-tight font-bold tracking-tight text-white uppercase sm:text-4xl">
+      <h1 className="mt-3 font-display text-3xl leading-tight font-bold tracking-[-0.025em] text-white sm:text-4xl">
         {title}
       </h1>
       {sub ? <p className="mt-3 max-w-2xl text-sm text-hf-muted sm:text-base">{sub}</p> : null}
@@ -35,7 +35,7 @@ export function PageHeading({
 export function RailHeading({ title, link }: { title: string; link?: string }) {
   return (
     <div className="flex items-end justify-between gap-4">
-      <h2 className="font-display text-lg font-bold tracking-tight text-white uppercase sm:text-xl">
+      <h2 className="font-display text-lg font-bold tracking-[-0.025em] text-white sm:text-xl">
         {title}
       </h2>
       {link ? (

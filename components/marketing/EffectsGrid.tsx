@@ -11,7 +11,7 @@ export function EffectsGrid() {
       <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         {EFFECTS.presets.map((preset) => (
           <li key={preset.name}>
-            <Link href="/ai/effects" className="group relative block overflow-hidden rounded-2xl border border-hf-border">
+            <Link href="/ai/effects" className="hover-glow group relative block overflow-hidden rounded-[var(--radius-media)] border border-hf-border">
               <div className="relative aspect-video w-full overflow-hidden">
                 <Image
                   src={preset.image}
@@ -24,7 +24,7 @@ export function EffectsGrid() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3">
-                <h3 className="font-display text-sm font-bold tracking-tight text-white uppercase sm:text-base">
+                <h3 className="font-display text-sm font-bold tracking-[-0.025em] text-white sm:text-base">
                   {preset.name}
                 </h3>
                 {/* Revealed on hover, and always readable for keyboard users */}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
-import { SETUP_OPTIONS, nextPillValue } from "@/lib/workspace/options";
+import { SETUP_GROUPS, SETUP_OPTIONS, nextPillValue } from "@/lib/workspace/options";
 import { useToast } from "@/components/ui/Toast";
 import { Icon } from "./Icon";
 import { GenerateButton } from "./GenerateButton";
@@ -22,6 +22,8 @@ export function DockBar({ surface }: { surface: Surface }) {
     Object.fromEntries((dock?.setup ?? []).map((item) => [item.label, item.value])),
   );
   const [openSetup, setOpenSetup] = useState<string | null>(null);
+  // Parameters used to be hidden outright below sm; now they fold away instead.
+  const [paramsOpen, setParamsOpen] = useState(false);
   const customised = Object.entries(setupValues).filter(
     ([key, value]) => SETUP_OPTIONS[key] && value !== "Auto",
   ).length;
@@ -33,74 +35,115 @@ export function DockBar({ surface }: { surface: Surface }) {
   const stepperMax = Number(stepper?.split("/")[1] ?? 4);
 
   return (
-    <div className="sticky bottom-0 px-4 pb-4">
+    // Sticky only from sm up: on a phone an open parameter sheet is taller than
+    // the space left, and a pinned dock would sit on top of the scene.
+    <div className="relative px-4 pb-4 sm:sticky sm:bottom-0">
       {/* Setting tiles above the composer, as in Cinema Studio */}
       {setup ? (
-        <div className="glass mx-auto mb-2.5 hidden max-w-4xl flex-wrap items-center gap-2 rounded-3xl p-2 sm:flex">
-          {setup.map((item) => (
-            <div key={item.label} className="relative flex-1">
-              <button
-                type="button"
-                aria-expanded={openSetup === item.label}
-                aria-haspopup={SETUP_OPTIONS[item.label] ? "listbox" : undefined}
-                onClick={() => {
-                  if (!SETUP_OPTIONS[item.label]) {
-                    toast(`${item.label} picker opened`, "info");
-                    return;
-                  }
-                  setOpenSetup((prev) => (prev === item.label ? null : item.label));
-                }}
-                className={`flex w-full items-center gap-2 rounded-2xl px-3 py-2 text-left transition-colors ${
-                  setupValues[item.label] && setupValues[item.label] !== "Auto"
-                    ? "bg-hf-cyan/10 ring-1 ring-hf-cyan/60 ring-inset"
-                    : "bg-hf-surface-3 hover:bg-hf-surface-4"
-                }`}
-              >
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-hf-surface-4 text-hf-muted">
-                  <Icon name={item.icon} className="size-3.5" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-[10px] text-hf-dim">{item.label}</span>
-                  <span className="block truncate text-xs font-medium text-white">
-                    {setupValues[item.label] ?? item.value}
-                  </span>
-                </span>
-              </button>
+        <button
+          type="button"
+          aria-expanded={paramsOpen}
+          aria-controls="studio-parameters"
+          onClick={() => setParamsOpen((prev) => !prev)}
+          className="press glass mx-auto mb-2 flex min-h-11 w-full max-w-4xl items-center justify-between rounded-[var(--radius-control)] px-4 text-sm text-white sm:hidden"
+        >
+          <span>Parameters</span>
+          <span className={customised > 0 ? "text-hf-cyan" : "text-hf-dim"}>
+            {customised > 0 ? `${customised} set` : "All auto"}
+          </span>
+        </button>
+      ) : null}
 
-              {openSetup === item.label && SETUP_OPTIONS[item.label] ? (
-                <ul
-                  role="listbox"
-                  aria-label={item.label}
-                  className="glass absolute bottom-full left-0 z-40 mb-2 grid w-64 grid-cols-2 gap-1.5 rounded-2xl p-2 shadow-lg"
-                >
-                  {SETUP_OPTIONS[item.label].map((option) => {
-                    const chosen = setupValues[item.label] === option;
-                    return (
-                      <li key={option}>
-                        <button
-                          type="button"
-                          role="option"
-                          aria-selected={chosen}
-                          onClick={() => {
-                            setSetupValues((prev) => ({ ...prev, [item.label]: option }));
-                            setOpenSetup(null);
-                            toast(`${item.label}: ${option}`);
-                          }}
-                          className={`flex min-h-11 w-full items-center justify-center rounded-xl px-2 text-center text-xs transition-colors ${
-                            chosen
-                              ? "bg-hf-cyan/15 text-white ring-1 ring-hf-cyan ring-inset"
-                              : "bg-hf-surface-3 text-hf-muted hover:bg-hf-surface-4 hover:text-white"
-                          }`}
-                        >
-                          {option}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : null}
-            </div>
-          ))}
+      {setup ? (
+        <div
+          id="studio-parameters"
+          className={`glass mx-auto mb-2.5 max-w-4xl flex-col gap-3 rounded-[var(--radius-panel)] p-3 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 ${
+            paramsOpen ? "flex" : "hidden"
+          }`}
+        >
+          {SETUP_GROUPS.map((group) => {
+            const items = setup.filter((entry) => group.labels.includes(entry.label));
+            if (items.length === 0) return null;
+            return (
+              <div
+                key={group.name}
+                role="group"
+                aria-label={group.name}
+                className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center"
+              >
+                <span className="px-1 text-[11px] font-medium text-hf-dim sm:w-9 sm:shrink-0">
+                  {group.name}
+                </span>
+                <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:flex">
+                  {items.map((item) => (
+                  <div key={item.label} className="relative flex-1">
+                    <button
+                      type="button"
+                      aria-expanded={openSetup === item.label}
+                      aria-haspopup={SETUP_OPTIONS[item.label] ? "listbox" : undefined}
+                      onClick={() => {
+                        if (!SETUP_OPTIONS[item.label]) {
+                          toast(`${item.label} picker opened`, "info");
+                          return;
+                        }
+                        setOpenSetup((prev) => (prev === item.label ? null : item.label));
+                      }}
+                      className={`flex w-full items-center gap-2 rounded-2xl px-3 py-2 text-left transition-colors ${
+                        SETUP_OPTIONS[item.label] && setupValues[item.label] !== "Auto"
+                          ? "bg-hf-cyan/10 ring-1 ring-hf-cyan/60 ring-inset"
+                          : "bg-hf-surface-3 hover:bg-hf-surface-4"
+                      }`}
+                    >
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-hf-surface-4 text-hf-muted">
+                        <Icon name={item.icon} className="size-3.5" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[10px] text-hf-dim">{item.label}</span>
+                        <span className="block truncate text-xs font-medium text-white">
+                          {setupValues[item.label] ?? item.value}
+                        </span>
+                      </span>
+                    </button>
+
+                    {openSetup === item.label && SETUP_OPTIONS[item.label] ? (
+                      <ul
+                        role="listbox"
+                        aria-label={item.label}
+                        className="glass absolute bottom-full left-0 z-40 mb-2 grid w-64 grid-cols-2 gap-1.5 rounded-2xl p-2 shadow-lg"
+                      >
+                        {SETUP_OPTIONS[item.label].map((option) => {
+                          const chosen = setupValues[item.label] === option;
+                          return (
+                            <li key={option}>
+                              <button
+                                type="button"
+                                role="option"
+                                aria-selected={chosen}
+                                onClick={() => {
+                                  setSetupValues((prev) => ({ ...prev, [item.label]: option }));
+                                  setOpenSetup(null);
+                                  toast(`${item.label}: ${option}`);
+                                }}
+                                className={`flex min-h-11 w-full items-center justify-center rounded-xl px-2 text-center text-xs transition-colors ${
+                                  chosen
+                                    ? "bg-hf-cyan/15 text-white ring-1 ring-hf-cyan ring-inset"
+                                    : "bg-hf-surface-3 text-hf-muted hover:bg-hf-surface-4 hover:text-white"
+                                }`}
+                              >
+                                {option}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : null}
+                  </div>
+          
+                  ))}
+                </div>
+              </div>
+            );
+          })}
 
           {customised > 0 ? (
             <button
@@ -154,7 +197,7 @@ export function DockBar({ surface }: { surface: Surface }) {
           </div>
         ) : null}
 
-      <div className="glass min-w-0 flex-1 rounded-3xl p-3">
+      <div className="gradient-border min-w-0 flex-1 rounded-[var(--radius-panel)] p-3 shadow-[0_24px_60px_-24px_color-mix(in_srgb,var(--color-hf-accent)_40%,transparent)]">
         <div className="flex items-center gap-2.5">
           <button
             type="button"

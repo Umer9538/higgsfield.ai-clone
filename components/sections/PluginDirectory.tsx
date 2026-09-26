@@ -39,7 +39,7 @@ export function PluginDirectory() {
           <span className="size-1.5 rounded-full bg-hf-accent" aria-hidden />
           {PLUGINS.status}
         </span>
-        <h1 className="mt-4 font-display text-3xl leading-tight font-bold tracking-tight text-white uppercase sm:text-4xl">
+        <h1 className="mt-4 font-display text-3xl leading-tight font-bold tracking-[-0.025em] text-white sm:text-4xl">
           {PLUGINS.headline[0]}
           <br />
           <span className="text-hf-accent-soft">{active.name}</span>
@@ -58,7 +58,7 @@ export function PluginDirectory() {
       </section>
 
       <section className="mt-10">
-        <h2 className="font-display text-lg font-bold tracking-tight text-white uppercase">
+        <h2 className="font-display text-lg font-bold tracking-[-0.025em] text-white">
           Integrations
         </h2>
         <ul role="list" aria-label="Integrations" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -127,7 +127,7 @@ export function PluginDirectory() {
       </section>
 
       <section className="mt-12 rounded-3xl border border-hf-border bg-hf-surface p-6">
-        <h2 className="font-display text-lg font-bold tracking-tight text-white uppercase">
+        <h2 className="font-display text-lg font-bold tracking-[-0.025em] text-white">
           {PLUGINS.bridge.title}
         </h2>
 

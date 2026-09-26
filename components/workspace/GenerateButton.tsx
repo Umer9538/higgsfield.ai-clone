@@ -22,12 +22,18 @@ export function GenerateButton({
       disabled={inactive}
       onClick={start}
       aria-busy={busy}
-      className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-base font-semibold text-black transition-colors ${
+      // background-color stays the flat accent (tests and forced-colors read
+      // it); the gradient and highlight sit on top as background-image.
+      className={`press relative isolate flex w-full items-center justify-center gap-2 overflow-hidden rounded-[var(--radius-control)] px-5 py-3.5 text-base font-semibold text-black ${
         inactive
           ? "cursor-not-allowed bg-hf-accent-muted text-black/60"
-          : "bg-hf-accent hover:bg-hf-accent-deep"
+          : "glow bg-hf-accent bg-[linear-gradient(180deg,rgb(255_255_255/0.22),rgb(255_255_255/0)_55%),linear-gradient(90deg,var(--color-hf-accent),var(--color-hf-accent-soft))] hover:bg-hf-accent-deep"
       } ${className}`}
     >
+      {busy ? (
+        // While running, a band of light sweeps the button: the render is developing.
+        <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 -z-10 w-1/3 animate-sweep bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+      ) : null}
       {busy ? "Generating…" : "Generate"}
       {busy ? null : badge ? (
         <span className="flex items-center gap-1.5 rounded bg-black/20 px-1.5 py-0.5 text-[11px] font-bold">

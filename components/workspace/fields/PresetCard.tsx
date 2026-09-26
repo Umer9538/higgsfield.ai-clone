@@ -34,7 +34,7 @@ export function PresetCard({
       </button>
 
       <div className="absolute right-3 bottom-3 left-3">
-        <p className="font-display text-lg leading-none font-bold tracking-tight text-hf-accent-soft uppercase">
+        <p className="font-display text-lg leading-none font-bold tracking-[-0.025em] text-hf-accent-soft">
           {current}
         </p>
         <p className="mt-1.5 truncate text-xs text-hf-muted">{sublabel}</p>

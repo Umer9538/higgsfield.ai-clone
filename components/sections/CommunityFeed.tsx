@@ -42,7 +42,7 @@ export function CommunityFeed() {
           <p className="mt-4 font-display text-3xl font-bold tracking-tight text-hf-accent-soft sm:text-4xl">
             {COMMUNITY.banner.prize}
           </p>
-          <h2 className="mt-1 font-display text-xl font-bold tracking-tight text-white uppercase">
+          <h2 className="mt-1 font-display text-xl font-bold tracking-[-0.025em] text-white">
             {COMMUNITY.banner.title}
           </h2>
           <p className="mt-2 max-w-xl text-sm text-hf-muted">{COMMUNITY.banner.body}</p>
@@ -121,7 +121,7 @@ export function CommunityFeed() {
       </section>
 
       <section className="mt-14 rounded-3xl border border-hf-border bg-hf-surface p-6 text-center">
-        <h2 className="font-display text-lg font-bold tracking-tight text-white uppercase">
+        <h2 className="font-display text-lg font-bold tracking-[-0.025em] text-white">
           Join the conversation
         </h2>
         <ul className="mt-4 flex flex-wrap justify-center gap-2">

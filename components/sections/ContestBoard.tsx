@@ -115,7 +115,7 @@ export function ContestBoard() {
       ) : (
         <>
           <section className="mt-8 overflow-hidden rounded-3xl border border-hf-border bg-gradient-to-br from-[#1a1405] via-hf-surface to-hf-black p-6 sm:p-8">
-            <h2 className="font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+            <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
               {CONTESTS.active.title}
             </h2>
             <p className="mt-2 text-sm text-hf-muted">{CONTESTS.active.tagline}</p>

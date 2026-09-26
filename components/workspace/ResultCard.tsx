@@ -240,7 +240,7 @@ export function ResultCard({ result }: { result: GenerationResult }) {
         </button>
       </div>
 
-      <div className="mt-3">
+      <div className="mt-3 animate-reveal">
         {result.kind === "video" ? (
           <VideoPlayer src={result.src} poster={result.poster} />
         ) : (

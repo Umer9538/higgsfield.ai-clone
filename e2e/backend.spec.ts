@@ -133,6 +133,34 @@ test("studio parameters open a chip grid and reset in one step", async ({ page }
   await expect(page.getByRole("button", { name: /^Reset/ })).toHaveCount(0);
 });
 
+test("mobile: studio parameters fold behind a disclosure that reports what is set", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/ai/cinema-studio");
+
+  const toggle = page.getByRole("button", { name: /^Parameters/ });
+  const panel = page.locator("#studio-parameters");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(panel).toBeHidden();
+  await expect(toggle).toContainText("All auto");
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(panel.getByRole("group", { name: "Look" })).toBeVisible();
+  await expect(panel.getByRole("group", { name: "Lens" })).toBeVisible();
+
+  // References is a counter, not a picker: it must not claim to be configured
+  const references = panel.getByRole("button", { name: /^References/ });
+  expect(await references.evaluate((el) => el.className)).not.toContain("ring-hf-cyan");
+
+  await panel.getByRole("button", { name: /^Camera/ }).click();
+  await page.getByRole("listbox", { name: "Camera" }).getByRole("option", { name: "50mm" }).click();
+  await expect(toggle).toContainText("1 set");
+
+  // On a phone the dock scrolls with the page instead of pinning over the scene
+  const position = await panel.evaluate((el) => getComputedStyle(el.parentElement!).position);
+  expect(position).not.toBe("sticky");
+});
+
 test("keyboard focus draws the cyan ring", async ({ page }) => {
   await page.goto("/pricing");
   // Tab until a control inside main takes focus

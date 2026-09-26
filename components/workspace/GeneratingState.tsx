@@ -32,7 +32,22 @@ export function GeneratingState() {
           </button>
         </div>
 
-        <div className="mt-6">
+        <div
+          aria-hidden
+          className="relative mt-6 aspect-video w-full overflow-hidden rounded-[var(--radius-media)] border border-hf-border bg-hf-black"
+        >
+          {/* Exposure rises with progress: the frame develops as the render runs */}
+          <div
+            className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,color-mix(in_srgb,var(--color-hf-accent)_45%,transparent),transparent_70%)] transition-opacity duration-300"
+            style={{ opacity: 0.15 + (progress / 100) * 0.85 }}
+          />
+          <div className="absolute inset-y-0 left-0 w-1/3 animate-sweep bg-gradient-to-r from-transparent via-hf-accent-soft/35 to-transparent" />
+          <span className="absolute bottom-3 left-3 text-[11px] text-hf-muted tabular-nums">
+            Frame {Math.max(1, Math.round((progress / 100) * 120))} of 120
+          </span>
+        </div>
+
+        <div className="mt-5">
           <div className="flex items-center justify-between text-xs">
             <span className="font-medium text-white">{stages[stageIndex]}</span>
             <span className="text-hf-muted tabular-nums">{percent}%</span>

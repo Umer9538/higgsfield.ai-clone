@@ -84,7 +84,7 @@ export function PlanCard({
     <article role="listitem" className={`flex flex-col rounded-3xl border p-5 ${theme.shell}`}>
       <header>
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className={`font-display text-xl font-bold tracking-tight uppercase ${theme.name}`}>
+          <h3 className={`font-display text-xl font-bold tracking-[-0.025em] ${theme.name}`}>
             {plan.name}
           </h3>
           {plan.discountLabel ? (

@@ -17,7 +17,7 @@ export function ProductRail() {
         <div className="relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-hf-border p-6 sm:p-8">
           <div className="absolute inset-0 bg-gradient-to-br from-[#3a1d5c] via-hf-surface-3 to-hf-black" />
           <div className="relative">
-            <h2 className="font-display text-2xl leading-tight font-bold tracking-tight uppercase sm:text-3xl">
+            <h2 className="font-display text-2xl leading-tight font-bold tracking-[-0.025em] sm:text-3xl">
               <span className="text-white">{PROMO_PANEL.headline}</span>
               <br />
               <span className="text-hf-accent-soft">{PROMO_PANEL.highlight}</span>
@@ -43,7 +43,7 @@ export function ProductRail() {
             <li key={tile.id}>
               <Link
                 href={tile.href}
-                className="flex h-full flex-col justify-between gap-4 rounded-3xl border border-hf-border bg-hf-surface p-4 transition-colors hover:border-hf-accent/40 hover:bg-hf-surface-3"
+                className="hover-glow flex h-full flex-col justify-between gap-4 rounded-[var(--radius-media)] border border-hf-border bg-hf-surface p-4 hover:bg-hf-surface-2"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="size-6 rounded-md bg-hf-surface-4" aria-hidden />
@@ -87,7 +87,7 @@ export function SectionHeading({
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 className="font-display text-2xl font-bold tracking-tight text-hf-accent-soft uppercase sm:text-3xl">
+        <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-hf-accent-soft sm:text-3xl">
           {title}
         </h2>
         <p className="mt-2 max-w-xl text-sm text-hf-muted">{sub}</p>

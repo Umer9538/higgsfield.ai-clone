@@ -60,7 +60,7 @@ export function PlanGrid() {
 
       {audience === "business" ? (
         <div className="mt-6 rounded-3xl border border-hf-border bg-hf-surface p-8 text-center">
-          <h2 className="font-display text-xl font-bold tracking-tight text-white uppercase">
+          <h2 className="font-display text-xl font-bold tracking-[-0.025em] text-white">
             Business plans
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-hf-muted">

@@ -12,7 +12,7 @@ export function ContactSales() {
     <section id="contact-sales" className="mt-24 scroll-mt-20">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <div>
-          <h2 className="font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+          <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
             Contact our sales team
           </h2>
           <p className="mt-3 text-sm text-hf-muted">

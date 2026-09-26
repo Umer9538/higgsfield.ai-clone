@@ -28,10 +28,10 @@ export default function EnterprisePage() {
       <main className="mx-auto max-w-6xl px-4 pb-16">
         {/* Hero */}
         <section className="pt-14 text-center">
-          <p className="text-xs tracking-widest text-hf-muted uppercase">
+          <p className="text-xs text-hf-muted">
             {ENTERPRISE_HERO.eyebrow}
           </p>
-          <h1 className="mx-auto mt-4 max-w-3xl font-display text-3xl leading-tight font-bold tracking-tight text-white uppercase sm:text-4xl lg:text-5xl">
+          <h1 className="mx-auto mt-4 max-w-3xl font-display text-3xl leading-tight font-bold tracking-[-0.025em] text-white sm:text-4xl lg:text-5xl">
             {ENTERPRISE_HERO.headline}
           </h1>
           <p className="mt-4 text-sm text-hf-accent-soft">{ENTERPRISE_HERO.proof}</p>
@@ -60,7 +60,7 @@ export default function EnterprisePage() {
 
         {/* Security pillars */}
         <section className="mt-24">
-          <h2 className="font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+          <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
             Premium. Secure. Enterprise.
           </h2>
           <ul className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -82,7 +82,7 @@ export default function EnterprisePage() {
         {/* Workspace */}
         <section className="mt-24">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+            <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
               Enterprise-level workspace
             </h2>
             <a
@@ -116,13 +116,13 @@ export default function EnterprisePage() {
 
         {/* Capabilities */}
         <section className="mt-24">
-          <h2 className="font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+          <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
             Purpose-built for the modern creative enterprise
           </h2>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {CAPABILITIES.map((item) => (
               <li key={item.id} className="rounded-3xl border border-hf-border bg-hf-surface p-5">
-                <h3 className="font-display text-sm font-bold tracking-tight text-hf-accent-soft uppercase">
+                <h3 className="font-display text-sm font-bold tracking-[-0.025em] text-hf-accent-soft">
                   {item.title}
                 </h3>
                 <p className="mt-2 text-sm font-medium text-white">{item.lead}</p>

@@ -38,3 +38,12 @@ export const SETUP_OPTIONS: Record<string, string[]> = {
   "Color palette": ["Auto", "Warm Vintage", "Orange Teal", "Monochrome", "Pastel"],
   Lighting: ["Auto", "Studio Soft Light", "Golden Hour", "Neon Night", "High Key"],
 };
+
+/**
+ * Setup tiles grouped by what they control. "Look" shapes the image, "Lens"
+ * shapes how it is captured. Anything unlisted falls into "More".
+ */
+export const SETUP_GROUPS: { name: string; labels: string[] }[] = [
+  { name: "Look", labels: ["Film setup", "Color palette", "Lighting"] },
+  { name: "Lens", labels: ["Camera", "References"] },
+];

@@ -14,7 +14,7 @@ export default function SupercomputerPage() {
       <AppHeader activeNav="supercomputer" />
 
       <main className="mx-auto max-w-5xl px-4 py-16">
-        <h1 className="text-center font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+        <h1 className="text-center font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
           What are we creating today?
         </h1>
 

@@ -100,7 +100,7 @@ export function CommandPalette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="glass relative z-10 w-full max-w-lg overflow-hidden rounded-3xl shadow-2xl"
+        className="glass animate-reveal relative z-10 w-full max-w-lg overflow-hidden rounded-[var(--radius-panel)] shadow-[0_40px_120px_-20px_color-mix(in_srgb,var(--color-hf-accent)_35%,transparent)]"
       >
         <div className="flex items-center gap-2.5 border-b border-hf-border px-4">
           <Search className="size-4 shrink-0 text-hf-dim" aria-hidden strokeWidth={1.75} />
@@ -143,7 +143,7 @@ export function CommandPalette() {
           ) : (
             Object.entries(grouped).map(([group, items]) => (
               <li key={group}>
-                <p className="px-3 pt-3 pb-1 text-[10px] tracking-widest text-hf-dim uppercase">
+                <p className="px-3 pt-3 pb-1 text-[10px] text-hf-dim">
                   {group}
                 </p>
                 <ul>

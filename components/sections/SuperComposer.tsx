@@ -99,7 +99,7 @@ export function SuperComposer() {
         </ul>
       ) : null}
 
-      <h2 className="mt-20 text-center font-display text-xl leading-tight font-bold tracking-tight text-white uppercase sm:text-2xl">
+      <h2 className="mt-20 text-center font-display text-xl leading-tight font-bold tracking-[-0.025em] text-white sm:text-2xl">
         Build, generate, and market anything with skills,
         <br />
         connectors, and automation

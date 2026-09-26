@@ -35,7 +35,7 @@ export default function CanvasPage() {
         </section>
 
         <section className="mt-14 rounded-3xl border border-hf-border bg-hf-surface p-6 sm:p-8">
-          <h2 className="font-display text-xl font-bold tracking-tight text-white uppercase">
+          <h2 className="font-display text-xl font-bold tracking-[-0.025em] text-white">
             {CANVAS.featureTitle}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-hf-muted">

@@ -71,7 +71,7 @@ export function PluginPage() {
           )}
         </div>
 
-        <h1 className="mt-8 font-display text-3xl font-bold tracking-tight text-hf-accent-soft uppercase sm:text-4xl lg:text-5xl">
+        <h1 className="mt-8 font-display text-3xl font-bold tracking-[-0.025em] text-hf-accent-soft sm:text-4xl lg:text-5xl">
           Higgsfield plugin for ChatGPT
         </h1>
         <p className="mt-3 text-sm text-hf-muted sm:text-base">
@@ -177,7 +177,7 @@ export function PluginPage() {
       </p>
 
       <section className="mt-20">
-        <h2 className="text-center font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+        <h2 className="text-center font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
           How does MCP work?
         </h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">

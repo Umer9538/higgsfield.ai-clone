@@ -193,7 +193,7 @@ export function Calculator() {
 
           <div className="mt-5 rounded-3xl border border-hf-accent/25 bg-gradient-to-b from-[#161c07] to-hf-surface p-4">
             <div className="flex items-center gap-2">
-              <h3 className="font-display text-lg font-bold tracking-tight text-white uppercase">
+              <h3 className="font-display text-lg font-bold tracking-[-0.025em] text-white">
                 {plan.name}
               </h3>
               {plan.discountLabel ? (

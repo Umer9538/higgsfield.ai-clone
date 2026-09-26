@@ -21,7 +21,7 @@ export default function OriginalsPage() {
         <section className="relative overflow-hidden rounded-3xl border border-hf-border">
           <div className="relative aspect-[21/9] w-full bg-gradient-to-br from-hf-surface-4 via-hf-surface-3 to-hf-black">
             <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10">
-              <h1 className="font-display text-3xl leading-tight font-bold tracking-tight text-white uppercase sm:text-4xl lg:text-5xl">
+              <h1 className="font-display text-3xl leading-tight font-bold tracking-[-0.025em] text-white sm:text-4xl lg:text-5xl">
                 {ORIGINALS.hero.title}
               </h1>
               <p className="mt-3 max-w-xl text-sm text-hf-muted">{ORIGINALS.hero.sub}</p>
@@ -109,7 +109,7 @@ export default function OriginalsPage() {
           <span className="rounded bg-hf-pink px-2 py-0.5 text-[11px] font-semibold text-white">
             {ORIGINALS.promo.badge}
           </span>
-          <h2 className="mt-4 font-display text-2xl font-bold tracking-tight text-white uppercase">
+          <h2 className="mt-4 font-display text-2xl font-bold tracking-[-0.025em] text-white">
             {ORIGINALS.promo.title}
           </h2>
           <p className="mt-2 text-sm text-hf-muted">{ORIGINALS.promo.sub}</p>

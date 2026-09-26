@@ -16,9 +16,9 @@ export function Hero() {
         {/* Lead */}
         <Link
           href={lead.href}
-          className="group relative block overflow-hidden rounded-3xl border border-hf-border"
+          className="gradient-border group relative block overflow-hidden rounded-[var(--radius-panel)]"
         >
-          <div className="relative aspect-[16/10] w-full lg:aspect-[16/11]">
+          <div className="relative aspect-[16/10] h-full w-full lg:aspect-auto lg:min-h-[28rem]">
             <Image
               src={lead.image}
               alt=""
@@ -31,10 +31,10 @@ export function Hero() {
           </div>
 
           <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-accent px-3 py-1 text-[11px] font-semibold tracking-wide text-black uppercase">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-accent px-3 py-1 text-xs font-semibold text-black">
               Featured
             </span>
-            <h2 className="mt-3 max-w-lg font-display text-2xl leading-tight font-bold tracking-tight text-white uppercase sm:text-3xl">
+            <h2 className="mt-3 max-w-lg font-display text-2xl leading-tight font-bold tracking-[-0.025em] text-white sm:text-3xl">
               {lead.title}
             </h2>
             <p className="mt-2 max-w-md text-sm text-hf-muted">{lead.description}</p>
@@ -50,7 +50,7 @@ export function Hero() {
           {rest.map((card) => (
             <li key={card.id}>
               <Link href={card.href} className="group block h-full">
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-hf-border">
+                <div className="hover-glow relative aspect-[4/3] w-full overflow-hidden rounded-[var(--radius-media)] border border-hf-border">
                   <Image
                     src={card.image}
                     alt=""
@@ -60,7 +60,7 @@ export function Hero() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
                 </div>
-                <h2 className="mt-3 font-display text-sm font-bold tracking-tight text-white uppercase">
+                <h2 className="mt-3 font-display text-sm font-bold tracking-[-0.025em] text-white">
                   {card.title}
                 </h2>
                 <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-hf-muted">

@@ -10,7 +10,7 @@ function FeedCard({ item }: { item: FeedItem }) {
   return (
     <article
       style={{ gridRowEnd: `span ${item.span}` }}
-      className="group relative block overflow-hidden rounded-2xl border border-hf-border"
+      className="hover-glow group relative block overflow-hidden rounded-[var(--radius-media)] border border-hf-border"
     >
       <div className="relative size-full">
         <FeedMedia item={item} />
@@ -204,7 +204,7 @@ export function ExploreFeed() {
           <section key={rail.id} className="mt-14">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="font-display text-xl font-bold tracking-tight text-hf-accent-soft uppercase sm:text-2xl">
+                <h2 className="font-display text-xl font-bold tracking-[-0.025em] text-hf-accent-soft sm:text-2xl">
                   {rail.title}
                 </h2>
                 <p className="mt-1.5 text-sm text-hf-muted">{rail.sub}</p>
@@ -270,7 +270,7 @@ export function ExploreFeed() {
       )}
 
       <section className="mt-20 text-center">
-        <h2 className="font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
+        <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-white sm:text-3xl">
           Explore more AI features
         </h2>
         <ul className="mx-auto mt-6 flex max-w-4xl flex-wrap justify-center gap-2">

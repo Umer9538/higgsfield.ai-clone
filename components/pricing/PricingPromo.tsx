@@ -38,7 +38,7 @@ export function PricingPromo() {
             {PRICING_PROMO.badge}
           </span>
 
-          <h2 className="mt-4 font-display text-2xl leading-tight font-bold tracking-tight uppercase sm:text-3xl lg:text-4xl">
+          <h2 className="mt-4 font-display text-2xl leading-tight font-bold tracking-[-0.025em] sm:text-3xl lg:text-4xl">
             <span className="text-hf-pink">{PRICING_PROMO.headline}</span>
             <br />
             <span className="text-white">{PRICING_PROMO.subheadline}</span>

@@ -22,7 +22,7 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
 
   return (
     <section className="mt-14">
-      <h2 className="font-display text-lg font-bold tracking-tight text-white uppercase sm:text-xl">
+      <h2 className="font-display text-lg font-bold tracking-[-0.025em] text-white sm:text-xl">
         {templates.title}
       </h2>
 
