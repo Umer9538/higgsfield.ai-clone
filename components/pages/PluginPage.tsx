@@ -59,7 +59,7 @@ export function PluginPage() {
     <main className="mx-auto max-w-5xl px-4 py-14">
       <div className="text-center">
         <div className="mx-auto flex w-fit items-center -space-x-3">
-          {["#1f2937", "#111827", "#ffffff", "#d1fe17", "#1f2937", "#b91c1c", "#ea580c"].map(
+          {["#1f2937", "#111827", "#ffffff", "#8b5cf6", "#1f2937", "#b91c1c", "#ea580c"].map(
             (colour, index) => (
               <span
                 key={colour + index}

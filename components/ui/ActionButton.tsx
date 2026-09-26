@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useToast } from "./Toast";
 import { downloadAsset } from "@/lib/ui/download";
 
-type Variant = "lime" | "outline" | "ghost" | "white";
+type Variant = "primary" | "outline" | "ghost" | "white";
 
 const VARIANTS: Record<Variant, string> = {
-  lime: "bg-hf-accent text-black hover:bg-hf-accent-deep font-semibold",
+  primary: "bg-hf-accent text-black hover:bg-hf-accent-deep font-semibold",
   outline: "border border-hf-border text-white hover:border-hf-accent/50 hover:text-hf-accent-soft",
   ghost: "text-hf-muted hover:text-white",
   white: "bg-white text-black hover:bg-white/90 font-medium",
@@ -20,7 +20,7 @@ const VARIANTS: Record<Variant, string> = {
 export function ActionButton({
   children,
   message,
-  variant = "lime",
+  variant = "primary",
   className = "",
   toggleLabel,
   download,

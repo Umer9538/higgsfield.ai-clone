@@ -206,7 +206,7 @@ export function NodeCanvas() {
           type="button"
           onClick={() => deleteNode(selected)}
           disabled={nodes.length <= 1}
-          className="flex items-center gap-1.5 rounded-lg border border-hf-border px-3 py-2 text-sm text-white transition-colors hover:border-hf-pink hover:text-hf-pink disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-lg border border-hf-border px-3 py-2 text-sm text-white transition-colors hover:border-hf-danger hover:text-hf-danger disabled:opacity-40"
         >
           <Trash2 className="size-4" aria-hidden strokeWidth={1.75} />
           Delete
@@ -240,7 +240,7 @@ export function NodeCanvas() {
                 y1={`${a.y + 5}%`}
                 x2={`${b.x + 8}%`}
                 y2={`${b.y + 5}%`}
-                stroke="#d1fe17"
+                stroke="var(--color-hf-cyan)"
                 strokeWidth={2}
                 strokeOpacity={0.55}
               />
@@ -299,7 +299,7 @@ export function NodeCanvas() {
                   type="button"
                   aria-label={`Delete ${type.label} node`}
                   onClick={() => deleteNode(node.id)}
-                  className="text-hf-dim transition-colors hover:text-hf-pink"
+                  className="text-hf-dim transition-colors hover:text-hf-danger"
                 >
                   <X className="size-3.5" aria-hidden strokeWidth={2} />
                 </button>

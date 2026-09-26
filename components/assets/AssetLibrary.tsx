@@ -138,7 +138,7 @@ function AssetCard({
             aria-label={`Delete ${asset.title}`}
             title="Delete"
             onClick={() => onDelete(asset.id)}
-            className="flex size-11 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-hf-pink md:size-8"
+            className="flex size-11 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-hf-danger md:size-8"
           >
             <Trash2 className="size-4" aria-hidden strokeWidth={1.75} />
           </button>

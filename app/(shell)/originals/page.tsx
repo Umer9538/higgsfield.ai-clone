@@ -103,8 +103,8 @@ export default function OriginalsPage() {
         </section>
 
         {/* Promo */}
-        <section className="mt-12 overflow-hidden rounded-3xl border border-hf-border bg-gradient-to-r from-[#161c07] to-hf-black p-6 sm:p-8">
-          <span className="rounded bg-hf-pink px-2 py-0.5 text-[11px] font-semibold text-white">
+        <section className="mt-12 overflow-hidden rounded-3xl border border-hf-border bg-gradient-to-r from-hf-accent/10 to-hf-black p-6 sm:p-8">
+          <span className="rounded bg-hf-accent px-2 py-0.5 text-[11px] font-semibold text-black">
             {ORIGINALS.promo.badge}
           </span>
           <h2 className="mt-4 font-display text-2xl font-bold tracking-[-0.025em] text-white">

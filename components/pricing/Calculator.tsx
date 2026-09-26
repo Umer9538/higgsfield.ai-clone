@@ -115,9 +115,9 @@ export function Calculator() {
                       onChange={(event) =>
                         setCounts((prev) => ({ ...prev, [slider.id]: Number(event.target.value) }))
                       }
-                      className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-accent"
+                      className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-cyan"
                       style={{
-                        background: `linear-gradient(to right, #d1fe17 ${percent}%, #292b2c ${percent}%)`,
+                        background: `linear-gradient(to right, var(--color-hf-cyan) ${percent}%, var(--color-hf-surface-4) ${percent}%)`,
                       }}
                     />
                     <div className="mt-1.5 flex items-center justify-between text-[11px]">
@@ -191,13 +191,13 @@ export function Calculator() {
             </span>
           </p>
 
-          <div className="mt-5 rounded-3xl border border-hf-accent/25 bg-gradient-to-b from-[#161c07] to-hf-surface p-4">
+          <div className="mt-5 rounded-3xl border border-hf-accent/25 bg-gradient-to-b from-hf-accent/10 to-hf-surface p-4">
             <div className="flex items-center gap-2">
               <h3 className="font-display text-lg font-bold tracking-[-0.025em] text-white">
                 {plan.name}
               </h3>
               {plan.discountLabel ? (
-                <span className="rounded bg-hf-pink px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                <span className="rounded bg-hf-accent px-1.5 py-0.5 text-[10px] font-semibold text-black">
                   {plan.discountLabel}
                 </span>
               ) : null}
@@ -234,7 +234,7 @@ export function Calculator() {
 
             <div className="mt-4 flex flex-wrap items-baseline gap-2">
               {billing === "annual" && plan.monthly !== plan.annual ? (
-                <s className="font-display text-xl font-bold text-hf-pink">${plan.monthly}</s>
+                <s className="font-display text-xl font-bold text-hf-dim">${plan.monthly}</s>
               ) : null}
               <span className="font-display text-2xl font-bold text-white">${price}</span>
               <span className="text-[11px] text-hf-muted">

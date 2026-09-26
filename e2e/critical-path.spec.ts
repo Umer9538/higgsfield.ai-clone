@@ -489,7 +489,7 @@ test("the accent renders as Electric Violet on the active link, New badge and Ge
   await expect(newBadge).toHaveCSS("background-color", ACCENT);
   await expect(newBadge).toHaveCSS("color", "rgb(0, 0, 0)");
 
-  // Primary action: solid lime background, black text
+  // Primary action: solid violet background, black text
   const generate = page.getByRole("button", { name: /^Generate/ });
   await expect(generate).toHaveCSS("background-color", ACCENT);
   await expect(generate).toHaveCSS("color", "rgb(0, 0, 0)");

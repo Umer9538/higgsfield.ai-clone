@@ -51,7 +51,7 @@ export function ComparisonMatrix() {
                           {plan.name}
                         </span>
                         {plan.bestValue ? (
-                          <span className="flex items-center gap-1 rounded bg-[#9ce6f3] px-1.5 py-0.5 text-[10px] font-semibold text-black">
+                          <span className="flex items-center gap-1 rounded bg-hf-cyan px-1.5 py-0.5 text-[10px] font-semibold text-black">
                             <Zap className="size-2.5" aria-hidden fill="currentColor" strokeWidth={0} />
                             BEST VALUE
                           </span>

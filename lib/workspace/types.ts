@@ -52,7 +52,7 @@ export interface Option {
 }
 
 export type Field =
-  /** Preset thumbnail with a lime label, e.g. GENERAL / Seedance 2.5 */
+  /** Preset thumbnail with an accent label, e.g. GENERAL / Seedance 2.5 */
   | { kind: "preset"; id: string; label: string; sublabel: string; image: string }
   | { kind: "segmented"; id: string; options: Option[]; defaultValue: string }
   | { kind: "dropzone"; id: string; title: string; subtitle?: string; accepts: IconName[] }

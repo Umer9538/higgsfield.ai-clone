@@ -228,7 +228,7 @@ export function Quiz() {
               >
                 <Tag className="size-4" aria-hidden strokeWidth={1.75} />
                 {claimed ? "54% sign-up discount claimed" : "Claim your 54% sign-up discount"}
-                <span className="rounded bg-hf-pink px-1.5 py-0.5 text-[10px] font-bold text-white">
+                <span className="rounded bg-hf-accent px-1.5 py-0.5 text-[10px] font-bold text-black">
                   54% OFF
                 </span>
               </button>

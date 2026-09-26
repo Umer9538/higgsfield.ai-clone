@@ -8,7 +8,7 @@ export type PlanId = "basic" | "pro" | "max";
 export interface FeatureRow {
   label: string;
   included: boolean;
-  badges?: { label: string; tone: "lime" | "pink" | "neutral" | "green" }[];
+  badges?: { label: string; tone: "feature" | "new" | "neutral" | "saving" }[];
   note?: string;
 }
 
@@ -105,7 +105,7 @@ export const PLANS: Plan[] = [
           included: true,
           badges: [
             { label: "1080p", tone: "neutral" },
-            { label: "Full access", tone: "lime" },
+            { label: "Full access", tone: "feature" },
           ],
         },
         {
@@ -113,7 +113,7 @@ export const PLANS: Plan[] = [
           included: true,
           badges: [
             { label: "4K", tone: "neutral" },
-            { label: "Full access", tone: "lime" },
+            { label: "Full access", tone: "feature" },
           ],
         },
       ],
@@ -125,18 +125,18 @@ export const PLANS: Plan[] = [
         included: true,
         badges: [
           { label: "2K", tone: "neutral" },
-          { label: "7-day unlimited", tone: "lime" },
+          { label: "7-day unlimited", tone: "feature" },
         ],
       },
       {
         label: "Kling 3.0",
         included: true,
-        badges: [{ label: "7-day unlimited", tone: "lime" }],
+        badges: [{ label: "7-day unlimited", tone: "feature" }],
       },
     ],
     unlimitedMore: "7 unlimited & free generation models",
     capabilities: [
-      { label: "Unlimited paid parallel generations", included: true, badges: [{ label: "New", tone: "pink" }] },
+      { label: "Unlimited paid parallel generations", included: true, badges: [{ label: "New", tone: "new" }] },
       { label: "Access to Supercomputer", included: true },
       { label: "Access to all Seedance models", included: true },
       { label: "Access to all models & features", included: true },
@@ -172,7 +172,7 @@ export const PLANS: Plan[] = [
           included: true,
           badges: [
             { label: "1080p", tone: "neutral" },
-            { label: "Full access", tone: "lime" },
+            { label: "Full access", tone: "feature" },
           ],
         },
         {
@@ -180,7 +180,7 @@ export const PLANS: Plan[] = [
           included: true,
           badges: [
             { label: "4K", tone: "neutral" },
-            { label: "Full access", tone: "lime" },
+            { label: "Full access", tone: "feature" },
           ],
         },
       ],
@@ -191,7 +191,7 @@ export const PLANS: Plan[] = [
         included: true,
         badges: [
           { label: "2K", tone: "neutral" },
-          { label: "7-day unlimited", tone: "lime" },
+          { label: "7-day unlimited", tone: "feature" },
         ],
       },
       {
@@ -199,14 +199,14 @@ export const PLANS: Plan[] = [
         included: true,
         badges: [
           { label: "2K", tone: "neutral" },
-          { label: "7-day unlimited", tone: "lime" },
+          { label: "7-day unlimited", tone: "feature" },
         ],
       },
-      { label: "Kling 3.0", included: true, badges: [{ label: "7-day unlimited", tone: "lime" }] },
+      { label: "Kling 3.0", included: true, badges: [{ label: "7-day unlimited", tone: "feature" }] },
     ],
     unlimitedMore: "7 unlimited & free generation models",
     capabilities: [
-      { label: "Unlimited paid parallel generations", included: true, badges: [{ label: "New", tone: "pink" }] },
+      { label: "Unlimited paid parallel generations", included: true, badges: [{ label: "New", tone: "new" }] },
       { label: "Access to Supercomputer", included: true },
       { label: "Access to all Seedance models", included: true },
       { label: "Access to all models & features", included: true },
@@ -215,7 +215,7 @@ export const PLANS: Plan[] = [
       {
         label: "Lowest cost per credit",
         included: true,
-        badges: [{ label: "70% CHEAPER", tone: "green" }],
+        badges: [{ label: "70% CHEAPER", tone: "saving" }],
       },
     ],
   },

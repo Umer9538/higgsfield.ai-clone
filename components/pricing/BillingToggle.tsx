@@ -37,7 +37,7 @@ export function BillingToggle({
       <span className={`text-sm ${annual ? "text-white" : "text-hf-dim"}`}>Annual</span>
 
       {discountLabel ? (
-        <span className="rounded bg-hf-pink px-1.5 py-0.5 text-[10px] font-semibold text-white">
+        <span className="rounded bg-hf-accent px-1.5 py-0.5 text-[10px] font-semibold text-black">
           {discountLabel}
         </span>
       ) : null}

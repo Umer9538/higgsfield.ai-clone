@@ -6,8 +6,8 @@ import type { FeatureRow, Plan, PlanId } from "@/lib/pricing/content";
 import type { Billing } from "./BillingToggle";
 
 /**
- * Per-plan theming. Lime carries Pro (the recommended plan), magenta carries
- * Max, and Basic stays neutral — mirroring how the real page ranks them.
+ * Per-plan theming in one hue, by intensity: Basic neutral, Pro a violet
+ * wash (the recommended plan), Max the brightest violet with a glow.
  */
 const THEME: Record<PlanId, { shell: string; cta: string; name: string }> = {
   basic: {
@@ -16,22 +16,25 @@ const THEME: Record<PlanId, { shell: string; cta: string; name: string }> = {
     name: "text-white",
   },
   pro: {
-    shell: "border-hf-accent/25 bg-gradient-to-b from-[#161c07] to-hf-surface",
+    shell: "border-hf-accent/25 bg-gradient-to-b from-hf-accent/8 to-hf-surface",
     cta: "bg-hf-accent text-black hover:bg-hf-accent-deep",
     name: "text-white",
   },
   max: {
-    shell: "border-hf-pink/30 bg-gradient-to-b from-[#2a0a1d] to-hf-surface",
-    cta: "bg-gradient-to-r from-hf-magenta to-hf-pink text-white hover:opacity-90",
+    // The top tier gets the brightest version of the one brand colour
+    // rather than a second hue: a lit violet gradient with a glow.
+    shell: "border-hf-accent/50 bg-gradient-to-b from-hf-accent/20 to-hf-surface",
+    cta: "glow bg-hf-accent bg-[linear-gradient(90deg,var(--color-hf-accent),var(--color-hf-accent-soft))] text-black hover:bg-hf-accent-deep",
     name: "text-white",
   },
 };
 
+/** Badges by meaning: a feature perk, something new, a spec, a saving. */
 const BADGE_TONE = {
-  lime: "bg-hf-accent/15 text-hf-accent-soft",
-  pink: "bg-hf-pink text-white",
+  feature: "bg-hf-accent/15 text-hf-accent-soft",
+  new: "bg-hf-accent text-black",
   neutral: "bg-hf-surface-4 text-hf-muted",
-  green: "bg-[#1a4d1a] text-[#6ee76e]",
+  saving: "bg-hf-cyan/15 text-hf-cyan",
 };
 
 function Row({ row, dimmed }: { row: FeatureRow; dimmed?: boolean }) {
@@ -88,12 +91,12 @@ export function PlanCard({
             {plan.name}
           </h3>
           {plan.discountLabel ? (
-            <span className="rounded bg-hf-pink px-1.5 py-0.5 text-[10px] font-semibold text-white">
+            <span className="rounded bg-hf-accent px-1.5 py-0.5 text-[10px] font-semibold text-black">
               {plan.discountLabel}
             </span>
           ) : null}
           {plan.bestValue ? (
-            <span className="flex items-center gap-1 rounded bg-[#9ce6f3] px-1.5 py-0.5 text-[10px] font-semibold text-black">
+            <span className="flex items-center gap-1 rounded bg-hf-cyan px-1.5 py-0.5 text-[10px] font-semibold text-black">
               <Zap className="size-2.5" aria-hidden fill="currentColor" strokeWidth={0} />
               BEST VALUE
             </span>
@@ -126,9 +129,9 @@ export function PlanCard({
               value={stepIndex}
               aria-label={`${plan.name} monthly credits`}
               onChange={(event) => setStepIndex(Number(event.target.value))}
-              className="h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-accent"
+              className="h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-cyan"
               style={{
-                background: `linear-gradient(to right, #d1fe17 ${(stepIndex / (steps.length - 1)) * 100}%, #292b2c ${(stepIndex / (steps.length - 1)) * 100}%)`,
+                background: `linear-gradient(to right, var(--color-hf-cyan) ${(stepIndex / (steps.length - 1)) * 100}%, var(--color-hf-surface-4) ${(stepIndex / (steps.length - 1)) * 100}%)`,
               }}
             />
             <div className="mt-2 flex justify-between">
@@ -153,7 +156,7 @@ export function PlanCard({
       {/* Price */}
       <div className="mt-5 flex flex-wrap items-baseline gap-2">
         {showStrike ? (
-          <s className="font-display text-2xl font-bold text-hf-pink">${plan.monthly}</s>
+          <s className="font-display text-2xl font-bold text-hf-dim">${plan.monthly}</s>
         ) : null}
         <span className="font-display text-3xl font-bold tracking-tight text-white">${price}</span>
         <span className="text-xs text-hf-muted">
@@ -222,7 +225,7 @@ export function PlanCard({
       {/* Seedance */}
       <section
         className={`mt-3 rounded-2xl border p-3.5 ${
-          plan.seedance.available ? "border-[#1d4ed8]/40 bg-[#0b1c3d]" : "border-hf-border"
+          plan.seedance.available ? "border-hf-cyan/30 bg-hf-cyan/5" : "border-hf-border"
         }`}
       >
         <h4 className="text-[11px] font-semibold tracking-wide uppercase">

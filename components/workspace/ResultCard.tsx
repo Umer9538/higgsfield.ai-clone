@@ -107,9 +107,9 @@ function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
             video.currentTime = Number(event.target.value);
             setCurrent(Number(event.target.value));
           }}
-          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/25 accent-hf-accent"
+          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/25 accent-hf-cyan"
           style={{
-            background: `linear-gradient(to right, #d1fe17 ${progress}%, rgba(255,255,255,0.25) ${progress}%)`,
+            background: `linear-gradient(to right, var(--color-hf-cyan) ${progress}%, rgba(255,255,255,0.25) ${progress}%)`,
           }}
         />
 

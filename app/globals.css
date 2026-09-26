@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /*
- * Design tokens measured from the live higgsfield.ai stylesheets.
- * See docs/higgsfield-reference.md for provenance.
+ * Design tokens. The palette is our own — Obsidian, Electric Violet, Cyber
+ * Cyan — and its reasoning lives in PRODUCT_DECISIONS.md.
  */
 @theme {
   /*
@@ -15,32 +15,34 @@
   --color-hf-accent-deep: #7c3aed;
   --color-hf-accent-muted: #4c3a7a;
 
-  /* Secondary, used sparingly for highlights alongside the violet */
+  /*
+   * Cyber Cyan is state, never brand: selected, focused, configured, live,
+   * and how far along something is (progress, slider fills).
+   */
   --color-hf-cyan: #06b6d4;
 
-  /* Surface ramp, darkest to lightest */
+  /* Functional only — destructive actions and errors. Not part of the brand. */
+  --color-hf-danger: #f43f5e;
+
   /*
-   * Surfaces carry a trace of the brand violet rather than neutral grey, so
-   * the whole room reads as lit by the screen. Each step is a layer: page,
-   * panel, raised control, pressed control, hairline.
+   * Obsidian: a near-neutral ramp with only a hair of cool. The chrome must
+   * not tint the work — a coloured surround shifts how every image and clip
+   * on it is perceived, which is why grading suites use neutral grey. Each
+   * step is a layer: page, panel, raised control, pressed control, hairline.
    */
-  --color-hf-black: #07060b;
-  --color-hf-surface: #0d0b14;
-  --color-hf-surface-2: #12101b;
-  --color-hf-surface-3: #1a1725;
-  --color-hf-surface-4: #231f30;
-  --color-hf-border: #2c2840;
+  --color-hf-black: #09090b;
+  --color-hf-surface: #101013;
+  --color-hf-surface-2: #16161a;
+  --color-hf-surface-3: #1e1e23;
+  --color-hf-surface-4: #27272d;
+  --color-hf-border: #303038;
 
   /* Text */
   --color-hf-text: #ffffff;
-  /* Muted text keeps AA on every surface: 8:1 and 4.8:1 against the panel */
-  --color-hf-muted: #aaa6b8;
-  --color-hf-dim: #857f98;
-
-  /* Status / badges */
-  --color-hf-pink: #ff005b;
-  --color-hf-magenta: #ed1572;
-  --color-hf-amber: #fabc00;
+  /* Measured: muted 8.1:1 and dim 5.9:1 on the panel; dim stays above 4.6:1
+     even on a pressed control */
+  --color-hf-muted: #a8a8b3;
+  --color-hf-dim: #8f8f9b;
 
   --font-sans: var(--font-body);
   --font-display: var(--font-heading);
@@ -146,6 +148,12 @@ body {
  * surface on each screen that is the point of it — the composer, the lead
  * story — so it stays a signal rather than a pattern.
  */
+/*
+ * Focal surfaces only (the composers). At rest the edge is violet light
+ * fading out; while you type in it, cyan takes over and a second pixel of
+ * outline joins it, so the surface itself is the 2px focus indicator. The
+ * field inside skips its own ring (below) instead of drawing a second one.
+ */
 @utility gradient-border {
   border: 1px solid transparent;
   background:
@@ -153,10 +161,55 @@ body {
     linear-gradient(
         135deg,
         color-mix(in srgb, var(--color-hf-accent) 70%, transparent),
-        color-mix(in srgb, var(--color-hf-cyan) 45%, transparent) 55%,
+        color-mix(in srgb, var(--color-hf-accent) 18%, transparent) 55%,
         color-mix(in srgb, white 6%, transparent)
       )
       border-box;
+  &:has(:is(input, textarea):focus) {
+    outline: 1px solid color-mix(in srgb, var(--color-hf-cyan) 55%, transparent);
+    outline-offset: 1px;
+    background:
+      linear-gradient(var(--color-hf-surface-2), var(--color-hf-surface-2)) padding-box,
+      linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--color-hf-cyan) 75%, transparent),
+          color-mix(in srgb, var(--color-hf-accent) 45%, transparent) 60%,
+          color-mix(in srgb, white 6%, transparent)
+        )
+        border-box;
+  }
+}
+
+.gradient-border :is(input, textarea):focus-visible {
+  outline: none;
+}
+
+/*
+ * Sliders show how far along a value is, which is state: the filled track
+ * is cyan (set inline per slider), the thumb a white disc with a cyan halo.
+ */
+input[type="range"] {
+  accent-color: var(--color-hf-cyan);
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-hf-cyan) 45%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.5);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-hf-cyan) 45%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.5);
 }
 
 /* Tactile press: the control gives a little under the finger. */

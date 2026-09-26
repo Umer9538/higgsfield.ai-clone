@@ -1,6 +1,6 @@
 /**
  * Explore feed. On the real site Explore is the signed-in homepage: a stack of
- * per-model rails, each a lime uppercase heading over a masonry grid, with
+ * per-model rails, each an accent heading over a masonry grid, with
  * author and like chips revealed on hover. See recon/home.
  */
 

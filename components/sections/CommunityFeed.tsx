@@ -34,7 +34,7 @@ export function CommunityFeed() {
 
       {/* Contest banner */}
       <section className="mt-6 overflow-hidden rounded-3xl border border-hf-border">
-        <div className="relative bg-gradient-to-r from-[#1a1405] via-[#2a2208] to-hf-black p-6 sm:p-8">
+        <div className="relative bg-gradient-to-r from-hf-accent/12 via-hf-accent/5 to-hf-black p-6 sm:p-8">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-accent/15 px-2.5 py-1 text-[11px] font-semibold text-hf-accent-soft">
             <span className="size-1.5 rounded-full bg-hf-accent" aria-hidden />
             {COMMUNITY.banner.label}

@@ -8,30 +8,98 @@ set of cuts made on purpose. This file records what changed and why.
 
 ## What we changed
 
-### Visual identity
+### Visual identity: Obsidian, Electric Violet, Cyber Cyan
+
+**The rule behind every colour below: the work is the only thing on screen
+allowed to be colourful.** A creative tool's canvas is full of generated
+images and video; the chrome's job is to frame them without competing or
+tinting them. So the base is near-neutral, and colour is spent only where
+it tells you something.
+
+| Role | Token | Hex | Used for |
+|---|---|---|---|
+| Page | `hf-black` | `#09090B` | the room |
+| Panel | `hf-surface` | `#101013` | rail, inspector, footer |
+| Raised | `hf-surface-2` | `#16161A` | composers, cards |
+| Control | `hf-surface-3` | `#1E1E23` | tiles, chips |
+| Pressed | `hf-surface-4` | `#27272D` | active tab, slider track |
+| Hairline | `hf-border` | `#303038` | every border |
+| Text | `hf-text` | `#FFFFFF` | headings, values |
+| Muted text | `hf-muted` | `#A8A8B3` | body copy |
+| Dim text | `hf-dim` | `#8F8F9B` | labels, struck-out prices |
+| **Brand / action** | `hf-accent` | `#8B5CF6` | Generate, Create, primary buttons, New and offer badges, the active rail marker |
+| Brand text | `hf-accent-soft` | `#A78BFA` | violet text on dark |
+| Hover / pressed | `hf-accent-deep` | `#7C3AED` | primary hover |
+| Disabled | `hf-accent-muted` | `#4C3A7A` | Generate while disabled |
+| **State** | `hf-cyan` | `#06B6D4` | focus ring, selected and configured controls, progress, slider fills, node connections, a composer while you type in it |
+| Danger | `hf-danger` | `#F43F5E` | destructive actions only — not part of the brand |
+
+**Three roles, never mixed.** Violet means *do this*. Cyan means *this is
+the current state* — selected, focused, configured, how far along. Obsidian
+is everything else. A glance tells you whether something is an action or a
+status, and neither ever appears as decoration.
+
+**Measured contrast (WCAG):**
+
+| On | White | Muted | Dim | Violet tint | Cyan |
+|---|---|---|---|---|---|
+| Page `#09090B` | 19.9 | 8.5 | 6.2 | 7.3 | 8.2 |
+| Panel `#101013` | 19.0 | 8.1 | 5.9 | 7.0 | 7.8 |
+| Control `#1E1E23` | 16.6 | 7.1 | 5.2 | 6.1 | 6.8 |
+| Pressed `#27272D` | 14.9 | 6.3 | 4.7 | 5.5 | 6.1 |
+
+Every text colour clears AA (4.5:1) on every surface it can sit on. Black
+on a violet button is 5.0:1, black on cyan 8.7:1. Full-strength violet
+`#8B5CF6` only reaches 4.5:1 as text, which is why text always uses the
+`#A78BFA` tint and the full tone is kept for fills.
+
+**Why violet and cyan, and not lime.** Lime is the reference's signature;
+going back to it would undo the point of making this our own. Violet is
+rare in natural footage — skin, foliage, sand and sunsets are warm or
+green — so a violet button stays distinct next to most frames instead of
+blending into them. Cyan is violet's cool neighbour: related enough to
+feel like one system, distinct enough to read as a different signal.
+
+**Reversed from the previous pass: violet-tinted surfaces.** Last round the
+surfaces carried a violet cast (`#07060B` → `#231F30`) to make the room feel
+lit by the screen. That works for an empty room and against a room full of
+work: a coloured surround shifts how everything placed on it is perceived
+(simultaneous contrast), nudging images toward the opposite hue — here,
+yellow-green. Grading suites use neutral grey for exactly this reason. The
+ramp is now near-neutral with a hair of cool, at the same lightness steps.
+
+**Removed for consistency.** An audit found colours left over from the
+reference and earlier passes, each doing a job the system already covers:
+
+- **Lime `#D1FE17`** still filled the result video scrubber, both pricing
+  credit sliders and the Canvas node connections. Sliders and progress are
+  state, so they are now cyan with a white thumb; connections are cyan too.
+- **Pink `#FF005B`, magenta and amber** carried discount badges, the Max
+  plan, the pricing promo and the contest banners. Offers are actions, so
+  they are now violet. Max is the brightest violet with a glow rather than a
+  second hue. Destructive hovers moved to the new danger token.
+- **Struck-out old prices** were pink, which pulled the eye to the price you
+  *don't* pay. They are now dim; the real price stays white.
+- **Green and blue tier badges** ("70% cheaper", Seedance access) now use
+  cyan tints.
+- **The full-bleed violet footer** — the reference's lime-footer signature,
+  repainted — was the largest area of colour in the app. It now sits on
+  Obsidian, with violet on one line of the wordmark.
+- Names that described colours were renamed to meanings: the pricing badge
+  tones `lime / pink / green` are now `feature / new / saving`, and the
+  `lime` button variant is `primary`.
+
+**Depth without colour noise.** Glass (translucent obsidian + blur + a
+white 6% top highlight) is only for things that float: dialogs, the
+palette, popovers. Gradient borders are only on the two composers: violet
+light fading out at rest, turning cyan while you type, with a second pixel
+of outline so the surface itself is a 2px focus indicator. The one ambient
+glow is the violet light behind the home composer.
 
 | | Reference | Ours |
 |---|---|---|
-| Primary accent | Lime `#d1fe17` | **Electric Violet** `#8B5CF6` |
-| Accent text on dark | Lime | Violet tint `#A78BFA` |
-| State and focus | Lime | **Neon Cyan** `#06B6D4` |
 | Radius | `rounded-xl` everywhere | a three-step scale: controls `12px`, media `18px`, panels `24px` |
-| Floating chrome | Solid dark panels | Glass: translucent fill, backdrop blur, hairline highlight |
 | Type | One grotesque, uppercase display | **Bricolage Grotesque** headlines, **Instrument Sans** body, sentence case |
-| Surfaces | Neutral greys | Ink tinted a few degrees toward violet (`#07060b` → `#231f30`) |
-
-Two colours with two jobs. **Violet is the brand** — primary buttons, badges,
-the footer block. **Cyan is state** — what is selected, focused, configured
-or live. Keeping them apart means a glance tells you whether something is a
-call to action or a status, which one accent colour could not do.
-
-**Contrast drove the split between violet and its tint.** `#8B5CF6` on the
-surface colour only reaches about 4.5:1 — borderline for body text. The
-`#A78BFA` tint clears 6.9:1, so text uses the tint and fills use the full
-tone. Black text on a violet button sits at 5.0:1, above AA.
-
-The token was renamed from `lime` to `accent` across 49 files. A class called
-`text-hf-lime` rendering violet would be a trap for the next person.
 
 ### Structure: three decisions
 
@@ -134,8 +202,9 @@ the light source, and the chrome stays dark and quiet around it.
   as shouting and made long model names hard to scan. Headlines are now
   sentence case in Bricolage Grotesque with tight tracking; body copy is
   Instrument Sans. 39 headings and every tracked-out eyebrow were changed.
-- **Ink, not grey.** Surfaces carry a slight violet cast, so the accent
-  belongs to the palette instead of sitting on top of it.
+- **Neutral ground.** Surfaces are near-neutral obsidian so the work is
+  never tinted — see *Visual identity* for why the earlier violet cast was
+  reversed.
 - **One radius per job.** Controls, media and panels each get one radius
   from a token, so nesting always steps outward and nothing looks
   accidentally mismatched.

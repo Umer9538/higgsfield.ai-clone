@@ -3,33 +3,33 @@ import { SmartLink } from "@/components/ui/SmartLink";
 import { routeFor } from "@/lib/routes";
 
 /**
- * Full-bleed lime block with black text. This inversion is the site's single
- * biggest visual signature and the one place lime is used as a surface rather
- * than an accent.
+ * Quiet on purpose. The reference ends every page on a full-bleed accent
+ * block; here the footer sits on the same obsidian as the chrome, so the
+ * largest coloured area on any page is the work, never the furniture.
  */
 export function SiteFooter() {
   return (
     <footer className="mt-16">
-      <div className="bg-hf-accent text-black">
+      <div className="border-t border-hf-border bg-hf-surface text-white">
         <div className="px-4 py-12 sm:py-16">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
             <h2 className="font-display text-4xl leading-[0.95] font-bold tracking-[-0.025em] sm:text-5xl">
               {FOOTER.wordmark[0]}
               <br />
-              {FOOTER.wordmark[1]}
+              <span className="text-hf-accent-soft">{FOOTER.wordmark[1]}</span>
             </h2>
 
             <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
               {FOOTER_COLUMNS.map((column) => (
                 <div key={column.title}>
-                  <h3 className="text-sm font-medium text-black/45">{column.title}</h3>
+                  <h3 className="text-sm font-medium text-hf-dim">{column.title}</h3>
                   <ul className="mt-3 space-y-2.5">
                     {column.links.map((link) => (
                       <li key={link}>
                         <SmartLink
                           label={link}
                           href={routeFor(link)}
-                          className="inline-flex min-h-11 items-center text-sm font-medium hover:underline md:min-h-0"
+                          className="inline-flex min-h-11 items-center text-sm text-hf-muted transition-colors hover:text-white md:min-h-0"
                         />
                       </li>
                     ))}
@@ -40,13 +40,13 @@ export function SiteFooter() {
           </div>
 
           <div className="mt-12 flex flex-wrap items-center justify-between gap-4 text-sm">
-            <p className="font-medium">{FOOTER.address}</p>
+            <p className="text-hf-muted">{FOOTER.address}</p>
             <ul className="flex flex-wrap items-center gap-5">
               {FOOTER.socials.map((social) => (
                 <li key={social}>
                   <SmartLink
                     label={social}
-                    className="inline-flex min-h-11 items-center font-medium hover:underline md:min-h-0"
+                    className="inline-flex min-h-11 items-center text-hf-muted transition-colors hover:text-hf-accent-soft md:min-h-0"
                   />
                 </li>
               ))}

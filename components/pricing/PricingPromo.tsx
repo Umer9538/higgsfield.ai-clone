@@ -29,17 +29,17 @@ export function PricingPromo() {
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-hf-border">
-      <div className="absolute inset-0 bg-gradient-to-r from-[#2a0d1f] via-[#3d1030] to-[#5c1038]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-hf-surface via-hf-accent/10 to-hf-accent/25" />
 
       <div className="relative flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-pink px-2.5 py-1 text-[11px] font-semibold text-white uppercase">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-accent px-2.5 py-1 text-[11px] font-semibold text-black">
             <Tag className="size-3" aria-hidden strokeWidth={2} />
             {PRICING_PROMO.badge}
           </span>
 
           <h2 className="mt-4 font-display text-2xl leading-tight font-bold tracking-[-0.025em] sm:text-3xl lg:text-4xl">
-            <span className="text-hf-pink">{PRICING_PROMO.headline}</span>
+            <span className="text-hf-accent-soft">{PRICING_PROMO.headline}</span>
             <br />
             <span className="text-white">{PRICING_PROMO.subheadline}</span>
           </h2>
@@ -47,9 +47,9 @@ export function PricingPromo() {
           <p className="mt-4 text-xs text-white/55 sm:text-sm">{PRICING_PROMO.note}</p>
         </div>
 
-        <div className="shrink-0 rounded-3xl border border-hf-pink/40 bg-black/30 p-4">
+        <div className="shrink-0 rounded-3xl border border-hf-accent/40 bg-black/30 p-4">
           <p className="flex items-center gap-1.5 text-xs text-white/70">
-            <Hourglass className="size-3.5 text-hf-pink" aria-hidden strokeWidth={1.75} />
+            <Hourglass className="size-3.5 text-hf-accent-soft" aria-hidden strokeWidth={1.75} />
             {PRICING_PROMO.countdownLabel}
           </p>
           <div className="mt-3 flex gap-2">
