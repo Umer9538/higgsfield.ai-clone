@@ -39,6 +39,22 @@ export const SETUP_OPTIONS: Record<string, string[]> = {
   Lighting: ["Auto", "Studio Soft Light", "Golden Hour", "Neon Night", "High Key"],
 };
 
+/** Named looks: several picker values applied in one step from ⌘K. */
+export const LOOKS: { name: string; values: Record<string, string> }[] = [
+  {
+    name: "Noir",
+    values: { "Film setup": "Cinematic", "Color palette": "Monochrome", Lighting: "Studio Soft Light", Camera: "50mm" },
+  },
+  {
+    name: "Golden hour",
+    values: { "Film setup": "Documentary", "Color palette": "Warm Vintage", Lighting: "Golden Hour", Camera: "35mm" },
+  },
+  {
+    name: "Neon",
+    values: { "Film setup": "Music video", "Color palette": "Orange Teal", Lighting: "Neon Night", Camera: "Anamorphic" },
+  },
+];
+
 /**
  * Setup tiles grouped by what they control. "Look" shapes the image, "Lens"
  * shapes how it is captured. Anything unlisted falls into "More".

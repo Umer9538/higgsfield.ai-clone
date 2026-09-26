@@ -2,12 +2,16 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CornerDownLeft, Search } from "lucide-react";
+import { Copy, CornerDownLeft, Search } from "lucide-react";
 import { COMMANDS, matches, type CommandItem } from "@/lib/commands/registry";
 import { useExclusiveOverlay, useScrollLock } from "./overlay";
 import { useAuth } from "@/lib/auth/context";
 import { useToast } from "./Toast";
 import { clearGeneratedAssets } from "@/lib/assets/store";
+import { useStudioContext } from "@/lib/commands/studio-context";
+import { JsonView } from "./JsonView";
+import { Modal } from "./Modal";
+import { toggleHud } from "./PerfHud";
 
 export const OPEN_PALETTE_EVENT = "hf:open-palette";
 
@@ -27,13 +31,56 @@ export function CommandPalette() {
   useScrollLock(open);
   const { isAuthenticated, signOut } = useAuth();
   const { toast } = useToast();
+  const studio = useStudioContext();
+  const [inspecting, setInspecting] = useState<Record<string, unknown> | null>(null);
+
+  // In a studio, its own commands come first: they act on what is on screen.
+  const studioCommands = useMemo<CommandItem[]>(() => {
+    if (!studio) return [];
+    return [
+      {
+        id: "studio-copy-prompt",
+        label: "Copy prompt",
+        group: "Studio",
+        keywords: "clipboard text",
+        run: () => {
+          const text = studio.prompt().trim();
+          if (!text) {
+            toast("The prompt is empty", "info");
+            return;
+          }
+          navigator.clipboard
+            .writeText(text)
+            .then(() => toast("Prompt copied"))
+            .catch(() => toast("Copy blocked by the browser", "info"));
+        },
+      },
+      {
+        id: "studio-inspect",
+        label: "Inspect generation JSON",
+        group: "Studio",
+        keywords: "metadata json settings debug developer",
+        run: () => setInspecting(studio.metadata()),
+      },
+      ...studio.looks.map<CommandItem>((look) => ({
+        id: `studio-look-${look.name}`,
+        label: `Apply look: ${look.name}`,
+        group: "Studio",
+        keywords: "preset style camera lighting palette",
+        run: () => {
+          look.apply();
+          toast(`${look.name} look applied`);
+        },
+      })),
+    ];
+  }, [studio, toast]);
 
   const results = useMemo(() => {
-    const available = COMMANDS.filter((item) =>
+    const available = [...studioCommands, ...COMMANDS].filter((item) =>
       item.action === "signout" ? isAuthenticated : true,
     );
     return available.filter((item) => matches(item, query));
-  }, [query, isAuthenticated]);
+  }, [query, isAuthenticated, studioCommands]);
 
   // Global shortcut
   useEffect(() => {
@@ -66,6 +113,10 @@ export function CommandPalette() {
   const run = useCallback(
     (item: CommandItem) => {
       setOpen(false);
+      if (item.run) {
+        item.run();
+        return;
+      }
       if (item.href) {
         router.push(item.href);
         return;
@@ -85,6 +136,9 @@ export function CommandPalette() {
           clearGeneratedAssets();
           toast("Saved generations cleared");
           break;
+        case "toggle-hud":
+          toggleHud();
+          break;
         case "toggle-motion": {
           const root = document.documentElement;
           const next = !root.classList.contains("reduce-motion");
@@ -97,7 +151,30 @@ export function CommandPalette() {
     [router, signOut, toast],
   );
 
-  if (!open) return null;
+  const inspector = (
+    <Modal open={inspecting !== null} onClose={() => setInspecting(null)} title="Generation metadata">
+      <p className="mb-3 text-sm text-hf-muted">
+        Exactly what is configured in {studio?.label ?? "this studio"} right now — the body a real
+        render request would carry.
+      </p>
+      {inspecting ? <JsonView value={inspecting} /> : null}
+      <button
+        type="button"
+        onClick={() =>
+          navigator.clipboard
+            .writeText(JSON.stringify(inspecting, null, 2))
+            .then(() => toast("JSON copied"))
+            .catch(() => toast("Copy blocked by the browser", "info"))
+        }
+        className="press mt-3 flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-hf-border px-4 text-sm text-white hover:border-hf-accent/50"
+      >
+        <Copy className="size-4" aria-hidden strokeWidth={1.75} />
+        Copy JSON
+      </button>
+    </Modal>
+  );
+
+  if (!open) return inspector;
 
   const grouped = results.reduce<Record<string, CommandItem[]>>((acc, item) => {
     (acc[item.group] ??= []).push(item);
@@ -106,6 +183,8 @@ export function CommandPalette() {
   let cursor = -1;
 
   return (
+    <>
+    {inspector}
     <div className="fixed inset-0 z-[95] flex items-start justify-center px-4 pt-[12vh]">
       <button
         type="button"
@@ -183,8 +262,8 @@ export function CommandPalette() {
                           }`}
                         >
                           {item.label}
-                          {item.href ? (
-                            <span className="ml-auto truncate text-[11px] text-hf-dim">{item.href}</span>
+                          {item.href || item.hint ? (
+                            <span className="ml-auto truncate text-[11px] text-hf-dim">{item.href ?? item.hint}</span>
                           ) : null}
                           {selected ? (
                             <CornerDownLeft className="size-3.5 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={2} />
@@ -200,5 +279,6 @@ export function CommandPalette() {
         </ul>
       </div>
     </div>
+    </>
   );
 }

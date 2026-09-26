@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/lib/auth/context";
 import { CommandPalette } from "@/components/ui/CommandPalette";
+import { PerfHud } from "@/components/ui/PerfHud";
 
 /**
  * Bricolage Grotesque for display: its optical-size axis tightens at large
@@ -37,6 +38,7 @@ export default function RootLayout({
           <ToastProvider>
             {children}
             <CommandPalette />
+            <PerfHud />
           </ToastProvider>
         </AuthProvider>
       </body>

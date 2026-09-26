@@ -1,11 +1,15 @@
 export interface CommandItem {
   id: string;
   label: string;
-  group: "Workspace" | "Browse" | "Account" | "Actions";
+  group: "Studio" | "Workspace" | "Browse" | "Account" | "Actions";
   /** Extra words matched by the fuzzy filter */
   keywords?: string;
   href?: string;
-  action?: "signout" | "copy-link" | "clear-generations" | "toggle-motion";
+  action?: "signout" | "copy-link" | "clear-generations" | "toggle-motion" | "toggle-hud";
+  /** Context commands supplied at runtime by the active studio */
+  run?: () => void;
+  /** Shortcut hint shown at the end of the row */
+  hint?: string;
 }
 
 export const COMMANDS: CommandItem[] = [
@@ -44,6 +48,7 @@ export const COMMANDS: CommandItem[] = [
   { id: "signout", label: "Sign out", group: "Account", action: "signout" },
 
   // Actions
+  { id: "toggle-hud", label: "Toggle performance HUD", group: "Actions", action: "toggle-hud", keywords: "fps latency vitals gpu debug specs", hint: "⇧D" },
   { id: "copy-link", label: "Copy current link", group: "Actions", action: "copy-link", keywords: "share url" },
   { id: "toggle-motion", label: "Toggle reduced motion", group: "Actions", action: "toggle-motion", keywords: "animation accessibility" },
   { id: "clear-generations", label: "Clear saved generations", group: "Actions", action: "clear-generations", keywords: "reset assets" },

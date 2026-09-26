@@ -8,6 +8,7 @@ import { Inspector } from "./Inspector";
 import { PromptBar } from "./PromptBar";
 import { SurfaceTabs } from "./SurfaceTabs";
 import { TemplateGallery } from "./TemplateGallery";
+import { useRegisterStudio } from "./useRegisterStudio";
 import { WorkspaceContent } from "./WorkspaceContent";
 
 /**
@@ -19,6 +20,7 @@ export function Studio({ surface }: { surface: Surface }) {
   const [collapsed, setCollapsed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const closeSheet = useCallback(() => setSheetOpen(false), []);
+  useRegisterStudio(surface);
 
   return (
     <div className="flex lg:h-[calc(100dvh-var(--spacing-header))]">

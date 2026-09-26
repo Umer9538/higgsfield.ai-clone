@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { GripVertical, Link2, Plus, Trash2, X } from "lucide-react";
+import { Activity, GripVertical, Link2, Plus, Trash2, X } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
+import { useCables, type CableStats } from "./useCables";
 
 type NodeTypeId = "text-prompt" | "image-input" | "video-output";
 
@@ -66,6 +67,14 @@ function defaults(type: NodeType): Record<string, string> {
 
 const typeOf = (id: NodeTypeId) => NODE_TYPES.find((t) => t.id === id)!;
 
+/**
+ * Credit estimate for an output node, from the Video studio's published rate
+ * (45 credits for 5 seconds). Labelled "est." in the UI: it is arithmetic on
+ * the pricing config, not a measurement.
+ */
+const CREDITS_PER_SECOND = 9;
+const estimateCredits = (duration: string) => Math.round((parseInt(duration, 10) || 5) * CREDITS_PER_SECOND);
+
 const INITIAL: CanvasNode[] = [
   { id: "n-text", type: "text-prompt", x: 6, y: 12, params: { text: "Neon alley, rain slick" } },
   { id: "n-image", type: "image-input", x: 6, y: 52, params: { source: "asset-3", weight: "0.5" } },
@@ -85,14 +94,39 @@ export function NodeCanvas() {
   const [linkFrom, setLinkFrom] = useState<string | null>(null);
   const [picker, setPicker] = useState(false);
   const { toast } = useToast();
+  const statsRef = useRef<HTMLSpanElement>(null);
 
+  // Live readout, written to the DOM directly so measuring does not itself
+  // cause a React render every frame.
+  const onStats = useCallback((stats: CableStats) => {
+    const el = statsRef.current;
+    if (!el) return;
+    el.dataset.running = String(stats.running);
+    el.textContent = stats.running
+      ? `${stats.workMs.toFixed(2)} ms/frame · ${stats.fps} fps${stats.dropped ? ` · ${stats.dropped} dropped` : ""}`
+      : `Settled · last ${stats.workMs.toFixed(2)} ms/frame`;
+  }, []);
+
+  const { nodeRef, pathRef } = useCables({ board: boardRef, edges, onStats, deps: nodes });
+
+  // Pointer events can fire several times per frame; apply at most one move
+  // per animation frame.
+  const pending = useRef<{ id: string; x: number; y: number } | null>(null);
+  const scheduled = useRef<number | null>(null);
   const move = useCallback((id: string, clientX: number, clientY: number) => {
     const board = boardRef.current;
     if (!board) return;
     const rect = board.getBoundingClientRect();
     const x = Math.min(74, Math.max(0, ((clientX - rect.left) / rect.width) * 100 - 8));
     const y = Math.min(66, Math.max(0, ((clientY - rect.top) / rect.height) * 100 - 5));
-    setNodes((prev) => prev.map((node) => (node.id === id ? { ...node, x, y } : node)));
+    pending.current = { id, x, y };
+    if (scheduled.current !== null) return;
+    scheduled.current = requestAnimationFrame(() => {
+      scheduled.current = null;
+      const next = pending.current;
+      if (!next) return;
+      setNodes((prev) => prev.map((node) => (node.id === next.id ? { ...node, x: next.x, y: next.y } : node)));
+    });
   }, []);
 
   const nudge = (id: string, dx: number, dy: number) =>
@@ -215,6 +249,12 @@ export function NodeCanvas() {
         <span aria-live="polite" className="ml-auto text-xs text-hf-dim">
           {nodes.length} nodes · {edges.length} connections
         </span>
+        <span className="flex items-center gap-1.5 rounded-full border border-hf-border px-2.5 py-1 font-mono text-[11px] text-hf-muted">
+          <Activity className="size-3 text-hf-cyan" aria-hidden strokeWidth={2} />
+          <span ref={statsRef} data-cable-stats>
+            Measuring…
+          </span>
+        </span>
       </div>
 
       <div
@@ -228,22 +268,24 @@ export function NodeCanvas() {
           backgroundSize: "22px 22px",
         }}
       >
+        {/* Paths are drawn by useCables; React only mounts them. Two layers per
+            cable: a soft base, and a dashed layer that flows source → target. */}
         <svg className="pointer-events-none absolute inset-0 size-full" aria-hidden>
           {edges.map(([from, to]) => {
-            const a = nodes.find((n) => n.id === from);
-            const b = nodes.find((n) => n.id === to);
-            if (!a || !b) return null;
+            const key = `${from}->${to}`;
             return (
-              <line
-                key={`${from}-${to}`}
-                x1={`${a.x + 8}%`}
-                y1={`${a.y + 5}%`}
-                x2={`${b.x + 8}%`}
-                y2={`${b.y + 5}%`}
-                stroke="var(--color-hf-cyan)"
-                strokeWidth={2}
-                strokeOpacity={0.55}
-              />
+              <g key={key} data-cable={key}>
+                <path ref={pathRef(key, 0)} fill="none" stroke="var(--color-hf-cyan)" strokeOpacity={0.3} strokeWidth={3} />
+                <path
+                  ref={pathRef(key, 1)}
+                  fill="none"
+                  stroke="var(--color-hf-cyan)"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeDasharray="2 10"
+                  className="animate-cable-flow"
+                />
+              </g>
             );
           })}
         </svg>
@@ -251,9 +293,14 @@ export function NodeCanvas() {
         {nodes.map((node) => {
           const type = typeOf(node.type);
           const isSelected = selected === node.id;
+          const inputs = edges.filter(([, to]) => to === node.id).length;
+          const hasIn = inputs > 0;
+          const hasOut = edges.some(([from]) => from === node.id);
           return (
             <div
               key={node.id}
+              ref={nodeRef(node.id)}
+              data-node={node.id}
               onPointerDown={() => {
                 if (linkFrom !== null) startLink(node.id);
                 else setSelected(node.id);
@@ -263,6 +310,15 @@ export function NodeCanvas() {
               }`}
               style={{ left: `${node.x}%`, top: `${node.y}%` }}
             >
+              {/* Ports, on the header's centre line where cables attach */}
+              <span
+                aria-hidden
+                className={`absolute top-[18px] -left-1 size-2 rounded-full border ${hasIn ? "border-hf-cyan bg-hf-cyan" : "border-hf-border bg-hf-surface"}`}
+              />
+              <span
+                aria-hidden
+                className={`absolute top-[18px] -right-1 size-2 rounded-full border ${hasOut ? "border-hf-cyan bg-hf-cyan" : "border-hf-border bg-hf-surface"}`}
+              />
               <div className="flex items-center gap-1.5 border-b border-hf-border px-2 py-1.5">
                 <button
                   type="button"
@@ -304,6 +360,17 @@ export function NodeCanvas() {
                   <X className="size-3.5" aria-hidden strokeWidth={2} />
                 </button>
               </div>
+
+              {node.type === "video-output" ? (
+                <div data-node-badges className="flex flex-wrap gap-1 border-b border-hf-border px-2 py-1.5 font-mono text-[10px]">
+                  <span className={`rounded px-1.5 py-0.5 ${hasIn ? "bg-hf-cyan/15 text-hf-cyan" : "bg-hf-surface-4 text-hf-dim"}`}>
+                    {inputs} {inputs === 1 ? "input" : "inputs"}
+                  </span>
+                  <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-muted">
+                    est. {estimateCredits(node.params.duration ?? "5s")} cr
+                  </span>
+                </div>
+              ) : null}
 
               <div className="space-y-2 p-2">
                 {type.params.map((param) => {

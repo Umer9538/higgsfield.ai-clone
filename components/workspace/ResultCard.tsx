@@ -1,164 +1,44 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { downloadAsset } from "@/lib/ui/download";
-import {
-  Download,
-  Maximize2,
-  Pause,
-  Play,
-  RotateCcw,
-  Share2,
-  Sparkles,
-  Volume2,
-  VolumeX,
-  Wand2,
-} from "lucide-react";
+import { Columns2, Download, RotateCcw, Share2, Sparkles, Wand2 } from "lucide-react";
 import type { GenerationResult } from "@/lib/workspace/types";
 import { useGeneration } from "./generation";
+import { CompareLayer } from "./media/CompareLayer";
+import { VideoStage } from "./media/VideoStage";
 
-function formatTime(seconds: number) {
-  if (!Number.isFinite(seconds)) return "0:00";
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(true);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-
-  const toggle = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      void video.play();
-    } else {
-      video.pause();
-    }
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const onPlay = () => setPlaying(true);
-    const onPause = () => setPlaying(false);
-    const onTime = () => setCurrent(video.currentTime);
-    const onMeta = () => setDuration(video.duration);
-
-    video.addEventListener("play", onPlay);
-    video.addEventListener("pause", onPause);
-    video.addEventListener("timeupdate", onTime);
-    video.addEventListener("loadedmetadata", onMeta);
-    return () => {
-      video.removeEventListener("play", onPlay);
-      video.removeEventListener("pause", onPause);
-      video.removeEventListener("timeupdate", onTime);
-      video.removeEventListener("loadedmetadata", onMeta);
-    };
-  }, []);
-
-  const progress = duration > 0 ? (current / duration) * 100 : 0;
+/** Image result with the same preview-vs-final comparison as video. */
+function ImageStage({ src }: { src: string }) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [compare, setCompare] = useState(false);
+  const [split, setSplit] = useState(50);
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-hf-border bg-black">
-      <video
-        ref={videoRef}
+    <div className="relative overflow-hidden rounded-2xl border border-hf-border">
+      <Image
+        ref={imageRef}
         src={src}
-        poster={poster}
-        muted={muted}
-        preload="metadata"
-        loop
-        playsInline
-        className="aspect-video w-full"
-        onClick={toggle}
+        alt="Generated result"
+        width={1280}
+        height={720}
+        className="aspect-video w-full object-cover"
+        priority
       />
-
-      {!playing ? (
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label="Play"
-          className="absolute inset-0 flex items-center justify-center bg-black/30"
-        >
-          <span className="flex size-14 items-center justify-center rounded-full bg-hf-accent text-black">
-            <Play className="size-6 translate-x-0.5" aria-hidden fill="currentColor" strokeWidth={0} />
-          </span>
-        </button>
-      ) : null}
-
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-3">
-        <input
-          type="range"
-          min={0}
-          max={duration || 0}
-          step={0.01}
-          value={current}
-          aria-label="Seek"
-          onChange={(event) => {
-            const video = videoRef.current;
-            if (!video) return;
-            video.currentTime = Number(event.target.value);
-            setCurrent(Number(event.target.value));
-          }}
-          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/25 accent-hf-cyan"
-          style={{
-            background: `linear-gradient(to right, var(--color-hf-cyan) ${progress}%, rgba(255,255,255,0.25) ${progress}%)`,
-          }}
-        />
-
-        <div className="mt-2 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={playing ? "Pause" : "Play"}
-            className="text-white transition-opacity hover:opacity-80"
-          >
-            {playing ? (
-              <Pause className="size-4" aria-hidden fill="currentColor" strokeWidth={0} />
-            ) : (
-              <Play className="size-4" aria-hidden fill="currentColor" strokeWidth={0} />
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              const video = videoRef.current;
-              if (!video) return;
-              video.muted = !video.muted;
-              setMuted(video.muted);
-            }}
-            aria-label={muted ? "Unmute" : "Mute"}
-            className="text-white transition-opacity hover:opacity-80"
-          >
-            {muted ? (
-              <VolumeX className="size-4" aria-hidden strokeWidth={1.75} />
-            ) : (
-              <Volume2 className="size-4" aria-hidden strokeWidth={1.75} />
-            )}
-          </button>
-
-          <span className="text-xs text-white/85 tabular-nums">
-            {formatTime(current)} / {formatTime(duration)}
-          </span>
-
-          <button
-            type="button"
-            onClick={() => void videoRef.current?.requestFullscreen?.()}
-            aria-label="Fullscreen"
-            className="ml-auto text-white transition-opacity hover:opacity-80"
-          >
-            <Maximize2 className="size-4" aria-hidden strokeWidth={1.75} />
-          </button>
-        </div>
-      </div>
+      {compare ? <CompareLayer source={imageRef} split={split} onSplit={setSplit} /> : null}
+      <button
+        type="button"
+        aria-pressed={compare}
+        onClick={() => setCompare((prev) => !prev)}
+        className={`absolute right-3 bottom-3 flex h-8 items-center gap-1.5 rounded-md px-2 text-xs backdrop-blur transition-colors ${
+          compare ? "bg-hf-cyan/25 text-hf-cyan" : "bg-black/60 text-white hover:bg-black/75"
+        }`}
+      >
+        <Columns2 className="size-4" aria-hidden strokeWidth={1.75} />
+        Compare
+      </button>
     </div>
   );
 }
@@ -223,7 +103,11 @@ export function ResultCard({ result }: { result: GenerationResult }) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl">
+    // On desktop the studio column has a fixed height, and at laptop heights a
+    // full-width 16:9 player put its own controls under the prompt bar. Width
+    // is capped by the height left over (~26rem of chrome), so the whole
+    // player — scrubber included — stays on screen.
+    <div className="mx-auto w-full max-w-3xl lg:max-w-[min(48rem,calc((100dvh-26rem)*16/9))]">
       <div className="flex items-center justify-between gap-4">
         <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-white">
           <span className="size-1.5 rounded-full bg-hf-accent" aria-hidden />
@@ -242,18 +126,9 @@ export function ResultCard({ result }: { result: GenerationResult }) {
 
       <div className="mt-3 animate-reveal">
         {result.kind === "video" ? (
-          <VideoPlayer src={result.src} poster={result.poster} />
+          <VideoStage src={result.src} poster={result.poster} />
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-hf-border">
-            <Image
-              src={result.src}
-              alt="Generated result"
-              width={1280}
-              height={720}
-              className="aspect-video w-full object-cover"
-              priority
-            />
-          </div>
+          <ImageStage src={result.src} />
         )}
       </div>
 

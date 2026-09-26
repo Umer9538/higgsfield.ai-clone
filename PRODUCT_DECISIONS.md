@@ -319,6 +319,87 @@ listboxes use proper ARIA roles.
 
 ---
 
+## Signature Technical Innovations
+
+Three features built to show engineering, with one rule held throughout:
+generation here is simulated, so **every number the UI calls live is
+measured in the browser**, and anything derived from config says so.
+Inventing GPU telemetry would be the one thing a technical reviewer would
+catch immediately.
+
+### 1. Node canvas with spring-driven cables
+
+- **Physics.** Each connection is a cubic bezier from an output port to an
+  input port. The endpoints are exact; the two control points chase their
+  resting positions on a damped spring (stiffness 180, damping 17,
+  semi-implicit Euler with dt clamped to 1/30 s), so a dragged node pulls
+  its cable into a bow that settles like a real lead. Cables leave from
+  whichever side faces their target.
+- **Off the React path.** The engine is a plain class
+  (`components/sections/useCables.ts`) that writes path data straight to the
+  DOM from a `requestAnimationFrame` loop. The loop runs only while a spring
+  is moving and stops itself at rest, so idle cost is zero. Pointer moves
+  are coalesced to one state update per frame.
+- **Live instrumentation.** The toolbar shows the cable engine's own
+  per-frame main-thread cost and the frame rate, measured from rAF
+  timestamps, with dropped frames counted. It is written to the DOM through
+  a ref, so measuring does not itself cause renders.
+- **Node badges.** Output nodes show their connected-input count and a
+  credit estimate from the Video studio's published rate. The estimate is
+  labelled "est." because it is arithmetic, not a measurement.
+- **Reduced motion:** springs snap to rest and the flowing dashes stop.
+
+### 2. Cinematic media stage
+
+- **Preview pass vs final render.** A draggable split (pointer, touch or
+  arrow keys; it is a real `role="slider"`). The preview side is a canvas
+  holding the current frame at 1/8 resolution, upscaled by the browser with
+  `image-rendering: pixelated`. There is one video decode, and the canvas
+  redraws on `requestVideoFrameCallback`, exactly once per presented frame,
+  never on a timer. With a real draft asset this becomes a source swap; the
+  interaction and rendering path stay the same. Works on image results too.
+- **Frame-accurate scrubbing.** The frame rate is measured from presented
+  frames (median `mediaTime` delta), not assumed. The timecode is
+  `HH:MM:SS:FF`. Previous and next frame buttons (and `,` `.`) land inside
+  the target frame, and the seek slider steps one frame at a time.
+- **Hover previews and scene markers.** After the page is idle, a hidden
+  second video samples 24 frames into a single JPEG sprite. Hovering the
+  track shows the nearest frame and its timecode. The same pass compares
+  each sample with the previous one by mean luminance difference at 16×9;
+  outliers (mean + 1.5σ) become scene-change markers, and `[` `]` jump
+  between them. On the result clip it finds 2.
+- **Fits the screen.** At laptop heights a full-width 16:9 player put its
+  own controls under the prompt bar, found by the tests for this feature.
+  The player's width is now capped by the height available.
+
+### 3. Command matrix and performance HUD
+
+- **Context-aware ⌘K.** A studio registers itself with a small external
+  store while mounted, so the global palette gains a Studio group: **Copy
+  prompt**, **Inspect generation JSON** (a syntax-coloured view of exactly
+  what is configured, with Copy JSON), and one-step **looks** (Noir, Golden
+  hour, Neon) that set four Cinema parameters at once. Outside a studio the
+  group does not appear.
+- **HUD, Shift+D or ⌘K.** A terminal-style panel. **Measured:** frame rate,
+  mean and worst frame time (rAF); long tasks; LCP; CLS; slowest
+  interaction (Event Timing); `/api/*` latency from Resource Timing; the GPU
+  the browser renders with (WebGL renderer string); JS heap and network
+  where the browser exposes them; viewport and DPR. **Studio · config:** the
+  active surface's model and output specs, labelled as configuration.
+  Nothing runs while it is closed. Shift+D is ignored while typing, since it
+  is a capital D, and whether the HUD is open is remembered per viewer.
+
+**Measured performance** (headless Chromium, desktop): cable updates cost
+**0.24–0.33 ms per frame** over a sustained drag at **60 fps**; video
+playback with the comparison layer redrawing every frame held **60 fps**
+with a worst frame of **17 ms**.
+
+**Tests:** ten new ones. They cover bezier geometry and settling, reduced
+motion, badge arithmetic, frame stepping to the exact frame, the filmstrip
+preview, the split by keyboard and pointer, looks, prompt copy via the real
+clipboard, the JSON contents, the HUD shortcut's typing guard, and real
+`/api` latency in the HUD.
+
 ## QA audit of the live site
 
 A scripted browser audit of the production deployment, measuring rather
@@ -356,7 +437,7 @@ it 276 px too low.
 
 ## How it is verified
 
-78 Playwright tests run against both the local build and the live
+88 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.
