@@ -4,7 +4,6 @@ export const cinemaStudio: Surface = {
   id: "cinema-studio",
   label: "Cinema Studio",
   navLabel: "Cinema Studio",
-  layout: "dock",
   fields: [],
   dock: {
     placeholder: "Describe your scene - use @ to add characters & locations",

@@ -8,6 +8,12 @@ import { useAuth } from "@/lib/auth/context";
 import { useToast } from "./Toast";
 import { clearGeneratedAssets } from "@/lib/assets/store";
 
+export const OPEN_PALETTE_EVENT = "hf:open-palette";
+
+export function openCommandPalette() {
+  window.dispatchEvent(new Event(OPEN_PALETTE_EVENT));
+}
+
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -35,12 +41,20 @@ export function CommandPalette() {
         setActive(0);
       }
     };
+    // The top bar's search field opens the palette rather than a second search
+    const onOpen = () => {
+      setOpen(true);
+      setQuery("");
+      setActive(0);
+    };
     window.addEventListener("keydown", onKey);
+    window.addEventListener(OPEN_PALETTE_EVENT, onOpen);
     // Marks the shortcut as live, so tests can wait for hydration instead of
     // racing it with a fixed delay.
     document.documentElement.dataset.paletteReady = "true";
     return () => {
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener(OPEN_PALETTE_EVENT, onOpen);
       delete document.documentElement.dataset.paletteReady;
     };
   }, []);

@@ -5,7 +5,6 @@ export const motionControl: Surface = {
   id: "motion-control",
   label: "Motion Control",
   navLabel: "Motion Control",
-  layout: "panel",
   tabGroup: VIDEO_TABS,
   fields: [
     { kind: "preset", id: "preset", image: "/media/presets/3.jpg", label: "MOTION CONTROL", sublabel: "Control motion with video references" },

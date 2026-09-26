@@ -4,7 +4,6 @@ export const effects: Surface = {
   id: "effects",
   label: "Higgsfield Effects",
   navLabel: "Effects",
-  layout: "panel",
   fields: [
     {
       kind: "preset",

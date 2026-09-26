@@ -9,7 +9,7 @@ export function SurfaceTabs({
   activeId: SurfaceId;
 }) {
   return (
-    <nav className="flex gap-5 overflow-x-auto border-b border-hf-border px-4">
+    <nav aria-label="Studio mode" className="-mb-px flex min-w-0 gap-5 self-stretch overflow-x-auto [scrollbar-width:none]">
       {tabs.map((tab) => {
         const active = tab.id === activeId;
         return (
@@ -17,7 +17,7 @@ export function SurfaceTabs({
             key={tab.id}
             href={`/ai/${tab.id}`}
             aria-current={active ? "page" : undefined}
-            className={`-mb-px shrink-0 border-b-2 py-3.5 text-sm font-medium transition-colors ${
+            className={`flex shrink-0 items-center border-b-2 text-sm font-medium transition-colors ${
               active
                 ? "border-hf-accent text-white"
                 : "border-transparent text-hf-muted hover:text-white"

@@ -47,6 +47,8 @@
 
   /* Header is 4rem on mobile, 5rem from md up */
   --spacing-header: 4rem;
+  --spacing-rail: 4.5rem;
+  --spacing-tabbar: 4rem;
 
   /*
    * Radius encodes hierarchy instead of one value everywhere: the larger the

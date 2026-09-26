@@ -4,7 +4,6 @@ export const audio: Surface = {
   id: "audio",
   label: "Text to Speech",
   navLabel: "Audio",
-  layout: "panel",
   fields: [
     {
       kind: "prompt",

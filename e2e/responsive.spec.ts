@@ -37,75 +37,70 @@ for (const [name, viewport] of [["mobile", MOBILE], ["tablet", TABLET]] as const
   });
 }
 
-test("mobile: hamburger drawer replaces the horizontal nav", async ({ page }) => {
+test("mobile: a tab bar replaces the rail and Create opens the catalog as a sheet", async ({ page }) => {
   await page.setViewportSize(MOBILE);
   await page.goto("/");
 
-  // The desktop nav is hidden; the hamburger is the way in
   await expect(page.getByRole("navigation", { name: "Main" })).toBeHidden();
+  const tabs = page.getByRole("navigation", { name: "Sections" });
+  await expect(tabs).toBeVisible();
+  for (const label of ["Explore", "Assets", "Learn", "Pricing"]) {
+    await expect(tabs.getByRole("link", { name: label })).toBeVisible();
+  }
 
-  const burger = page.getByRole("button", { name: "Open menu" });
-  await expect(burger).toBeVisible();
-  await burger.click();
+  // Pinned to the bottom edge, within thumb reach
+  const bar = (await tabs.boundingBox())!;
+  expect(bar.y + bar.height).toBeGreaterThanOrEqual(MOBILE.height - 1);
 
-  const drawer = page.getByRole("dialog", { name: "Navigation" });
-  await expect(drawer).toBeVisible();
-
-  // A visible element can still be mispositioned: assert the panel actually
-  // fills the viewport height and paints an opaque background behind the list.
-  const box = await drawer.boundingBox();
-  expect(box!.height).toBeGreaterThan(MOBILE.height * 0.9);
-  const opaque = await drawer.evaluate((el) => getComputedStyle(el).backgroundColor);
+  await tabs.getByRole("button", { name: "Create" }).click();
+  const sheet = page.getByRole("dialog", { name: "Create" });
+  await expect(sheet).toBeVisible();
+  const opaque = await sheet.evaluate((el) => getComputedStyle(el).backgroundColor);
   expect(opaque).not.toContain("rgba(0, 0, 0, 0)");
 
-  // Nav items must sit inside the painted panel, not overflow it
-  const firstItem = await drawer.getByRole("link").first().boundingBox();
-  expect(firstItem!.y + firstItem!.height).toBeLessThanOrEqual(box!.y + box!.height + 1);
-
-  // Every nav destination is reachable, plus search and the action buttons
-  for (const label of ["Explore", "Video", "Cinema Studio", "Canvas", "Originals"]) {
-    await expect(drawer.getByRole("link", { name: new RegExp(`^${label}$`) })).toBeVisible();
+  for (const label of ["Video", "Cinema Studio", "Canvas", "Originals", "Enterprise"]) {
+    await expect(sheet.getByRole("link", { name: new RegExp(`^${label}\\b`) }).first()).toBeAttached();
   }
-  await expect(drawer.getByPlaceholder("Search models and presets")).toBeVisible();
-  await expect(drawer.getByRole("link", { name: /Pricing/ })).toBeVisible();
-  await expect(drawer.getByRole("link", { name: "Enterprise" })).toBeVisible();
-  await expect(drawer.getByRole("link", { name: "Assets" })).toBeVisible();
 
   // Navigating closes it
-  await drawer.getByRole("link", { name: "Canvas" }).click();
+  await sheet.getByRole("link", { name: /^Canvas/ }).click();
   await expect(page).toHaveURL(/\/canvas$/);
-  await expect(page.getByRole("dialog", { name: "Navigation" })).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "Create" })).toHaveCount(0);
 });
 
-test("desktop keeps the horizontal nav and hides the hamburger", async ({ page }) => {
+test("desktop shows the rail and hides the tab bar", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
   await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Open menu" })).toBeHidden();
+  await expect(page.getByRole("navigation", { name: "Sections" })).toBeHidden();
 });
 
-test("mobile: workspace stacks and its settings collapse", async ({ page }) => {
+test("mobile: studio settings open as a sheet and Generate stays pinned", async ({ page }) => {
   await page.setViewportSize(MOBILE);
   await page.goto("/ai/video");
 
-  const aside = page.locator("aside");
-  const main = page.locator("main").first();
+  const settings = page.getByRole("complementary", { name: "Settings" });
+  await expect(settings).toBeHidden();
 
-  // Stacked, not side by side
-  const a = await aside.boundingBox();
-  const m = await main.boundingBox();
-  expect(a!.width).toBeGreaterThan(MOBILE.width * 0.9);
-  expect(m!.y).toBeGreaterThanOrEqual(a!.y);
+  // Generate is on screen without scrolling, above the tab bar
+  const generate = page.getByRole("button", { name: /^Generate/ });
+  const box = (await generate.boundingBox())!;
+  const tabs = (await page.getByRole("navigation", { name: "Sections" }).boundingBox())!;
+  expect(box.y + box.height).toBeLessThanOrEqual(tabs.y);
 
-  // Settings collapse so the content pane is reachable
-  const toggle = page.getByRole("button", { name: "Show settings" });
-  await expect(toggle).toBeVisible();
-  await expect(page.locator("#control-fields")).toBeHidden();
-  await toggle.click();
-  await expect(page.locator("#control-fields")).toBeVisible();
+  await page.getByRole("button", { name: "Settings" }).click();
+  await expect(settings).toBeVisible();
+  await expect(settings.getByRole("group", { name: "Model" })).toBeVisible();
+  // Polled: the sheet rises into place over a short reveal animation
+  await expect
+    .poll(async () => {
+      const sheet = (await settings.boundingBox())!;
+      return sheet.y + sheet.height;
+    })
+    .toBeGreaterThanOrEqual(MOBILE.height - 1);
 
-  // Generate stays reachable at all times
-  await expect(page.getByRole("button", { name: /^Generate/ })).toBeVisible();
+  await settings.getByRole("button", { name: "Done" }).click();
+  await expect(settings).toBeHidden();
 });
 
 test("mobile: card actions do not depend on hover", async ({ page }) => {
@@ -118,7 +113,7 @@ test("mobile: card actions do not depend on hover", async ({ page }) => {
 
   // Assets: the action row is visible without hovering
   await page.goto("/assets");
-  const asset = page.getByRole("listitem").first();
+  const asset = page.getByRole("main").getByRole("listitem").first();
   await expect(asset.getByRole("button", { name: /^Download/ })).toBeVisible();
   await expect(asset.getByRole("link", { name: /Open .* in Studio/ })).toBeVisible();
 });

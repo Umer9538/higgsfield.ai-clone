@@ -9,7 +9,6 @@ export const image: Surface = {
   id: "image",
   label: "Create Image",
   navLabel: "Image",
-  layout: "dock",
   fields: [],
   dock: {
     placeholder: "Describe the scene you imagine",

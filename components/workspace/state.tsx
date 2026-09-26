@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import type { Field } from "@/lib/workspace/types";
+import type { Surface } from "@/lib/workspace/types";
 
 export type FieldValue = string | boolean;
 
@@ -13,9 +13,31 @@ interface WorkspaceContextValue {
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
+/** Keys for the prompt-bar and inspector state of dock-configured studios. */
+export const dockKey = {
+  prompt: "prompt",
+  mode: "mode",
+  count: "count",
+  pill: (index: number) => `pill:${index}`,
+  setup: (label: string) => `setup:${label}`,
+  slot: (name: string) => `slot:${name}`,
+};
+
 /** Seed state from whatever defaults the surface config declares. */
-function initialValues(fields: Field[]): Record<string, FieldValue> {
+function initialValues(surface: Surface): Record<string, FieldValue> {
+  const { fields, dock } = surface;
   const seed: Record<string, FieldValue> = {};
+  if (dock) {
+    seed[dockKey.prompt] = "";
+    // Start in the mode whose model the composer already shows
+    const model = dock.pills.find((pill) => pill.icon === "model")?.label;
+    const matching = Object.entries(dock.modeModels ?? {}).find(([, value]) => value === model)?.[0];
+    seed[dockKey.mode] = matching ?? dock.rail?.[0]?.label ?? "";
+    seed[dockKey.count] = dock.stepper?.split("/")[0] ?? "1";
+    dock.pills.forEach((pill, index) => (seed[dockKey.pill(index)] = pill.label));
+    dock.setup?.forEach((entry) => (seed[dockKey.setup(entry.label)] = entry.value));
+    dock.slots?.forEach((slot) => (seed[dockKey.slot(slot)] = false));
+  }
   for (const field of fields) {
     if (field.kind === "segmented") seed[field.id] = field.defaultValue;
     if (field.kind === "toggle") {
@@ -29,21 +51,22 @@ function initialValues(fields: Field[]): Record<string, FieldValue> {
 }
 
 export function WorkspaceProvider({
-  fields,
+  surface,
   children,
 }: {
-  fields: Field[];
+  surface: Surface;
   children: React.ReactNode;
 }) {
-  // Remix links arrive as /ai/video?prompt=... — seed the first prompt field with it.
+  // Remix and the home composer arrive as ?prompt=... — seed the prompt with it.
   const searchParams = useSearchParams();
   const incomingPrompt = searchParams.get("prompt");
 
   const [values, setValues] = useState<Record<string, FieldValue>>(() => {
-    const seed = initialValues(fields);
+    const seed = initialValues(surface);
     if (incomingPrompt) {
-      const target = fields.find((field) => field.kind === "prompt");
+      const target = surface.fields.find((field) => field.kind === "prompt");
       if (target) seed[target.id] = incomingPrompt;
+      else if (surface.dock) seed[dockKey.prompt] = incomingPrompt;
     }
     return seed;
   });

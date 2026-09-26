@@ -6,22 +6,65 @@ import { expect, test } from "@playwright/test";
  * and a generation run completes and produces a playable result.
  */
 
-test("homepage renders its key sections", async ({ page }) => {
+test("homepage leads with a composer, then one feed", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Visual Effects" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Higgsfield AI Motion Designer/i })).toBeVisible();
-  // Footer is the lime block
-  await expect(page.getByText("535 Mission St, 14th floor, San Francisco, CA, 94105")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "What do you want to make?" })).toBeVisible();
+  await expect(page.getByLabel("Describe what you want to make")).toBeVisible();
+  const output = page.getByRole("group", { name: "Output" });
+  for (const label of ["Image", "Video", "Cinema"]) {
+    await expect(output.getByRole("button", { name: label })).toBeVisible();
+  }
+  await expect(page.getByRole("list", { name: "Starting points" }).getByRole("button")).toHaveCount(4);
 
-  // All 15 effect presets render
-  await expect(page.getByText("Lacewalker")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Made with Higgsfield" })).toBeVisible();
+  await expect(page.locator("main article").first()).toBeVisible();
+  await expect(page.getByText("535 Mission St, 14th floor, San Francisco, CA, 94105")).toBeVisible();
 });
 
-test("hero and effect imagery actually loads", async ({ page }) => {
+test("the home composer opens the chosen studio with the prompt filled in", async ({ page }) => {
   await page.goto("/");
 
-  const hero = page.locator("img").first();
+  await page.getByRole("button", { name: "Film scene" }).click();
+  await expect(page.getByRole("group", { name: "Output" }).getByRole("button", { name: "Cinema" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  const prompt = await page.getByLabel("Describe what you want to make").inputValue();
+  expect(prompt).toContain("salt flat");
+
+  await page.locator("form").getByRole("button", { name: "Create" }).click();
+  await expect(page).toHaveURL(/\/ai\/cinema-studio\?prompt=/, { timeout: 20_000 });
+  await expect(page.getByPlaceholder(/Describe your scene/)).toHaveValue(prompt);
+
+  // Enter submits too, into the Video studio's prompt field
+  await page.goto("/");
+  const composer = page.getByLabel("Describe what you want to make");
+  await composer.fill("A paper boat in a gutter stream");
+  await composer.press("Enter");
+  await expect(page).toHaveURL(/\/ai\/video\?prompt=/, { timeout: 20_000 });
+  await expect(page.locator("#prompt")).toHaveValue("A paper boat in a gutter stream");
+});
+
+test("remixing on the home page loads the prompt into the composer instead of leaving", async ({ page }) => {
+  await page.goto("/");
+
+  const card = page.locator("main article").first();
+  await card.hover();
+  const promptText = (await card.locator("p").first().textContent())!.trim();
+  await card.getByRole("button", { name: "Remix" }).click();
+
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByLabel("Describe what you want to make")).toHaveValue(promptText);
+  await expect(page.locator("[data-toast]").last()).toContainText("Prompt loaded");
+});
+
+test("home feed imagery actually loads", async ({ page }) => {
+  await page.goto("/");
+  // The feed opens on video; the Image filter surfaces the stills
+  await page.getByRole("tablist", { name: "Feed filter" }).getByRole("tab", { name: "Image" }).click();
+
+  const hero = page.locator("main img").first();
   await expect(hero).toBeVisible();
 
   // naturalWidth > 0 proves the bytes decoded, not just that the tag exists.
@@ -88,10 +131,33 @@ test("audio surface keeps Generate disabled, matching the real product", async (
   await expect(page.getByRole("button", { name: /^Generate/ })).toBeDisabled();
 });
 
-test("image surface uses the docked prompt bar, not the side panel", async ({ page }) => {
-  await page.goto("/ai/image");
-  await expect(page.getByPlaceholder("Describe the scene you imagine")).toBeVisible();
-  await expect(page.locator("aside")).toHaveCount(0);
+test("every studio shares one canvas, prompt bar and inspector", async ({ page }) => {
+  for (const [route, prompt] of [
+    ["/ai/image", page.getByPlaceholder("Describe the scene you imagine")],
+    ["/ai/video", page.locator("#prompt")],
+    ["/ai/cinema-studio", page.getByPlaceholder(/Describe your scene/)],
+    ["/ai/audio", page.locator("#script")],
+  ] as const) {
+    await page.goto(route);
+    await expect(page.getByRole("complementary", { name: "Settings" }), route).toBeVisible();
+    await expect(page.locator("aside"), route).toHaveCount(1);
+    await expect(prompt, route).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Generate/ }), route).toHaveCount(1);
+  }
+});
+
+test("the inspector collapses on desktop and hands the canvas the width", async ({ page }) => {
+  await page.goto("/ai/video");
+  const canvas = page.getByRole("region", { name: /canvas$/ });
+  const before = (await canvas.boundingBox())!.width;
+
+  await page.getByRole("button", { name: "Hide settings" }).click();
+  await expect(page.getByRole("complementary", { name: "Settings" })).toBeHidden();
+  expect((await canvas.boundingBox())!.width).toBeGreaterThan(before + 300);
+
+  // Field state survives the round trip: the inspector stays mounted
+  await page.getByRole("button", { name: "Show settings" }).click();
+  await expect(page.getByRole("complementary", { name: "Settings" })).toBeVisible();
 });
 
 test("pricing page renders plans, toggles billing, and expands an FAQ", async ({ page }) => {
@@ -157,34 +223,54 @@ test("compare features matrix expands to reveal all groups", async ({ page }) =>
   await expect(page.getByRole("columnheader", { name: "Platform" })).toBeHidden();
 });
 
-test("header nav exposes every studio item with the right label and badge", async ({ page }) => {
-  await page.goto("/");
-  const nav = page.getByRole("navigation", { name: "Main" });
+const CATALOG_LABELS = [
+  "Image", "Video", "Audio", "Edit", "Motion Control",
+  "Cinema Studio", "Marketing Studio", "Genjutsu", "Effects", "3D Jutsu",
+  "Canvas", "Supercomputer", "ChatGPT Plugin", "MCP", "Plugins",
+];
 
-  for (const label of [
-    "Explore",
-    "Image",
-    "Video",
-    "Audio",
-    "MCP",
-    "ChatGPT Plugin",
-    "Genjutsu",
-    "Effects",
-    "Cinema Studio",
-    "Marketing Studio",
-    "Supercomputer",
-    "3D Jutsu",
-    "Edit",
-  ]) {
-    await expect(nav.getByText(label, { exact: true })).toBeVisible();
+test("the rail holds five sections and Create opens every model, studio and app", async ({ page }) => {
+  await page.goto("/");
+  const rail = page.getByRole("navigation", { name: "Main" });
+
+  await expect(rail.getByRole("button", { name: "Create" })).toBeVisible();
+  for (const label of ["Explore", "Assets", "Learn", "Pricing"]) {
+    await expect(rail.getByRole("link", { name: label, exact: true })).toBeVisible();
+  }
+
+  await rail.getByRole("button", { name: "Create" }).click();
+  const catalog = page.getByRole("dialog", { name: "Create" });
+  await expect(catalog).toBeVisible();
+  for (const group of ["Models", "Studios", "Apps"]) {
+    await expect(catalog.getByRole("heading", { name: group })).toBeVisible();
+  }
+  for (const label of CATALOG_LABELS) {
+    await expect(catalog.getByRole("link", { name: new RegExp(`^${label}\\b`) }).first()).toBeVisible();
   }
 
   // Badges: New on ChatGPT Plugin and 3D Jutsu, Free on Genjutsu and Effects
-  await expect(nav.getByText("New", { exact: true })).toHaveCount(2);
-  await expect(nav.getByText("Free", { exact: true })).toHaveCount(2);
+  await expect(catalog.getByText("New", { exact: true })).toHaveCount(2);
+  await expect(catalog.getByText("Free", { exact: true })).toHaveCount(2);
+
+  // Escape closes it and hands focus back to Create
+  await page.keyboard.press("Escape");
+  await expect(catalog).toHaveCount(0);
+  await expect(rail.getByRole("button", { name: "Create" })).toBeFocused();
 });
 
-test("every studio route resolves and marks itself active", async ({ page }) => {
+test("secondary pages reveal beside their rail section", async ({ page }) => {
+  await page.goto("/");
+  const rail = page.getByRole("navigation", { name: "Main" });
+
+  await rail.getByRole("link", { name: "Explore", exact: true }).hover();
+  const more = rail.getByRole("list", { name: "More in Explore" });
+  await expect(more.getByRole("link", { name: "Community" })).toBeVisible();
+  await more.getByRole("link", { name: "Contests" }).click();
+  await expect(page).toHaveURL(/\/contests$/);
+  await expect(rail.getByRole("link", { name: "Explore", exact: true })).toHaveAttribute("data-active", "true");
+});
+
+test("every studio route resolves and marks its place in the nav", async ({ page }) => {
   const routes: [string, string][] = [
     ["/ai/genjutsu", "Genjutsu"],
     ["/ai/effects", "Effects"],
@@ -200,25 +286,30 @@ test("every studio route resolves and marks itself active", async ({ page }) => 
     const response = await page.goto(route);
     expect(response?.status(), `${route} should return 200`).toBe(200);
 
-    const active = page.getByRole("navigation", { name: "Main" }).getByRole("link", {
+    const rail = page.getByRole("navigation", { name: "Main" });
+    const create = rail.getByRole("button", { name: "Create" });
+    await expect(create).toHaveAttribute("data-active", "true");
+
+    await create.click();
+    const active = page.getByRole("dialog", { name: "Create" }).getByRole("link", {
       name: new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
     });
     await expect(active.first()).toHaveAttribute("aria-current", "page");
+    await page.keyboard.press("Escape");
   }
 });
 
-test("genjutsu and effects use the panel shell; studios use the dock", async ({ page }) => {
+test("genjutsu and effects keep their switches in the inspector", async ({ page }) => {
   await page.goto("/ai/genjutsu");
   await expect(page.locator("aside")).toHaveCount(1);
-  await expect(page.getByRole("switch", { name: "Prompt" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "Settings" }).getByRole("switch", { name: "Prompt" })).toBeVisible();
 
   await page.goto("/ai/effects");
   await expect(page.getByRole("switch", { name: "Use free gens" })).toBeVisible();
   await expect(page.getByRole("button", { name: /1 FREE LEFT/ })).toBeVisible();
 
-  await page.goto("/ai/cinema-studio");
-  await expect(page.locator("aside")).toHaveCount(0);
-  await expect(page.getByPlaceholder(/Describe your scene/)).toBeVisible();
+  // No prompt field: the bar says so instead of showing an empty box
+  await expect(page.getByText("No prompt needed. Add your inputs in Settings, then generate.")).toBeVisible();
 });
 
 // Electric Violet #8B5CF6 for fills, #A78BFA for text on dark surfaces.
@@ -229,15 +320,16 @@ test("header shows signed-out controls by default on every public page", async (
   for (const route of ["/", "/pricing", "/ai/video", "/mcp", "/supercomputer"]) {
     await page.goto(route);
     const header = page.getByRole("banner");
+    const rail = page.getByRole("navigation", { name: "Main" });
 
     await expect(header.getByRole("button", { name: "Search" })).toBeVisible();
-    await expect(header.getByRole("link", { name: /Pricing/ })).toBeVisible();
     await expect(header.getByRole("button", { name: "Sign up" })).toBeVisible();
+    await expect(rail.getByRole("link", { name: "Pricing", exact: true })).toBeVisible();
 
     // Signed-in chrome must not leak while signed out
     await expect(header.getByRole("button", { name: "Account" })).toHaveCount(0);
 
-    await expect(header.getByRole("img", { name: "Higgsfield" })).toBeVisible();
+    await expect(rail.getByRole("img", { name: "Higgsfield" })).toBeVisible();
   }
 });
 
@@ -387,16 +479,13 @@ test("onboarding prompts once: first sign-up detours, later sign-ups do not", as
 test("the accent renders as Electric Violet on the active link, New badge and Generate", async ({ page }) => {
   await page.goto("/ai/genjutsu");
 
-  const active = page
-    .getByRole("navigation", { name: "Main" })
-    .getByRole("link", { name: /^Genjutsu/ });
+  const rail = page.getByRole("navigation", { name: "Main" });
+  const active = rail.getByRole("button", { name: "Create" });
   await expect(active).toHaveCSS("color", ACCENT_SOFT);
 
-  // New badge: solid lime background, black text
-  const newBadge = page
-    .getByRole("navigation", { name: "Main" })
-    .getByText("New", { exact: true })
-    .first();
+  // New badge in the catalog: solid violet background, black text
+  await active.click();
+  const newBadge = page.getByRole("dialog", { name: "Create" }).getByText("New", { exact: true }).first();
   await expect(newBadge).toHaveCSS("background-color", ACCENT);
   await expect(newBadge).toHaveCSS("color", "rgb(0, 0, 0)");
 
@@ -470,7 +559,7 @@ test("assets library filters, searches, sorts and deletes", async ({ page }) => 
   await expect(page.getByLabel("Sort assets")).toHaveValue("oldest");
 
   // Hover actions exist, and delete actually removes the card
-  const first = page.getByRole("listitem").first();
+  const first = page.getByRole("main").getByRole("listitem").first();
   await first.hover();
   await expect(first.getByRole("button", { name: /^Download/ })).toBeVisible();
   await expect(first.getByRole("button", { name: /^Copy prompt/ })).toBeVisible();
@@ -546,12 +635,18 @@ test("every route returns 200 and logs no console errors", async ({ page }) => {
 test("every nav item links to a working route", async ({ page }) => {
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("button", { name: "Create" }).click();
 
-  const hrefs = await nav.getByRole("link").evaluateAll((links) =>
-    links.map((link) => (link as HTMLAnchorElement).getAttribute("href")).filter(Boolean),
-  );
+  // Rail links, their hover flyouts (in the DOM while hidden) and the catalog
+  const hrefs = [
+    ...new Set(
+      await nav.locator("a[href]").evaluateAll((links) =>
+        links.map((link) => (link as HTMLAnchorElement).getAttribute("href")!),
+      ),
+    ),
+  ];
 
-  // Every nav entry is a real link now, not inert text
+  // Every destination the old 19-item top bar carried is still reachable
   expect(hrefs.length).toBeGreaterThanOrEqual(19);
 
   for (const href of hrefs) {
@@ -644,7 +739,8 @@ test("workspace controls mutate state rather than sitting inert", async ({ page 
   await expect(pill).toContainText("8s");
 
   // Select row opens a listbox and changes the value
-  const model = page.getByRole("button", { name: /Model/ }).first();
+  // The picker, not the inspector's "Model" section heading
+  const model = page.getByRole("complementary", { name: "Settings" }).getByRole("button", { name: /^Model\s?\S/ });
   await model.click();
   await page.getByRole("option", { name: "Kling 3.0" }).click();
   await expect(model).toContainText("Kling 3.0");
@@ -808,13 +904,13 @@ test("a generation is persisted and appears in the asset library", async ({ page
 
   // It shows in the library without a reload of the store
   await page.goto("/assets");
-  const first = page.getByRole("listitem").first();
+  const first = page.getByRole("main").getByRole("listitem").first();
   await expect(first).toContainText(/Generation/);
   await expect(first).toContainText("Seedance 2.5");
 
   // And under the Videos tab
   await page.getByRole("tab", { name: "Videos" }).click();
-  await expect(page.getByRole("listitem").first()).toContainText(/Generation/);
+  await expect(page.getByRole("main").getByRole("listitem").first()).toContainText(/Generation/);
 });
 
 test("canvas nodes are typed and their parameters are editable", async ({ page }) => {

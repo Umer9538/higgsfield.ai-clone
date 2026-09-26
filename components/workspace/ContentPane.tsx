@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { BookOpen, ChevronLeft, ChevronRight, Folder } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Content } from "@/lib/workspace/types";
 
 function Headline({ text, highlight }: { text: string; highlight?: string }) {
@@ -104,33 +104,6 @@ export function ContentPane({ content }: { content: Content }) {
         <Headline text={content.headline} highlight={content.highlight} />
       </div>
       <p className="mt-3 max-w-xl text-sm leading-relaxed text-hf-muted sm:text-base">{content.sub}</p>
-    </div>
-  );
-}
-
-export function ContentTabs() {
-  const [active, setActive] = useState("How it works");
-
-  return (
-    <div role="tablist" aria-label="Workspace view" className="mb-6 flex items-center gap-1.5">
-      {[
-        { label: "History", icon: Folder },
-        { label: "How it works", icon: BookOpen },
-      ].map(({ label, icon: LucideIcon }) => (
-        <button
-          key={label}
-          type="button"
-          role="tab"
-          aria-selected={active === label}
-          onClick={() => setActive(label)}
-          className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-            active === label ? "bg-hf-surface-3 text-white" : "text-hf-muted hover:text-white"
-          }`}
-        >
-          <LucideIcon className="size-4" aria-hidden strokeWidth={1.75} />
-          {label}
-        </button>
-      ))}
     </div>
   );
 }

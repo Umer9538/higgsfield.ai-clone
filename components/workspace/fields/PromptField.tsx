@@ -16,7 +16,10 @@ export function PromptField({
   maxLength,
   optional,
   model,
+  bare = false,
 }: {
+  /** Inside the studio's prompt bar: no card chrome, the bar supplies it. */
+  bare?: boolean;
   id: string;
   label?: string;
   placeholder: string;
@@ -52,8 +55,12 @@ export function PromptField({
   };
 
   return (
-    <div className="rounded-2xl border border-hf-border bg-hf-surface-2 p-3 focus-within:border-hf-accent/40">
-      {label ? (
+    <div
+      className={
+        bare ? "" : "rounded-2xl border border-hf-border bg-hf-surface-2 p-3 focus-within:border-hf-accent/40"
+      }
+    >
+      {label && !bare ? (
         <div className="flex items-start justify-between gap-2">
           <label htmlFor={id} className="text-sm font-medium text-white">
             {label}
@@ -68,7 +75,8 @@ export function PromptField({
 
       <textarea
         id={id}
-        rows={3}
+        rows={bare ? 2 : 3}
+        aria-label={bare ? (label ?? placeholder) : undefined}
         value={value}
         maxLength={maxLength}
         placeholder={placeholder}
@@ -82,7 +90,7 @@ export function PromptField({
             <button
               type="button"
               onClick={enhance}
-              className="flex items-center gap-1.5 rounded-lg bg-hf-accent/15 px-2 py-1 text-xs font-medium text-hf-accent-soft transition-colors hover:bg-hf-accent/25"
+              className="press flex items-center gap-1.5 rounded-lg bg-hf-accent/15 px-2 py-1 text-xs font-medium text-hf-accent-soft transition-colors hover:bg-hf-accent/25 max-sm:min-h-11"
             >
               <Sparkles className="size-3.5" aria-hidden strokeWidth={2} />
               Magic Enhance
@@ -93,7 +101,7 @@ export function PromptField({
                 type="button"
                 onClick={() => onChip(chip.label === "On" ? (audioOn ? "On" : "Off") : chip.label)}
                 aria-pressed={chip.label === "On" ? audioOn : undefined}
-                className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs transition-colors ${
+                className={`press flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs transition-colors max-sm:min-h-11 ${
                   chip.label === "On" && audioOn
                     ? "bg-hf-accent/15 text-hf-accent-soft"
                     : "bg-hf-surface-4 text-hf-muted hover:text-white"

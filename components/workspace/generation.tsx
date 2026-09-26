@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { GenerationResult, Surface } from "@/lib/workspace/types";
 import { addGeneratedAsset } from "@/lib/assets/store";
-import { useWorkspace } from "./state";
+import { dockKey, useWorkspace } from "./state";
 
 export type GenerationStatus = "idle" | "running" | "done";
 
@@ -80,7 +80,8 @@ export function GenerationProvider({
         const result = surface?.result;
         if (result) {
           const promptField = surface?.fields.find((field) => field.kind === "prompt");
-          const prompt = promptField ? String(values[promptField.id] ?? "") : "";
+          // Dock studios keep their prompt under a fixed key rather than a field
+          const prompt = String(values[promptField ? promptField.id : dockKey.prompt] ?? "");
           const model = result.meta.find((m) => m.label === "Model")?.value ?? surface.label;
           const spec = result.meta
             .filter((m) => m.label !== "Model")

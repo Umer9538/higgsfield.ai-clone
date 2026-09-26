@@ -4,7 +4,6 @@ export const genjutsu: Surface = {
   id: "genjutsu",
   label: "Higgsfield Genjutsu",
   navLabel: "Genjutsu",
-  layout: "panel",
   fields: [
     {
       kind: "preset",

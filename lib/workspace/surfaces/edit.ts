@@ -5,7 +5,6 @@ export const edit: Surface = {
   id: "edit",
   label: "Edit Video",
   navLabel: "Edit",
-  layout: "panel",
   tabGroup: VIDEO_TABS,
   fields: [
     { kind: "preset", id: "preset", image: "/media/presets/2.jpg", label: "GENERAL", sublabel: "Seedance 2.5 Edit" },

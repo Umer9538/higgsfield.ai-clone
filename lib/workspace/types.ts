@@ -1,11 +1,11 @@
 /**
  * Config types for the generate workspace.
  *
- * Every generate surface on higgsfield.ai is the same shell with a different
- * field set, so the shell is written once and driven entirely from config.
- * Two layouts exist in the real product:
- *   - "panel": fixed left control panel + content pane (Video, Audio, Edit, Motion Control)
- *   - "dock":  centred content + bottom-docked prompt bar (Image)
+ * Every generate surface is the same studio with a different field set, so
+ * the studio is written once and driven entirely from config. A surface
+ * describes its controls either as `fields` (form-style) or as a `dock`
+ * (pills and picker tiles); both land in the same prompt bar + inspector,
+ * see lib/workspace/inspector.ts.
  */
 
 export type SurfaceId =
@@ -125,7 +125,6 @@ export interface Surface {
   label: string;
   /** Nav label shown in the header */
   navLabel: string;
-  layout: "panel" | "dock";
   /** Sibling tabs rendered above the panel, e.g. Create Video / Edit Video / Motion Control */
   tabGroup?: { id: SurfaceId; label: string }[];
   fields: Field[];

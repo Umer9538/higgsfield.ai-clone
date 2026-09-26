@@ -6,7 +6,13 @@ import { ArrowUpRight, Heart, Play, Search, Wand2 } from "lucide-react";
 import { CATEGORIES, FEATURE_TAGS, RAILS, SORTS, TRENDING_PROMPTS, type FeedItem } from "@/lib/explore/content";
 import { FeedMedia } from "./FeedMedia";
 
-function FeedCard({ item }: { item: FeedItem }) {
+/**
+ * One generation in the feed. Remix normally opens the video studio with the
+ * prompt; on the home page `onRemix` loads it into the composer instead.
+ */
+export function FeedCard({ item, onRemix }: { item: FeedItem; onRemix?: (item: FeedItem) => void }) {
+  const remixClass =
+    "pointer-events-auto mt-2.5 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-deep md:min-h-0";
   return (
     <article
       style={{ gridRowEnd: `span ${item.span}` }}
@@ -46,13 +52,17 @@ function FeedCard({ item }: { item: FeedItem }) {
           </span>
         </div>
 
-        <Link
-          href={`/ai/video?prompt=${encodeURIComponent(item.prompt)}`}
-          className="pointer-events-auto mt-2.5 flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-deep md:min-h-0"
-        >
-          <Wand2 className="size-3.5" aria-hidden strokeWidth={2} />
-          Remix
-        </Link>
+        {onRemix ? (
+          <button type="button" onClick={() => onRemix(item)} className={`press ${remixClass}`}>
+            <Wand2 className="size-3.5" aria-hidden strokeWidth={2} />
+            Remix
+          </button>
+        ) : (
+          <Link href={`/ai/video?prompt=${encodeURIComponent(item.prompt)}`} className={remixClass}>
+            <Wand2 className="size-3.5" aria-hidden strokeWidth={2} />
+            Remix
+          </Link>
+        )}
       </div>
     </article>
   );

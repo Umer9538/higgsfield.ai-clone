@@ -4,7 +4,6 @@ export const threeDJutsu: Surface = {
   id: "3d-jutsu",
   label: "3D Jutsu",
   navLabel: "3D Jutsu",
-  layout: "dock",
   fields: [],
   dock: {
     placeholder: "Describe the scene you want to block out...",

@@ -10,7 +10,6 @@ export const video: Surface = {
   id: "video",
   label: "Create Video",
   navLabel: "Video",
-  layout: "panel",
   tabGroup: VIDEO_TABS,
   fields: [
     { kind: "preset", id: "preset", image: "/media/presets/1.jpg", label: "GENERAL", sublabel: "Seedance 2.5" },

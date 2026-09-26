@@ -4,7 +4,6 @@ export const marketingStudio: Surface = {
   id: "marketing-studio",
   label: "Marketing Studio",
   navLabel: "Marketing Studio",
-  layout: "dock",
   fields: [],
   dock: {
     placeholder: "Describe what you want to create...",
