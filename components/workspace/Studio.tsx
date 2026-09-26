@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/Toast";
 import { PanelRightClose, PanelRightOpen, SlidersHorizontal } from "lucide-react";
 import type { Surface } from "@/lib/workspace/types";
 import { HistoryStrip } from "./HistoryStrip";
@@ -21,6 +23,17 @@ export function Studio({ surface }: { surface: Surface }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const closeSheet = useCallback(() => setSheetOpen(false), []);
   useRegisterStudio(surface);
+
+  // Arriving from the onboarding sandbox: say what was carried over, once
+  const params = useSearchParams();
+  const { toast } = useToast();
+  const announced = useRef(false);
+  useEffect(() => {
+    if (announced.current || params.get("from") !== "onboarding") return;
+    announced.current = true;
+    const count = params.getAll("set").length;
+    toast(`Your preset is loaded — prompt${count ? ` and ${count} settings` : ""} from onboarding`);
+  }, [params, toast]);
 
   return (
     <div className="flex lg:h-[calc(100dvh-var(--spacing-header))]">

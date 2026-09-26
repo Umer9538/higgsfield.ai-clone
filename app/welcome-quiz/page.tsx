@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Quiz } from "@/components/onboarding/Quiz";
+import { Sandbox } from "@/components/onboarding/Sandbox";
 
 export const metadata: Metadata = {
-  title: "Creator Profile Quiz — Higgsfield",
-  description: "Three minutes to personalise your Higgsfield workspace.",
+  title: "Make your first frame — Higgsfield",
+  description: "Pick a medium, build a prompt, watch a test frame render, and open a studio set up for it.",
 };
 
-export default function WelcomeQuizPage() {
-  return <Quiz />;
+export default function OnboardingPage() {
+  return <Sandbox />;
 }

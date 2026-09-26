@@ -414,7 +414,7 @@ test("signing in swaps the header to the app shell and out again", async ({ page
   // Avatar menu exposes the documented destinations
   await header.getByRole("button", { name: "Account" }).click();
   const menu = page.getByRole("menu", { name: "Account menu" });
-  for (const label of ["Profile", "Settings", "Onboarding Quiz"]) {
+  for (const label of ["Profile", "Settings", "Onboarding"]) {
     await expect(menu.getByRole("menuitem", { name: label })).toBeVisible();
   }
 
@@ -453,65 +453,18 @@ test("signup route toggles to sign-in mode", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
 });
 
-test("welcome quiz walks three steps and lands in a personalised workspace", async ({ page }) => {
-  await page.goto("/welcome-quiz");
-
-  const next = page.getByRole("button", { name: "Continue" });
-  await expect(next).toBeDisabled();
-
-  // Step 1: role
-  await page.getByRole("radio", { name: /AI Filmmaker/ }).click();
-  await expect(next).toBeEnabled();
-  await next.click();
-
-  // Step 2: level + at least one model. Picking an image model steers the surface.
-  await expect(next).toBeDisabled();
-  await page.getByRole("radio", { name: /Advanced/ }).click();
-  await page.getByRole("checkbox", { name: /Nano Banana Pro/ }).click();
-  await expect(next).toBeEnabled();
-  await next.click();
-
-  // Step 3: goal + discount
-  const finish = page.getByRole("button", { name: "Finish and start creating" });
-  await expect(finish).toBeDisabled();
-  await page.getByRole("radio", { name: /Ship more, faster/ }).click();
-  await page.getByRole("button", { name: /Claim your 54% sign-up discount/ }).click();
-  await expect(page.locator("[data-toast]")).toContainText("54% sign-up discount claimed");
-
-  await finish.click();
-
-  // Completing the quiz always lands on the feed
-  await expect(page).toHaveURL(/\/explore$/);
-
-  const saved = await page.evaluate(() => window.localStorage.getItem("hf.onboarding"));
-  expect(saved).toBeTruthy();
-  const parsed = JSON.parse(saved!);
-  expect(parsed.role).toBe("filmmaker");
-  expect(parsed.models).toContain("nano-banana-pro");
-  expect(parsed.claimedDiscount).toBe(true);
-  expect(parsed.hasCompletedOnboarding).toBe(true);
-
-  // And records the one-shot flag
-  const flag = await page.evaluate(() => window.localStorage.getItem("hf.onboardingCompleted"));
-  expect(flag).toBe("true");
-});
-
 test("onboarding prompts once: first sign-up detours, later sign-ups do not", async ({ page }) => {
-  // First sign-up on a clean device goes to the quiz
+  // First sign-up on a clean device goes to onboarding
   await page.goto("/");
   await page.getByRole("banner").getByRole("button", { name: "Sign up" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Continue with Google" }).click();
   await expect(page).toHaveURL(/\/welcome-quiz$/);
 
-  // Complete it
-  await page.getByRole("radio", { name: /UGC Creator/ }).click();
-  await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("radio", { name: /Beginner/ }).click();
-  await page.getByRole("checkbox", { name: /Seedance 2.5/ }).click();
-  await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("radio", { name: /Win client work/ }).click();
-  await page.getByRole("button", { name: "Finish and start creating" }).click();
-  await expect(page).toHaveURL(/\/explore$/);
+  // Make a frame and open the studio
+  await page.getByRole("radio", { name: /Product Ad/ }).click();
+  await page.getByRole("button", { name: "Render a test frame" }).click();
+  await page.getByRole("button", { name: "Open Workspace with This Preset" }).click({ timeout: 15_000 });
+  await expect(page).toHaveURL(/\/ai\/marketing-studio\?/);
 
   // Sign out, then sign up again on the same device: no second detour
   await page.getByRole("banner").getByRole("button", { name: "Account" }).click();
@@ -667,9 +620,9 @@ test("every route returns 200 and logs no console errors", async ({ page }) => {
   for (const route of ALL_ROUTES) {
     const response = await page.goto(route);
     expect(response?.status(), `${route} should return 200`).toBe(200);
-    // The onboarding quiz is intentionally full-screen with no header.
+    // Onboarding is intentionally full-screen with no header.
     if (route === "/welcome-quiz") {
-      await expect(page.getByRole("radiogroup", { name: "Primary workflow" })).toBeVisible();
+      await expect(page.getByRole("radiogroup", { name: "What are you creating today?" })).toBeVisible();
     } else {
       await expect(page.getByRole("banner")).toBeVisible();
     }
@@ -864,7 +817,7 @@ test("a first-run sign-up routes straight into the onboarding quiz", async ({ pa
   await page.getByRole("banner").getByRole("button", { name: "Sign up" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Continue with Apple" }).click();
   await expect(page).toHaveURL(/\/welcome-quiz$/);
-  await expect(page.getByRole("radiogroup", { name: "Primary workflow" })).toBeVisible();
+  await expect(page.getByRole("radiogroup", { name: "What are you creating today?" })).toBeVisible();
 });
 
 test("command palette opens on Ctrl/Cmd+K and navigates", async ({ page }) => {

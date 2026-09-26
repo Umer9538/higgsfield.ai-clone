@@ -405,6 +405,69 @@ preview, the split by keyboard and pointer, looks, prompt copy via the real
 clipboard, the JSON contents, the HUD shortcut's typing guard, and real
 `/api` latency in the HUD.
 
+## Interactive Onboarding Innovation
+
+**The old onboarding asked about you; the new one has you make something.**
+The three-step profile quiz (role, level, goal) collected answers that
+changed nothing you could see. It is replaced by a sandbox at the same
+route (`/welcome-quiz`, where first sign-up already sends people): four
+steps, about a minute, ending inside a studio that is already set up.
+
+1. **Medium, one click.** Cinematic Video, Social AI Reel, 3D Game Asset or
+   Product Ad, as picture cards that name the studio each opens. Picking
+   one advances immediately. The selected card glows Electric Violet, which
+   is consistent with the palette rules: here a card *is* the action.
+2. **Prompt builder.** A subject to start from (editable), then three tag
+   groups: camera angle, style and motion. Each tag adds words to a
+   **live prompt** that rebuilds as you tap, with tag words highlighted, and
+   shows exactly which studio controls it will set (Camera 35mm, Lighting
+   Neon Night…). Tags toggle, so tapping one again clears it. **Surprise
+   me** picks a subject and a tag from each group.
+3. **Test render.** A three-second render on a canvas, not a spinner. The
+   medium's still develops from 32 px blocks to full resolution, the same
+   preview-pass idea as the studio's compare view. It is graded by the chosen
+   style and moves the way the camera and motion tags say (a drone pan, a
+   push-in, handheld drift; hyper-lapse speeds the move, whip-pan snaps at
+   the end). A frame counter reads `Rendering test frame 041/120…`, and a
+   cyan edge brightens toward completion. It all runs from one
+   `requestAnimationFrame` loop that writes through refs.
+4. **Open Workspace with This Preset.** Opens the matching studio with the
+   prompt typed in and the controls set, and a toast says what was carried
+   over.
+
+**How the preset travels.** In the URL, as `?prompt=…&set=Label:Value`, so
+it is shareable, survives a reload, and needs no hidden state. It is also
+saved to `hf.onboarding` for later personalisation. The studio reads `set`
+through `presetFromUrl` and **validates every value** against what that
+control can actually hold: an unknown lens or ratio in a hand-edited URL is
+ignored rather than putting the UI into a state it cannot show. Tags map
+onto real controls only where the target studio has them (Cinema Studio's
+Camera and Look pickers); elsewhere they shape the prompt alone.
+
+**Where each medium goes.** There is no `/studio` route. Each medium opens
+the studio built for it: Cinematic Video and Social AI Reel open Cinema
+Studio (16:9, or 9:16 with a music-video film setup for reels), 3D Game
+Asset opens 3D Jutsu, and Product Ad opens Marketing Studio in Image mode.
+
+**Motion.** Step changes use `motion` (Framer Motion), because
+direction-aware exit and enter (forward slides left, Back slides right) is
+the one thing CSS cannot do cleanly. It uses the app's spring (stiffness
+300, damping 30) and `useReducedMotion`, which turns slides into an instant
+swap. It is **scoped to this route**: measured, the onboarding-only JavaScript
+is 55.5 KB gzipped, and `motion` is absent from every other route's bundles.
+The rest of the app stays on the CSS system below.
+
+**Still honest.** The render is a styled preview of a stock still, and the
+copy says so: "Graded and framed from your tags. Open the studio to
+generate the real thing." Skip for now is always one tap away, and
+onboarding still prompts only once per device.
+
+**Tests (`e2e/onboarding.spec.ts`):** the full path from medium to studio,
+checking the exact prompt and every control landed; reels opening vertical
+and product ads opening Marketing Studio in Image mode; Surprise me and tag
+clearing; URL presets validated rather than trusted; reduced motion. The
+once-per-device test now completes the sandbox.
+
 ## Motion system
 
 **CSS, not Framer Motion.** Every animation here runs as a CSS animation or
@@ -503,7 +566,7 @@ it 276 px too low.
 
 ## How it is verified
 
-96 Playwright tests run against both the local build and the live
+100 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

@@ -24,6 +24,11 @@ export function choicesFor(label: string, current: string): string[] {
   return CHOICES[label] ?? [current];
 }
 
+/** True when a pill can hold this value and still cycle from it. */
+export function isPillValue(value: string): boolean {
+  return value in PILL_CYCLES;
+}
+
 /** Next value when a pill is clicked; falls back to itself when there is no cycle. */
 export function nextPillValue(current: string): string {
   const cycle = PILL_CYCLES[current];

@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Surface } from "@/lib/workspace/types";
+import { SETUP_OPTIONS, isPillValue } from "@/lib/workspace/options";
 
 export type FieldValue = string | boolean;
 
@@ -50,6 +51,40 @@ function initialValues(surface: Surface): Record<string, FieldValue> {
   return seed;
 }
 
+/**
+ * Studio controls carried in the URL as `set=Label:Value` (repeatable), e.g.
+ * from the onboarding sandbox: `set=Camera:35mm&set=ratio:9:16&set=mode:Video`.
+ * A label names a picker tile; a lowercase key names a pill by its icon.
+ * Every value is checked against what the control can actually hold, so a
+ * hand-edited URL cannot put a studio into a state its UI cannot show.
+ */
+export function presetFromUrl(surface: Surface, entries: string[]): Record<string, FieldValue> {
+  const dock = surface.dock;
+  const out: Record<string, FieldValue> = {};
+  if (!dock) return out;
+  for (const entry of entries) {
+    const split = entry.indexOf(":");
+    if (split <= 0) continue;
+    const key = entry.slice(0, split);
+    const value = entry.slice(split + 1);
+
+    if (dock.setup?.some((tile) => tile.label === key)) {
+      if (SETUP_OPTIONS[key]?.includes(value)) out[dockKey.setup(key)] = value;
+      continue;
+    }
+    if (key === "mode" && dock.rail?.some((item) => item.label === value)) {
+      out[dockKey.mode] = value;
+      const model = dock.modeModels?.[value];
+      const modelIndex = dock.pills.findIndex((pill) => pill.icon === "model");
+      if (model && modelIndex >= 0) out[dockKey.pill(modelIndex)] = model;
+      continue;
+    }
+    const pillIndex = dock.pills.findIndex((pill) => pill.icon === key);
+    if (pillIndex >= 0 && isPillValue(value)) out[dockKey.pill(pillIndex)] = value;
+  }
+  return out;
+}
+
 export function WorkspaceProvider({
   surface,
   children,
@@ -68,6 +103,7 @@ export function WorkspaceProvider({
       if (target) seed[target.id] = incomingPrompt;
       else if (surface.dock) seed[dockKey.prompt] = incomingPrompt;
     }
+    Object.assign(seed, presetFromUrl(surface, searchParams.getAll("set")));
     return seed;
   });
 

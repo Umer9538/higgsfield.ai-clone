@@ -44,7 +44,7 @@ export const COMMANDS: CommandItem[] = [
   // Account
   { id: "login", label: "Log in", group: "Account", href: "/login" },
   { id: "signup", label: "Sign up", group: "Account", href: "/signup" },
-  { id: "quiz", label: "Onboarding Quiz", group: "Account", href: "/welcome-quiz", keywords: "profile setup" },
+  { id: "quiz", label: "Onboarding", group: "Account", href: "/welcome-quiz", keywords: "profile setup" },
   { id: "signout", label: "Sign out", group: "Account", action: "signout" },
 
   // Actions

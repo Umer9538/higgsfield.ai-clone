@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/Toast";
 const LINKS = [
   { href: "/assets", label: "Profile", icon: User },
   { href: "/pricing", label: "Settings", icon: Settings },
-  { href: "/welcome-quiz", label: "Onboarding Quiz", icon: Sparkles },
+  { href: "/welcome-quiz", label: "Onboarding", icon: Sparkles },
 ];
 
 export function UserMenu() {
