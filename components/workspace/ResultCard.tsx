@@ -163,6 +163,28 @@ function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
   );
 }
 
+const BADGE: Record<string, { label: string; tone: string }> = {
+  saving: { label: "Saving…", tone: "border-hf-border text-hf-dim" },
+  firestore: { label: "Synced to cloud", tone: "border-hf-cyan/50 bg-hf-cyan/10 text-hf-cyan" },
+  memory: { label: "Saved · session", tone: "border-hf-cyan/40 text-hf-cyan" },
+  local: { label: "Saved on device", tone: "border-hf-border text-hf-muted" },
+};
+
+/** Tells the user where their output actually landed, not just that it finished. */
+function PersistenceBadge({ state }: { state: string }) {
+  const badge = BADGE[state];
+  if (!badge) return null;
+  return (
+    <span
+      data-persistence={state}
+      role="status"
+      className={`rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase ${badge.tone}`}
+    >
+      {badge.label}
+    </span>
+  );
+}
+
 const ACTIONS = [
   { label: "Download", icon: Download },
   { label: "Upscale", icon: Wand2 },
@@ -171,7 +193,7 @@ const ACTIONS = [
 ] as const;
 
 export function ResultCard({ result }: { result: GenerationResult }) {
-  const { reset } = useGeneration();
+  const { reset, saved } = useGeneration();
   const { toast } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -203,9 +225,10 @@ export function ResultCard({ result }: { result: GenerationResult }) {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex items-center justify-between gap-4">
-        <p className="flex items-center gap-2 text-sm font-medium text-white">
+        <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-white">
           <span className="size-1.5 rounded-full bg-hf-accent" aria-hidden />
           Generation complete
+          <PersistenceBadge state={saved} />
         </p>
         <button
           type="button"

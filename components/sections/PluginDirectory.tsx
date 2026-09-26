@@ -69,7 +69,7 @@ export function PluginDirectory() {
               <li key={item.id}>
                 <div
                   className={`rounded-3xl border p-4 transition-colors ${
-                    selected ? "border-hf-accent/50 bg-hf-accent/5" : "border-hf-border bg-hf-surface"
+                    selected ? "border-hf-cyan/50 bg-hf-accent/5" : "border-hf-border bg-hf-surface"
                   }`}
                 >
                   <button

@@ -7,6 +7,9 @@ import { useWorkspace } from "./state";
 
 export type GenerationStatus = "idle" | "running" | "done";
 
+/** Where the finished output was persisted, surfaced as a live badge. */
+export type SaveState = "idle" | "saving" | "firestore" | "memory" | "local";
+
 /** Stage labels per output kind, so the status text reads like real work. */
 const STAGES: Record<GenerationResult["kind"], string[]> = {
   video: [
@@ -31,6 +34,7 @@ interface GenerationContextValue {
   stageIndex: number;
   start: () => void;
   reset: () => void;
+  saved: SaveState;
 }
 
 const GenerationContext = createContext<GenerationContextValue | null>(null);
@@ -47,6 +51,7 @@ export function GenerationProvider({
   const { values } = useWorkspace();
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [progress, setProgress] = useState(0);
+  const [saved, setSaved] = useState<SaveState>("idle");
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stages = STAGES[kind];
@@ -85,6 +90,7 @@ export function GenerationProvider({
           // Local store first so the library updates instantly, then persist.
           addGeneratedAsset({ kind: result.kind, model, prompt, src: result.src, poster: result.poster, spec });
 
+          setSaved("saving");
           void fetch("/api/generations", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -97,9 +103,15 @@ export function GenerationProvider({
               poster: result.poster,
               spec,
             }),
-          }).catch(() => {
-            // Offline or no backend: the local store already has it.
-          });
+          })
+            .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
+            .then((data: { source?: string }) =>
+              setSaved(data.source === "firestore" ? "firestore" : "memory"),
+            )
+            .catch(() => {
+              // Offline or no backend: the local store already has it.
+              setSaved("local");
+            });
         }
       }
     }, TICK_MS);
@@ -109,6 +121,7 @@ export function GenerationProvider({
     clear();
     setStatus("idle");
     setProgress(0);
+    setSaved("idle");
   }, [clear]);
 
   useEffect(() => clear, [clear]);
@@ -116,8 +129,8 @@ export function GenerationProvider({
   const stageIndex = Math.min(stages.length - 1, Math.floor((progress / 100) * stages.length));
 
   const value = useMemo(
-    () => ({ status, progress, stage: stages[stageIndex], stages, stageIndex, start, reset }),
-    [status, progress, stages, stageIndex, start, reset],
+    () => ({ status, progress, stage: stages[stageIndex], stages, stageIndex, start, reset, saved }),
+    [status, progress, stages, stageIndex, start, reset, saved],
   );
 
   return <GenerationContext.Provider value={value}>{children}</GenerationContext.Provider>;

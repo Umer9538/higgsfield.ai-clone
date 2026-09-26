@@ -28,7 +28,7 @@ export function Segmented({
             onClick={() => setValue(option.value)}
             className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               active
-                ? "bg-hf-surface-4 text-hf-accent-soft ring-1 ring-hf-accent/60 ring-inset"
+                ? "bg-hf-surface-4 text-hf-accent-soft ring-1 ring-hf-cyan/60 ring-inset"
                 : "text-hf-muted hover:text-white"
             }`}
           >

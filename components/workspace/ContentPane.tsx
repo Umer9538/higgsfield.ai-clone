@@ -175,7 +175,7 @@ function CarouselPane({
               aria-current={i === index ? "true" : undefined}
               onClick={() => setIndex(i)}
               className={`relative size-11 shrink-0 overflow-hidden rounded-full border transition-colors ${
-                i === index ? "border-hf-accent" : "border-hf-border hover:border-hf-accent/50"
+                i === index ? "border-hf-cyan" : "border-hf-border hover:border-hf-cyan/50"
               }`}
             >
               <Image

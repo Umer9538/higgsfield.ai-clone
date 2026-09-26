@@ -47,7 +47,7 @@ function ChoiceCard({
         <span
           className={`flex size-5 shrink-0 items-center justify-center border ${
             multi ? "rounded" : "rounded-full"
-          } ${selected ? "border-hf-accent bg-hf-accent text-black" : "border-hf-border"}`}
+          } ${selected ? "border-hf-cyan bg-hf-accent text-black" : "border-hf-border"}`}
         >
           {selected ? <Check className="size-3" aria-hidden strokeWidth={3} /> : null}
         </span>

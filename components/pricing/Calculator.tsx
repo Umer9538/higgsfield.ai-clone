@@ -80,7 +80,7 @@ export function Calculator() {
                     {goal.label}
                     <span
                       className={`flex size-4 shrink-0 items-center justify-center rounded border ${
-                        active ? "border-hf-accent bg-hf-accent text-black" : "border-hf-border"
+                        active ? "border-hf-cyan bg-hf-accent text-black" : "border-hf-border"
                       }`}
                     >
                       {active ? <Check className="size-3" aria-hidden strokeWidth={3} /> : null}

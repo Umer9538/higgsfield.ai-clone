@@ -100,7 +100,7 @@ export function CommandPalette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border border-hf-border bg-hf-surface shadow-2xl"
+        className="glass relative z-10 w-full max-w-lg overflow-hidden rounded-3xl shadow-2xl"
       >
         <div className="flex items-center gap-2.5 border-b border-hf-border px-4">
           <Search className="size-4 shrink-0 text-hf-dim" aria-hidden strokeWidth={1.75} />

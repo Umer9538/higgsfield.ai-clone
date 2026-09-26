@@ -70,7 +70,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-hf-border bg-hf-black/95 backdrop-blur">
+      <header className="glass sticky top-0 z-50 border-x-0 border-t-0">
       <div className="flex h-header items-center gap-4 px-4">
         <Link
           href="/"

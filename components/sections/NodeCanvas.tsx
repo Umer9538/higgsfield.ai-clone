@@ -259,7 +259,7 @@ export function NodeCanvas() {
                 else setSelected(node.id);
               }}
               className={`absolute w-52 rounded-2xl border bg-hf-surface-2 ${
-                isSelected ? "border-hf-accent" : "border-hf-border"
+                isSelected ? "border-hf-cyan" : "border-hf-border"
               }`}
               style={{ left: `${node.x}%`, top: `${node.y}%` }}
             >
