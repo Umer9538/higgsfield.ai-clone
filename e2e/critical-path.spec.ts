@@ -1137,10 +1137,11 @@ const AUDIT_ROUTES = [
   "/signup", "/welcome-quiz", "/ai/video", "/ai/image", "/ai/audio", "/ai/edit",
   "/ai/motion-control", "/ai/genjutsu", "/ai/effects", "/ai/cinema-studio",
   "/ai/marketing-studio", "/ai/3d-jutsu",
+  "/profile", "/settings",
 ];
 
 test("no route ships a placeholder anchor or a layout shift", async ({ page }) => {
-  // A 27-route crawl with a settle window per page; the default 30s budget is
+  // A 29-route crawl with a settle window per page; the default 30s budget is
   // fine locally but not against a deployment over a real network.
   test.setTimeout(240_000);
   const offenders: string[] = [];

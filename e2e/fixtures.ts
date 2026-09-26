@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { test as base, expect } from "@playwright/test";
 
 /**
@@ -6,11 +7,14 @@ import { test as base, expect } from "@playwright/test";
  * recognise and delete. Against the live deployment, untagged test runs used
  * to leave permanent records in every real visitor's library.
  */
-export const E2E_OWNER_PREFIX = "device:e2e-";
+/** Fixed owners used by API-level tests; the teardown cleans these too. */
+export const API_TEST_OWNERS = ["device:e2e-api", "device:e2e-contract"];
 
 export const test = base.extend({
   page: async ({ page }, provide) => {
     const device = `e2e-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    // Recorded for the teardown, which can only delete by the raw owner id
+    if (process.env.E2E_OWNERS_FILE) fs.appendFileSync(process.env.E2E_OWNERS_FILE, `device:${device}\n`);
     await page.addInitScript((id) => {
       if (!localStorage.getItem("hf.device")) localStorage.setItem("hf.device", id);
     }, device);

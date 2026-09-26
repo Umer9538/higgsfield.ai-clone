@@ -13,8 +13,10 @@ export interface Asset {
   meta: string;
   /** The Firestore document id, once the backend has stored it */
   remoteId?: string;
-  /** Who created it, as the API records it; only they can delete it */
+  /** Who created it (local generations only; the raw id never comes from the API) */
   owner?: string;
+  /** SHA-256 of the creator's id, as the API publishes it */
+  ownerHash?: string;
 }
 
 const PROMPTS = [

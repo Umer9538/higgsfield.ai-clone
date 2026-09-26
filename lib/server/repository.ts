@@ -1,6 +1,14 @@
 import "server-only";
 import { getAdminDb, isFirebaseConfigured } from "@/lib/firebase-admin";
-import type { FavoriteRecord, GenerationRecord, NewFavorite, NewGeneration } from "./types";
+import { createHash } from "node:crypto";
+import type { FavoriteRecord, GenerationRecord, NewFavorite, NewGeneration, PublicGeneration } from "./types";
+
+export const hashOwner = (owner: string) => createHash("sha256").update(owner).digest("hex");
+
+/** Strip the owner id (a delete credential) and publish only its hash. */
+function toPublic({ owner, ...rest }: GenerationRecord): PublicGeneration {
+  return { ...rest, ownerHash: owner ? hashOwner(owner) : null };
+}
 
 /**
  * Firestore (via firebase-admin) with an in-memory fallback.
@@ -42,9 +50,9 @@ function legacyFavoriteId(owner: string, itemId: string): string | null {
 
 /* -------------------------------- generations ------------------------------- */
 
-export async function listGenerations(max = 50): Promise<GenerationRecord[]> {
+export async function listGenerations(max = 50): Promise<PublicGeneration[]> {
   const db = getAdminDb();
-  if (!db) return memory.__hfGenerations!.slice(0, max);
+  if (!db) return memory.__hfGenerations!.slice(0, max).map(toPublic);
 
   const snapshot = await db
     .collection("generations")
@@ -52,10 +60,10 @@ export async function listGenerations(max = 50): Promise<GenerationRecord[]> {
     .limit(max)
     .get();
 
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<GenerationRecord, "id">) }));
+  return snapshot.docs.map((doc) => toPublic({ id: doc.id, ...(doc.data() as Omit<GenerationRecord, "id">) }));
 }
 
-export async function createGeneration(input: NewGeneration): Promise<GenerationRecord> {
+export async function createGeneration(input: NewGeneration): Promise<PublicGeneration> {
   const createdAt = new Date().toISOString();
   const db = getAdminDb();
 
@@ -63,7 +71,7 @@ export async function createGeneration(input: NewGeneration): Promise<Generation
     const record: GenerationRecord = { ...input, id: newId("gen"), createdAt };
     memory.__hfGenerations!.unshift(record);
     memory.__hfGenerations = memory.__hfGenerations!.slice(0, 200);
-    return record;
+    return toPublic(record);
   }
 
   // Firestore rejects undefined values, so optional fields become null.
@@ -79,7 +87,7 @@ export async function createGeneration(input: NewGeneration): Promise<Generation
     createdAt,
   });
 
-  return { ...input, id: ref.id, createdAt };
+  return toPublic({ ...input, id: ref.id, createdAt });
 }
 
 export type DeleteOutcome = "deleted" | "not_found" | "forbidden";

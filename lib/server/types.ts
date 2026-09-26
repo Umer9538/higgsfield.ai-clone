@@ -25,4 +25,12 @@ export interface FavoriteRecord {
 }
 
 export type NewGeneration = Omit<GenerationRecord, "id" | "createdAt">;
+
+/**
+ * What the API returns. The raw owner id never leaves the server: it is what
+ * authorises a delete, and publishing it let anyone list every owner and
+ * delete the whole library. Clients get its SHA-256 and compare it with the
+ * hash of their own identities to know what is theirs.
+ */
+export type PublicGeneration = Omit<GenerationRecord, "owner"> & { ownerHash: string | null };
 export type NewFavorite = Omit<FavoriteRecord, "id" | "createdAt">;

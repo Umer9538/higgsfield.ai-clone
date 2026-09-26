@@ -27,7 +27,7 @@ interface RemoteGeneration {
   poster?: string | null;
   spec: string;
   createdAt: string;
-  owner?: string | null;
+  ownerHash?: string | null;
 }
 
 /** Shape a stored generation into the card model the library renders. */
@@ -43,7 +43,7 @@ function toAsset(item: RemoteGeneration): Asset {
     poster: item.poster ?? undefined,
     meta: item.spec,
     remoteId: item.id,
-    owner: item.owner ?? undefined,
+    ownerHash: item.ownerHash ?? undefined,
   };
 }
 
@@ -58,7 +58,7 @@ function readHidden(): string[] {
     return [];
   }
 }
-import { useOwners } from "@/lib/identity";
+import { useOwnerHashes, useOwners } from "@/lib/identity";
 import {
   removeGeneratedAsset,
   getGeneratedServerSnapshot,
@@ -189,6 +189,7 @@ export function AssetLibrary() {
   // for you instead, and that sticks across reloads.
   const [deleted, setDeleted] = useState<string[]>([]);
   const owners = useOwners();
+  const ownerHashes = useOwnerHashes();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -268,8 +269,13 @@ export function AssetLibrary() {
   const remove = async (asset: Asset) => {
     const key = identity(asset);
     const local = generated.find((item) => item.id === asset.id || (asset.remoteId && item.remoteId === asset.remoteId));
-    const recordOwner = asset.owner ?? local?.owner;
-    const mine = Boolean(asset.remoteId && recordOwner && owners.includes(recordOwner));
+    // Yours if the local copy records one of your ids, or the shared copy's
+    // owner hash matches one of yours (the API never reveals raw owner ids)
+    const localOwner = local?.owner;
+    const mine = Boolean(
+      asset.remoteId &&
+        ((localOwner && owners.includes(localOwner)) || (asset.ownerHash && ownerHashes.has(asset.ownerHash))),
+    );
 
     if (mine) {
       const query = owners.map((owner) => `owner=${encodeURIComponent(owner)}`).join("&");

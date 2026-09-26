@@ -145,6 +145,17 @@ test("API contract: validation, ownership, bounds and methods", async ({ request
 
   // Ownership on delete
   const created = await (await request.post("/api/generations", { data: valid })).json();
+
+  // The raw owner id is a delete credential: never published, only its hash
+  const listed = (await (await request.get("/api/generations?limit=100")).json()).items as Record<string, unknown>[];
+  const record = listed.find((g) => g.id === created.item.id)!;
+  expect(record).toBeTruthy();
+  expect(record).not.toHaveProperty("owner");
+  expect(created.item).not.toHaveProperty("owner");
+  const { createHash } = await import("node:crypto");
+  expect(record.ownerHash).toBe(createHash("sha256").update(owner).digest("hex"));
+  // Knowing the hash is not enough to delete
+  expect((await request.delete(`/api/generations/${created.item.id}?owner=${record.ownerHash}`)).status()).toBe(403);
   expect((await request.delete(`/api/generations/${created.item.id}`)).status()).toBe(400);
   const forbidden = await request.delete(`/api/generations/${created.item.id}?owner=device:someone-else`);
   expect(forbidden.status()).toBe(403);

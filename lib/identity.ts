@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth/context";
 
 /**
@@ -52,3 +52,30 @@ export function useOwners(): string[] {
     (owner): owner is string => owner !== null,
   );
 }
+
+async function sha256(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+/**
+ * SHA-256 of each identity in useOwners(). The API publishes only owner
+ * hashes (the raw id is what authorises a delete), so this is how the
+ * library recognises what is yours.
+ */
+export function useOwnerHashes(): Set<string> {
+  const owners = useOwners();
+  const key = owners.join("|");
+  const [hashes, setHashes] = useState<Set<string>>(() => new Set());
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.all(key ? key.split("|").map(sha256) : []).then((list) => {
+      if (!cancelled) setHashes(new Set(list));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [key]);
+  return hashes;
+}
+

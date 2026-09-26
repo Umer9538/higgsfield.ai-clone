@@ -120,13 +120,17 @@ export function GenerationProvider({
             .then((data: { source?: string; item?: { id: string } }) => {
               const remoteId = data.item?.id;
               if (remoteId && wasDeletedBeforeSync(localId) && owner) {
-                // Deleted while this save was in flight: finish the delete
-                void fetch(`/api/generations/${encodeURIComponent(remoteId)}?owner=${encodeURIComponent(owner)}`, {
-                  method: "DELETE",
-                }).catch(() => undefined);
-              } else if (remoteId) {
-                linkRemoteId(localId, remoteId);
+                // Deleted while this save was in flight: finish the delete,
+                // retrying once, and do not report the generation as saved
+                const url = `/api/generations/${encodeURIComponent(remoteId)}?owner=${encodeURIComponent(owner)}`;
+                const attempt = () => fetch(url, { method: "DELETE" }).then((r) => r.ok || r.status === 404);
+                void attempt()
+                  .catch(() => false)
+                  .then((ok) => (ok ? true : attempt().catch(() => false)));
+                setSaved("idle");
+                return;
               }
+              if (remoteId) linkRemoteId(localId, remoteId);
               setSaved(data.source === "firestore" ? "firestore" : "memory");
             })
             .catch(() => {

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Pause, Play } from "lucide-react";
+import { Pause } from "lucide-react";
 import type { FeedItem } from "@/lib/explore/content";
 import { setPreference, usePreferences } from "@/lib/ui/preferences";
 
@@ -225,9 +225,11 @@ export function FeedVideoToggle() {
       type="button"
       aria-pressed={pauseVideo}
       onClick={() => setPreference("pauseVideo", !pauseVideo)}
-      className="press flex min-h-11 items-center gap-1.5 rounded-lg border border-hf-border px-3 text-sm text-hf-muted transition-colors hover:text-white motion-reduce:hidden sm:min-h-9"
+      className="press flex min-h-11 items-center gap-1.5 rounded-lg border border-hf-border px-3 text-sm text-hf-muted transition-colors hover:text-white aria-pressed:border-hf-cyan/60 aria-pressed:bg-hf-cyan/10 aria-pressed:text-white motion-reduce:hidden sm:min-h-9"
     >
-      {pauseVideo ? <Play className="size-3.5" aria-hidden fill="currentColor" strokeWidth={0} /> : <Pause className="size-3.5" aria-hidden fill="currentColor" strokeWidth={0} />}
+      {/* Pressed = paused: the icon stays a pause glyph so it agrees with the
+          label, and the cyan pressed style shows the state */}
+      <Pause className="size-3.5" aria-hidden fill="currentColor" strokeWidth={0} />
       Pause videos
     </button>
   );

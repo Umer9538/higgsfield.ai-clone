@@ -31,10 +31,13 @@ function FavoriteButton({ item }: { item: FeedItem }) {
       // "Remove from favorites, pressed")
       aria-label={`Favorite ${item.model} by ${item.author}`}
       // Not \`disabled\` while saving: disabling the focused button blurs it and
-      // drops a keyboard user's place. toggle() already ignores repeat clicks.
+      // drops a keyboard user's place. The click handler ignores repeats.
       disabled={!ready}
       aria-disabled={isPending(item.id) || undefined}
       onClick={async () => {
+        // A repeat click while saving is ignored here, before toggle(), which
+        // would report it as a failed save
+        if (isPending(item.id)) return;
         const result = await toggle(item.id, `${item.model} · ${item.author}`);
         if (result === null) toast("Couldn't save that — check your connection", "info");
         else toast(result ? "Saved to favorites" : "Removed from favorites");
@@ -273,7 +276,7 @@ export function ExploreFeed() {
                   id={`rail-${rail.id}`}
                   tabIndex={-1}
                   // Clears the top bar and the sticky toolbar when focused
-                  className="scroll-mt-44 font-display text-xl font-bold tracking-[-0.025em] text-hf-accent-soft focus:outline-none sm:text-2xl"
+                  className="scroll-mt-44 font-display text-xl font-bold tracking-[-0.025em] text-hf-accent-soft sm:text-2xl"
                 >
                   {rail.title}
                 </h2>

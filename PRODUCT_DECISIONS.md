@@ -427,9 +427,19 @@ New tests pin each focus fix: the palette returns focus to its opener, the
 heart keeps focus through a save, and "View all" lands on a visible control
 whose Back returns to the rail.
 
+**Round 3** confirmed the round-2 fixes (11 of 12 complete) and found only
+small things: a false "couldn't save" toast on a repeat heart click, a video
+toggle whose icon contradicted its label, a deleted-mid-save generation
+reported as saved, a stale schema cell, and two routes missing from the
+layout-shift crawl. It also surfaced the one serious remaining issue: the
+API returned raw owner ids, so anyone could list them and delete the whole
+library. Owner ids are now never returned (see *Real deletes, with
+ownership*), and the test teardown finds its records by hashing the device
+ids the run recorded.
+
 **Not changed, on purpose:** preview deployments keep the in-memory
-fallback (production refuses without a database). Ownership stays advisory
-while sign-in is mocked. Generations made by earlier test runs before owners
+fallback (production refuses without a database). User-owned records are
+only as protected as a guessable handle while sign-in is mocked. Generations made by earlier test runs before owners
 existed have no owner, so the public API cannot delete them; they need a
 one-off admin cleanup.
 
@@ -446,7 +456,7 @@ Firestore: credentials are server-only env vars (no `NEXT_PUBLIC_`), and
 | Collection | Document id | Fields |
 |---|---|---|
 | `generations` | Firestore auto id (20 chars) | `prompt`, `model`, `surface`, `kind` (`video`/`image`/`audio`), `src`, `poster` (nullable), `spec`, `owner` (nullable), `createdAt` (ISO) |
-| `favorites` | `${owner}__${itemId}` (deterministic) | `itemId`, `title`, `owner`, `createdAt` |
+| `favorites` | `f\|${owner}\|${itemId}` (deterministic; legacy `owner__item` ids are read and cleaned up) | `itemId`, `title`, `owner`, `createdAt` |
 
 The deterministic favourite id makes a toggle one read and one write with
 no query, and makes duplicates impossible. Favourites are read with an
@@ -457,7 +467,7 @@ project does not have.
 
 | Method & path | Success | Errors |
 |---|---|---|
-| `GET /api/generations?limit=1..100` | 200 `{ items, source }` | 500, 503 |
+| `GET /api/generations?limit=1..100` | 200 `{ items, source }`, each item with `ownerHash`, never the raw owner | 500, 503 |
 | `POST /api/generations` | 201 `{ item, source }`, with the real document id | 400 `invalid_body` / `invalid_field`, 500, 503 |
 | `DELETE /api/generations/:id?owner=` | 204 | 400 `invalid_owner`, 403 `forbidden`, 404 `not_found`, 500, 503 |
 | `GET /api/favorites?owner=` | 200 `{ items, source }` | 400, 500, 503 |
@@ -491,9 +501,14 @@ Success bodies are unchanged from the original contract; every error is
   id; the cause goes to the server log.
 - **Real deletes, with ownership.** A generation records who made it
   (`user:<handle>` signed in, else a random `device:<uuid>`), and only that
-  owner can delete it. Sign-in is mocked, so this is advisory rather than
-  authentication; with real auth, the owner would come from a verified
-  session instead of the request.
+  owner can delete it. The raw owner id is the delete credential, so **the API
+  never returns it**: responses carry `ownerHash` (its SHA-256), and the
+  browser compares that with the hash of its own ids. An earlier version
+  returned `owner` on every record, which let anyone list the owners and
+  delete the whole shared library. Device-owned records are now protected by
+  an unguessable UUID. User-owned ones are only as strong as the handle,
+  which is derived from the email, because sign-in is mocked; with real auth,
+  the owner would come from a verified session instead of the request.
 - **Favourites are now a feature, not just an endpoint.** Previously nothing
   in the UI wrote a favourite. The heart on every feed card now saves to
   Firestore, stays visible once saved, and shows on the Profile. It
