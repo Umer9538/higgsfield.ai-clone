@@ -287,8 +287,21 @@ The first cut of the video grid let every visible card stream. Measured on
 the deployment, leaving the feed took **23.5 s** against **231 ms** for a
 page without video: streaming video held the browser's per-host connections
 open and starved navigation. At most four cards now stream, chosen in
-reading order and released on scroll. Remix navigation is back to about
-**200 ms**.
+reading order and released on scroll.
+
+The cap was not enough once the home page gained a video feed. Measured on
+the deployment after that release: **17.6 s** to leave the home page and
+**9.0 s** to leave Explore, against **117 ms** from Pricing. Two fixes:
+
+- Feed clips are **6-second silent loops** — 11.8 MB of clips became 2.2 MB,
+  which also helps every phone on a metered connection.
+- A press on anything that navigates (a link, a submit, Enter in a composer
+  or the palette) **aborts every stream** until the navigation lands, so the
+  next page gets the whole connection. If nothing navigates, playback
+  resumes after three seconds.
+
+Re-measured on the deployment: **0.2–1.0 s** from Home and **~0.9 s** from
+Explore. A test now guards the home page as well as Explore.
 
 ### Faster studio controls
 
@@ -308,7 +321,7 @@ listboxes use proper ARIA roles.
 
 ## How it is verified
 
-74 Playwright tests run against both the local build and the live
+75 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.
