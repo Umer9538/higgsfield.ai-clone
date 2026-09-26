@@ -21,7 +21,7 @@ export function FeedCard({
   index?: number;
 }) {
   const remixClass =
-    "pointer-events-auto mt-2.5 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-deep md:min-h-0";
+    "pointer-events-auto mt-2.5 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-hover md:min-h-0";
   return (
     <article
       style={{ gridRowEnd: `span ${item.span}`, "--i": index } as React.CSSProperties}
@@ -231,7 +231,7 @@ export function ExploreFeed() {
               <div className="flex shrink-0 items-center gap-2">
                 <Link
                   href="/ai/effects"
-                  className="flex min-h-11 items-center rounded-lg bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep md:min-h-0 md:py-2"
+                  className="flex min-h-11 items-center rounded-lg bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover md:min-h-0 md:py-2"
                 >
                   {rail.cta ?? "Try free"}
                 </Link>
@@ -275,7 +275,7 @@ export function ExploreFeed() {
                         setFocused(rail.id);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="flex min-h-11 items-center gap-1.5 rounded-full bg-hf-accent px-5 text-sm font-semibold text-black shadow-lg transition-colors hover:bg-hf-accent-deep"
+                      className="flex min-h-11 items-center gap-1.5 rounded-full bg-hf-accent px-5 text-sm font-semibold text-black shadow-lg transition-colors hover:bg-hf-accent-hover"
                     >
                       View all {rail.title}
                       <ArrowUpRight className="size-4" aria-hidden strokeWidth={2.5} />

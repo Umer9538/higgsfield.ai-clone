@@ -50,7 +50,7 @@ export function PluginDirectory() {
             if (!installed.includes(active.id)) toggle(active.id);
             toast(`${active.name} plugin installed`);
           }}
-          className="mt-6 flex items-center gap-2 rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+          className="mt-6 flex items-center gap-2 rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
         >
           <Download className="size-4" aria-hidden strokeWidth={2} />
           {PLUGINS.cta}
@@ -244,7 +244,7 @@ export function PluginDirectory() {
                       : `${details.name} installed`,
                   );
                 }}
-                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
               >
                 {installed.includes(details.id) ? "Uninstall" : "Install"}
               </button>

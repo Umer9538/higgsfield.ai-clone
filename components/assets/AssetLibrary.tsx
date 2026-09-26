@@ -134,7 +134,7 @@ function AssetCard({
             href={`/ai/${asset.kind === "audio" ? "audio" : asset.kind}?prompt=${encodeURIComponent(asset.prompt)}`}
             aria-label={`Open ${asset.title} in Studio`}
             title="Open in Studio"
-            className="flex size-11 items-center justify-center rounded-lg bg-hf-accent text-black transition-colors hover:bg-hf-accent-deep md:size-8"
+            className="flex size-11 items-center justify-center rounded-lg bg-hf-accent text-black transition-colors hover:bg-hf-accent-hover md:size-8"
           >
             <Wand2 className="size-4" aria-hidden strokeWidth={1.75} />
           </Link>

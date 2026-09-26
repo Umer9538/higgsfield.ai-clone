@@ -112,7 +112,7 @@ export function ContactSales() {
 
           <button
             type="submit"
-            className="mt-6 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+            className="mt-6 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
           >
             Contact Sales
           </button>

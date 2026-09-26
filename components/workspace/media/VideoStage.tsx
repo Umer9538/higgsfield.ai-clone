@@ -8,7 +8,7 @@ import { useFilmstrip } from "./useFilmstrip";
 const FALLBACK_FPS = 30;
 
 /** HH:MM:SS:FF — frames, not hundredths, because editors think in frames. */
-export function timecode(seconds: number, fps: number) {
+function timecode(seconds: number, fps: number) {
   if (!Number.isFinite(seconds) || seconds < 0) seconds = 0;
   const whole = Math.floor(seconds);
   const frames = Math.floor((seconds - whole) * fps + 1e-6);

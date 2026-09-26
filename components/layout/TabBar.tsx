@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { SECTIONS, sectionFor } from "@/lib/nav";
-import { useExclusiveOverlay, useRouteScopedOpen, useScrollLock } from "@/components/ui/overlay";
+import { useCloseOutsideMedia, useDialogFocus, useExclusiveOverlay, useRouteScopedOpen, useScrollLock } from "@/components/ui/overlay";
 import { CreateCatalog } from "./CreateCatalog";
 import { SectionIcon } from "./SectionIcon";
 
@@ -22,12 +22,9 @@ export function TabBar() {
   useExclusiveOverlay("create-sheet", sheetOpen, close);
   useScrollLock(sheetOpen);
 
-  useEffect(() => {
-    if (!sheetOpen) return;
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && close();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [sheetOpen, close]);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(sheetRef, sheetOpen, close);
+  useCloseOutsideMedia("(max-width: 767.98px)", sheetOpen, close);
   const secondary = SECTIONS.flatMap((section) => section.children ?? []);
 
   return (
@@ -76,6 +73,7 @@ export function TabBar() {
           />
           <div
             id="create-sheet"
+            ref={sheetRef}
             role="dialog"
             aria-modal="true"
             aria-label="Create"

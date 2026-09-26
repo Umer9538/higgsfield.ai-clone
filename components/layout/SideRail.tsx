@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SECTIONS, sectionFor } from "@/lib/nav";
-import { useExclusiveOverlay, useRouteScopedOpen, useScrollLock } from "@/components/ui/overlay";
+import { useCloseOutsideMedia, useDialogFocus, useExclusiveOverlay, useRouteScopedOpen, useScrollLock } from "@/components/ui/overlay";
 import { CreateCatalog } from "./CreateCatalog";
 import { Logo } from "./Logo";
 import { SectionIcon } from "./SectionIcon";
@@ -26,23 +26,15 @@ export function SideRail() {
   // Scoped to the route: following any link — a rail item, the catalog, the
   // palette, the browser's back button — closes the catalog by construction.
   const { open: catalogOpen, toggle: toggleCatalog, close: closeCatalog } = useRouteScopedOpen();
-  const createRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useExclusiveOverlay("create-catalog", catalogOpen, closeCatalog);
   useScrollLock(catalogOpen);
 
-  useEffect(() => {
-    if (!catalogOpen) return;
-    panelRef.current?.querySelector<HTMLElement>("a")?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      closeCatalog();
-      createRef.current?.focus();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [catalogOpen, closeCatalog]);
+  // Focus moves into the catalog, Tab stays inside, Escape closes and returns
+  // focus to Create
+  useDialogFocus(panelRef, catalogOpen, closeCatalog);
+  useCloseOutsideMedia("(min-width: 768px)", catalogOpen, closeCatalog);
 
   return (
     <nav
@@ -72,7 +64,6 @@ export function SideRail() {
             return (
               <li key={section.key}>
                 <button
-                  ref={createRef}
                   type="button"
                   aria-expanded={catalogOpen}
                   aria-controls="create-catalog"

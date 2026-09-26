@@ -214,7 +214,7 @@ export function NodeCanvas() {
             aria-expanded={picker}
             aria-haspopup="menu"
             onClick={() => setPicker((prev) => !prev)}
-            className="flex items-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+            className="flex items-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
           >
             <Plus className="size-4" aria-hidden strokeWidth={2.5} />
             Add node

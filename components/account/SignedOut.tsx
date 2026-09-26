@@ -10,7 +10,7 @@ export function SignedOut({ page }: { page: string }) {
       </p>
       <Link
         href="/login"
-        className="press mt-6 inline-flex min-h-11 items-center rounded-full bg-hf-accent px-6 text-sm font-semibold text-black hover:bg-hf-accent-deep"
+        className="press mt-6 inline-flex min-h-11 items-center rounded-full bg-hf-accent px-6 text-sm font-semibold text-black hover:bg-hf-accent-hover"
       >
         Log in
       </Link>

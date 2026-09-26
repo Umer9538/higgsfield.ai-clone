@@ -80,7 +80,7 @@ test("mobile: studio settings open as a sheet and Generate stays pinned", async 
   await page.setViewportSize(MOBILE);
   await page.goto("/ai/video");
 
-  const settings = page.getByRole("complementary", { name: "Settings" });
+  const settings = page.getByRole("dialog", { name: "Settings" });
   await expect(settings).toBeHidden();
 
   // Generate is on screen without scrolling, above the tab bar

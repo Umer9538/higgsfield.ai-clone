@@ -33,7 +33,10 @@ export function JsonView({ value }: { value: unknown }) {
   parts.push(text.slice(last));
 
   return (
+    // Focusable so keyboard users can scroll long metadata
     <pre
+      tabIndex={0}
+      aria-label="Generation metadata JSON"
       data-json-view
       className="max-h-[55dvh] overflow-auto rounded-xl border border-hf-border bg-hf-black p-4 font-mono text-[12px] leading-relaxed text-hf-muted"
     >

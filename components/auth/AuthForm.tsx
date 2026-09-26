@@ -94,7 +94,7 @@ export function AuthForm({
             />
             <button
               type="submit"
-              className="mt-5 h-11 w-full rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+              className="mt-5 h-11 w-full rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
             >
               Send code
             </button>
@@ -139,7 +139,7 @@ export function AuthForm({
             <button
               type="submit"
               disabled={!filled}
-              className="mt-5 h-11 w-full rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep disabled:cursor-not-allowed disabled:bg-hf-accent-muted disabled:text-black/60"
+              className="mt-5 h-11 w-full rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover disabled:cursor-not-allowed disabled:bg-hf-accent-muted disabled:text-black/60"
             >
               Verify and continue
             </button>
@@ -230,7 +230,7 @@ export function AuthForm({
         <button
           type="submit"
           disabled={busy}
-          className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep disabled:opacity-70"
+          className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover disabled:opacity-70"
         >
           {busy ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
           {mode === "signin" ? "Sign in" : "Create account"}

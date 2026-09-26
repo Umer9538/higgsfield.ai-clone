@@ -140,7 +140,7 @@ export function ContestBoard() {
             <button
               type="button"
               onClick={() => setEntered(true)}
-              className="mt-6 rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+              className="mt-6 rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
             >
               {entered ? "Festival project created" : CONTESTS.active.cta}
             </button>
@@ -176,12 +176,14 @@ export function ContestBoard() {
               {CONTESTS.past.map((contest) => (
                 <li
                   key={contest.title}
-                  className="rounded-3xl border border-hf-border bg-hf-surface p-5 opacity-80"
+                  // "Past" is carried by the badge and a muted title, not by
+                  // opacity: fading the card pulled its badge to 3.5:1
+                  className="rounded-3xl border border-hf-border bg-hf-surface p-5"
                 >
-                  <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-[10px] text-hf-dim">
+                  <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-[10px] text-hf-muted">
                     {contest.status}
                   </span>
-                  <h3 className="mt-3 text-sm font-semibold text-white">{contest.title}</h3>
+                  <h3 className="mt-3 text-sm font-semibold text-hf-muted">{contest.title}</h3>
                   <p className="mt-1 text-xs text-hf-muted">
                     {contest.prize} · {contest.winners}
                   </p>

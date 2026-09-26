@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CATALOG, type NavBadge } from "@/lib/nav";
 
-export function Badge({ tone }: { tone: NavBadge }) {
+function Badge({ tone }: { tone: NavBadge }) {
   return (
     <span
       className={`rounded px-1.5 py-0.5 text-[10px] leading-none font-semibold ${

@@ -64,7 +64,7 @@ export function SuperComposer() {
               type="button"
               aria-label="Send"
               onClick={send}
-              className="flex size-8 items-center justify-center rounded-full bg-hf-accent text-black transition-colors hover:bg-hf-accent-deep"
+              className="flex size-8 items-center justify-center rounded-full bg-hf-accent text-black transition-colors hover:bg-hf-accent-hover"
             >
               <ArrowUp className="size-4" aria-hidden strokeWidth={2.5} />
             </button>

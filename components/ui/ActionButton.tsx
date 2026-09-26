@@ -7,7 +7,7 @@ import { downloadAsset } from "@/lib/ui/download";
 type Variant = "primary" | "outline" | "ghost" | "white";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-hf-accent text-black hover:bg-hf-accent-deep font-semibold",
+  primary: "bg-hf-accent text-black hover:bg-hf-accent-hover font-semibold",
   outline: "border border-hf-border text-white hover:border-hf-accent/50 hover:text-hf-accent-soft",
   ghost: "text-hf-muted hover:text-white",
   white: "bg-white text-black hover:bg-white/90 font-medium",

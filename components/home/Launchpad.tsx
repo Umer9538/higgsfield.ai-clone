@@ -136,7 +136,7 @@ export function Launchpad() {
             <span className="ml-auto hidden text-xs text-hf-dim sm:block">Enter to create</span>
             <button
               type="submit"
-              className="press glow flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] bg-hf-accent px-5 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep max-sm:ml-auto"
+              className="press glow flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] bg-hf-accent px-5 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover max-sm:ml-auto"
             >
               Create
               <ArrowRight className="size-4" aria-hidden strokeWidth={2.25} />

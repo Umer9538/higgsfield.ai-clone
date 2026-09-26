@@ -269,7 +269,7 @@ export function Sandbox() {
                     type="button"
                     disabled={!subject.trim()}
                     onClick={() => go(2)}
-                    className="press glow flex h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-hf-accent text-sm font-semibold text-black hover:bg-hf-accent-deep disabled:cursor-not-allowed disabled:bg-hf-accent-muted disabled:text-black/60"
+                    className="press glow flex h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-hf-accent text-sm font-semibold text-black hover:bg-hf-accent-hover disabled:cursor-not-allowed disabled:bg-hf-accent-muted disabled:text-black/60"
                   >
                     <Wand2 className="size-4" aria-hidden strokeWidth={2} />
                     Render a test frame
@@ -305,7 +305,7 @@ export function Sandbox() {
                     <button
                       type="button"
                       onClick={open}
-                      className="press glow flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-hf-accent text-sm font-semibold text-black hover:bg-hf-accent-deep"
+                      className="press glow flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-hf-accent text-sm font-semibold text-black hover:bg-hf-accent-hover"
                     >
                       Open Workspace with This Preset
                       <ArrowRight className="size-4" aria-hidden strokeWidth={2.25} />

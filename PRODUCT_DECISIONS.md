@@ -29,7 +29,7 @@ it tells you something.
 | Dim text | `hf-dim` | `#8F8F9B` | labels, struck-out prices |
 | **Brand / action** | `hf-accent` | `#8B5CF6` | Generate, Create, primary buttons, New and offer badges, the active rail marker |
 | Brand text | `hf-accent-soft` | `#A78BFA` | violet text on dark |
-| Hover / pressed | `hf-accent-deep` | `#7C3AED` | primary hover |
+| Hover | `hf-accent-hover` | `#9B73F7` | primary hover: lifts, not darkens (black text 6.2:1; the old `#7C3AED` was 3.7:1) |
 | Disabled | `hf-accent-muted` | `#4C3A7A` | Generate while disabled |
 | **State** | `hf-cyan` | `#06B6D4` | focus ring, selected and configured controls, progress, slider fills, node connections, a composer while you type in it |
 | Danger | `hf-danger` | `#F43F5E` | destructive actions only — not part of the brand |
@@ -318,6 +318,48 @@ style. Dialogs trap focus and restore scroll; the command palette, menus and
 listboxes use proper ARIA roles.
 
 ---
+
+## Final hardening pass
+
+Audited by tools, not by re-reading my own code.
+
+- **Accessibility: 0 axe violations** (WCAG 2.2 A/AA) across all 29 routes
+  and 13 interactive states: open overlays, modals, sheets, results,
+  compare mode, the HUD and onboarding steps. The audit found, and this pass
+  fixed:
+  - **Hover contrast.** Every primary button darkened to `#7C3AED` on
+    hover, and black text on it is 3.7:1, which fails AA in the hovered state
+    everywhere. Hover now lifts to `#9B73F7` (6.2:1). The token was renamed
+    `accent-deep` → `accent-hover`, since a "deep" token holding a lighter
+    colour would mislead.
+  - **Palette ARIA (critical).** The listbox contained list items and
+    nested lists. It is now listbox → labelled groups → options, with
+    `aria-activedescendant` so screen readers announce the highlighted
+    command, and the highlight scrolls into view.
+  - **Contrast by opacity.** Past contests were faded with `opacity-80`,
+    pulling their badges to 3.5:1. "Past" is now carried by the badge and a
+    muted title.
+  - **Keyboard scrolling.** The studio canvas and the JSON inspector scroll
+    on their own and are now focusable, so keyboard users can reach content.
+  These now run as permanent tests (`e2e/a11y.spec.ts`, one per route, plus
+  overlay states and a hover-contrast check), auditing settled states:
+  mid-animation text is partly transparent by design.
+- **Dialog behaviour.** The phone settings sheet had no Escape handler, and
+  neither phone sheet moved or contained focus. One shared hook now gives
+  every sheet and flyout the same behaviour: focus in, Tab contained, Escape
+  closes, focus returns to the opener. On phones the settings panel is a real
+  modal dialog (`role="dialog"`, `aria-modal`); on desktop it stays a side
+  region.
+- **Resizing with an overlay open.** Widening the window with a phone sheet
+  open left the page scroll-locked behind a dialog that was no longer
+  visible. Overlays now close when the viewport leaves their breakpoint.
+- **Dependencies.** `npm audit` reported two moderate advisories, both
+  through one transitive `uuid` inside `firebase-admin`'s Storage client,
+  which this app never loads. They are resolved with a scoped override to
+  the patched `uuid@11.1.1`: **0 vulnerabilities**.
+- **Cleanup.** knip reports no unused files or exports. A throwaway audit
+  script that slipped into an earlier commit was removed, and `.*.tmp.*` is
+  now ignored.
 
 ## Account pages and link integrity
 
@@ -608,7 +650,7 @@ it 276 px too low.
 
 ## How it is verified
 
-109 Playwright tests run against both the local build and the live
+144 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

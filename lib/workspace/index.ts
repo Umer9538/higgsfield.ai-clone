@@ -10,7 +10,7 @@ import { cinemaStudio } from "./surfaces/cinema-studio";
 import { marketingStudio } from "./surfaces/marketing-studio";
 import { threeDJutsu } from "./surfaces/3d-jutsu";
 
-export const SURFACES: Record<SurfaceId, Surface> = {
+const SURFACES: Record<SurfaceId, Surface> = {
   video,
   image,
   audio,

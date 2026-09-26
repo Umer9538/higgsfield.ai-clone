@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { FAQS } from "@/lib/pricing/content";
 
 /** Stable anchor for a question, e.g. #faq-how-do-credits-work */
-export const faqId = (question: string) =>
+const faqId = (question: string) =>
   `faq-${question.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
 
 export function Faq() {
@@ -71,7 +71,7 @@ export function Faq() {
         <span className="text-sm text-hf-muted">Are you ready?</span>
         <a
           href="#top"
-          className="rounded-lg bg-hf-accent px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+          className="rounded-lg bg-hf-accent px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
         >
           Choose your plan
         </a>

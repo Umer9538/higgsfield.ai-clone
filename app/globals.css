@@ -12,7 +12,10 @@
    */
   --color-hf-accent: #8b5cf6;
   --color-hf-accent-soft: #a78bfa;
-  --color-hf-accent-deep: #7c3aed;
+  /* Hover lifts rather than darkens: black text on #7C3AED (the old hover)
+     measured 3.7:1 and failed AA in every hovered primary button. #9B73F7
+     keeps black text at 6.2:1. */
+  --color-hf-accent-hover: #9b73f7;
   --color-hf-accent-muted: #4c3a7a;
 
   /*

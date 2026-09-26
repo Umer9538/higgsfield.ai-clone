@@ -151,7 +151,7 @@ export function ProfileView() {
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 href={studioUrl(medium, preset.prompt, preset.settings)}
-                className="press glow flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] bg-hf-accent px-4 text-sm font-semibold text-black hover:bg-hf-accent-deep"
+                className="press glow flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] bg-hf-accent px-4 text-sm font-semibold text-black hover:bg-hf-accent-hover"
               >
                 Open this preset
                 <ArrowRight className="size-4" aria-hidden strokeWidth={2.25} />
@@ -169,7 +169,7 @@ export function ProfileView() {
             <p className="text-sm text-hf-muted">You haven&apos;t made a starting preset yet.</p>
             <Link
               href="/welcome-quiz"
-              className="press mt-3 inline-flex min-h-11 items-center rounded-full bg-hf-accent px-5 text-sm font-semibold text-black hover:bg-hf-accent-deep"
+              className="press mt-3 inline-flex min-h-11 items-center rounded-full bg-hf-accent px-5 text-sm font-semibold text-black hover:bg-hf-accent-hover"
             >
               Make your first frame
             </Link>

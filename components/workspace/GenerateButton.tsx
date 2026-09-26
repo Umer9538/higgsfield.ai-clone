@@ -27,7 +27,7 @@ export function GenerateButton({
       className={`press relative isolate flex w-full items-center justify-center gap-2 overflow-hidden rounded-[var(--radius-control)] px-5 py-3.5 text-base font-semibold text-black ${
         inactive
           ? "cursor-not-allowed bg-hf-accent-muted text-black/60"
-          : "glow bg-hf-accent bg-[linear-gradient(180deg,rgb(255_255_255/0.22),rgb(255_255_255/0)_55%),linear-gradient(90deg,var(--color-hf-accent),var(--color-hf-accent-soft))] hover:bg-hf-accent-deep"
+          : "glow bg-hf-accent bg-[linear-gradient(180deg,rgb(255_255_255/0.22),rgb(255_255_255/0)_55%),linear-gradient(90deg,var(--color-hf-accent),var(--color-hf-accent-soft))] hover:bg-hf-accent-hover"
       } ${className}`}
     >
       {busy ? (

@@ -74,7 +74,7 @@ export function TopBar() {
                 <button
                   type="button"
                   onClick={() => setAuthMode("signup")}
-                  className="press flex min-h-11 items-center rounded-full bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+                  className="press flex min-h-11 items-center rounded-full bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
                 >
                   Sign up
                 </button>

@@ -26,3 +26,6 @@ next-env.d.ts
 .playwright/
 .env*
 !.env.example
+
+# Throwaway local scripts (browser audits, probes)
+.*.tmp.*

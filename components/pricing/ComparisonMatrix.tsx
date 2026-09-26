@@ -68,7 +68,7 @@ export function ComparisonMatrix() {
                         onClick={() => toast(`${plan.name} plan added to your cart`)}
                         className={`mt-3 w-full rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${
                           plan.bestValue
-                            ? "bg-hf-accent text-black hover:bg-hf-accent-deep"
+                            ? "bg-hf-accent text-black hover:bg-hf-accent-hover"
                             : "bg-hf-surface-4 text-white hover:bg-hf-border"
                         }`}
                       >

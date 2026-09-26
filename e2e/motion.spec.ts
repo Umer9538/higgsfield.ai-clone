@@ -124,7 +124,7 @@ test("sheets and the catalog slide in on the spec'd spring", async ({ page }) =>
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/ai/video");
   await page.getByRole("button", { name: "Settings" }).click();
-  const sheet = page.getByRole("complementary", { name: "Settings" });
+  const sheet = page.getByRole("dialog", { name: "Settings" });
   expect(await sheet.evaluate((el) => getComputedStyle(el).animationName)).toBe("sheet-up");
 });
 

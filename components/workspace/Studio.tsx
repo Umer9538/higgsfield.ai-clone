@@ -71,7 +71,9 @@ export function Studio({ surface }: { surface: Surface }) {
           </button>
         </div>
 
-        <main className="flex-1 px-4 py-8 sm:px-6 lg:overflow-y-auto">
+        {/* Focusable: on desktop this is its own scroll area, and keyboard
+            users must be able to scroll it even when it holds no controls */}
+        <main tabIndex={0} aria-label={`${surface.label} preview`} className="flex-1 px-4 py-8 sm:px-6 lg:overflow-y-auto">
           <div className="mx-auto w-full max-w-5xl">
             <WorkspaceContent surface={surface} />
             {surface.templates ? <TemplateGallery templates={surface.templates} /> : null}

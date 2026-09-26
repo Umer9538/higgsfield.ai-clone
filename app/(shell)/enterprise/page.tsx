@@ -37,7 +37,7 @@ export default function EnterprisePage() {
 
           <a
             href="#contact-sales"
-            className="mt-7 inline-block rounded-2xl bg-hf-accent px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+            className="mt-7 inline-block rounded-2xl bg-hf-accent px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
           >
             {ENTERPRISE_HERO.cta}
           </a>

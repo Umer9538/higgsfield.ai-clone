@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { inspectorSections, type InspectorEntry } from "@/lib/workspace/inspector";
@@ -9,7 +9,7 @@ import type { IconName, Surface } from "@/lib/workspace/types";
 import { FieldRenderer } from "./FieldRenderer";
 import { Icon } from "./Icon";
 import { dockKey, useField, useWorkspace } from "./state";
-import { useExclusiveOverlay, useScrollLock } from "@/components/ui/overlay";
+import { useCloseOutsideMedia, useDialogFocus, useExclusiveOverlay, useScrollLock } from "@/components/ui/overlay";
 
 /**
  * How the output is made, in one column that reads the same in every studio.
@@ -31,6 +31,10 @@ export function Inspector({
   // Only the phone sheet is an overlay; the desktop panel never locks the page
   useScrollLock(sheetOpen);
   useExclusiveOverlay("settings-sheet", sheetOpen, onCloseSheet);
+  // As a phone sheet it behaves as a dialog: focus in, Tab contained, Escape
+  const asideRef = useRef<HTMLElement>(null);
+  useDialogFocus(asideRef, sheetOpen, onCloseSheet);
+  useCloseOutsideMedia("(max-width: 1023.98px)", sheetOpen, onCloseSheet);
   const { values, setValue } = useWorkspace();
   const { toast } = useToast();
 
@@ -56,7 +60,10 @@ export function Inspector({
       ) : null}
 
       <aside
+        ref={asideRef}
         id="studio-settings"
+        aria-modal={sheetOpen || undefined}
+        role={sheetOpen ? "dialog" : undefined}
         aria-label="Settings"
         className={`flex-col bg-hf-surface ${
           sheetOpen

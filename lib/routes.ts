@@ -1,5 +1,5 @@
 /** Labels that map onto routes this rebuild actually serves. */
-export const ROUTE_FOR_LABEL: Record<string, string> = {
+const ROUTE_FOR_LABEL: Record<string, string> = {
   // Create
   "AI Video": "/ai/video",
   "AI Image": "/ai/image",

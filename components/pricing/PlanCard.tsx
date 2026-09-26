@@ -17,14 +17,14 @@ const THEME: Record<PlanId, { shell: string; cta: string; name: string }> = {
   },
   pro: {
     shell: "border-hf-accent/25 bg-gradient-to-b from-hf-accent/8 to-hf-surface",
-    cta: "bg-hf-accent text-black hover:bg-hf-accent-deep",
+    cta: "bg-hf-accent text-black hover:bg-hf-accent-hover",
     name: "text-white",
   },
   max: {
     // The top tier gets the brightest version of the one brand colour
     // rather than a second hue: a lit violet gradient with a glow.
     shell: "border-hf-accent/50 bg-gradient-to-b from-hf-accent/20 to-hf-surface",
-    cta: "glow bg-hf-accent bg-[linear-gradient(90deg,var(--color-hf-accent),var(--color-hf-accent-soft))] text-black hover:bg-hf-accent-deep",
+    cta: "glow bg-hf-accent bg-[linear-gradient(90deg,var(--color-hf-accent),var(--color-hf-accent-soft))] text-black hover:bg-hf-accent-hover",
     name: "text-white",
   },
 };

@@ -118,7 +118,7 @@ export function CourseGrid() {
                   <button
                     type="button"
                     onClick={() => toast(`Enrolled in “${course.title}”`)}
-                    className="flex items-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+                    className="flex items-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-hover"
                   >
                     <PlayCircle className="size-3.5" aria-hidden strokeWidth={2} />
                     Start now for free
@@ -160,7 +160,7 @@ export function CourseGrid() {
                 toast(`Enrolled in “${detail.title}”`);
                 setDetail(null);
               }}
-              className="mt-5 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+              className="mt-5 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
             >
               Start now for free
             </button>

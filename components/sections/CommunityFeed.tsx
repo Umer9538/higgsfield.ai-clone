@@ -48,7 +48,7 @@ export function CommunityFeed() {
           <p className="mt-3 text-xs text-hf-dim">{COMMUNITY.banner.dates}</p>
           <a
             href="/contests"
-            className="mt-5 inline-block rounded-2xl bg-hf-accent px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+            className="mt-5 inline-block rounded-2xl bg-hf-accent px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
           >
             {COMMUNITY.banner.cta}
           </a>

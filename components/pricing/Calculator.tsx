@@ -245,7 +245,7 @@ export function Calculator() {
             <button
               type="button"
               onClick={() => toast(`${plan.name} plan added to your cart`)}
-              className="mt-3 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+              className="mt-3 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
             >
               Get {plan.name}
             </button>

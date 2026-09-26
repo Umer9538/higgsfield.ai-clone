@@ -138,7 +138,7 @@ test("mobile: cinema parameters live in the settings sheet, grouped into Look an
   await page.goto("/ai/cinema-studio");
 
   await page.getByRole("button", { name: "Settings" }).click();
-  const settings = page.getByRole("complementary", { name: "Settings" });
+  const settings = page.getByRole("dialog", { name: "Settings" });
   await expect(settings.getByRole("group", { name: "Look" })).toBeVisible();
   await expect(settings.getByRole("group", { name: "Lens" })).toBeAttached();
 

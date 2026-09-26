@@ -14,7 +14,7 @@ import { Modal } from "./Modal";
 import { toggleHud } from "./PerfHud";
 import { setPreference } from "@/lib/ui/preferences";
 
-export const OPEN_PALETTE_EVENT = "hf:open-palette";
+const OPEN_PALETTE_EVENT = "hf:open-palette";
 
 export function openCommandPalette() {
   window.dispatchEvent(new Event(OPEN_PALETTE_EVENT));
@@ -24,7 +24,7 @@ export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
-  const listRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const closePalette = useCallback(() => setOpen(false), []);
@@ -110,6 +110,11 @@ export function CommandPalette() {
       delete document.documentElement.dataset.paletteReady;
     };
   }, []);
+
+  // Keep the highlighted option in view while arrowing through a long list
+  useEffect(() => {
+    listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
+  }, [active, open]);
 
   const run = useCallback(
     (item: CommandItem) => {
@@ -207,6 +212,8 @@ export function CommandPalette() {
             aria-expanded
             aria-controls="command-results"
             aria-label="Search commands"
+            // Screen readers announce the highlighted option as it moves
+            aria-activedescendant={results[active] ? `command-option-${results[active].id}` : undefined}
             data-palette-input
             value={query}
             onChange={(event) => {
@@ -235,48 +242,54 @@ export function CommandPalette() {
           </kbd>
         </div>
 
-        <ul id="command-results" ref={listRef} role="listbox" className="max-h-[52vh] overflow-y-auto p-2">
+        {/* listbox > group > option, per the ARIA listbox pattern: no list
+            items in between (axe flagged the old ul/li nesting as critical) */}
+        <div
+          id="command-results"
+          ref={listRef}
+          role="listbox"
+          aria-label="Commands"
+          className="max-h-[52vh] overflow-y-auto p-2"
+        >
           {results.length === 0 ? (
-            <li className="px-3 py-6 text-center text-sm text-hf-muted">No matches</li>
+            <p className="px-3 py-6 text-center text-sm text-hf-muted">No matches</p>
           ) : (
             Object.entries(grouped).map(([group, items]) => (
-              <li key={group}>
-                <p className="px-3 pt-3 pb-1 text-[10px] text-hf-dim">
+              <div key={group} role="group" aria-labelledby={`command-group-${group}`}>
+                <p id={`command-group-${group}`} className="px-3 pt-3 pb-1 text-[10px] text-hf-dim">
                   {group}
                 </p>
-                <ul>
-                  {items.map((item) => {
-                    cursor += 1;
-                    const index = cursor;
-                    const selected = index === active;
-                    return (
-                      <li key={item.id}>
-                        <button
-                          type="button"
-                          role="option"
-                          aria-selected={selected}
-                          onMouseEnter={() => setActive(index)}
-                          onClick={() => run(item)}
-                          className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                            selected ? "bg-hf-surface-4 text-hf-accent-soft" : "text-white hover:bg-hf-surface-3"
-                          }`}
-                        >
-                          {item.label}
-                          {item.href || item.hint ? (
-                            <span className="ml-auto truncate text-[11px] text-hf-dim">{item.href ?? item.hint}</span>
-                          ) : null}
-                          {selected ? (
-                            <CornerDownLeft className="size-3.5 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={2} />
-                          ) : null}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </li>
+                {items.map((item) => {
+                  cursor += 1;
+                  const index = cursor;
+                  const selected = index === active;
+                  return (
+                    <button
+                      key={item.id}
+                      id={`command-option-${item.id}`}
+                      type="button"
+                      role="option"
+                      aria-selected={selected}
+                      onMouseEnter={() => setActive(index)}
+                      onClick={() => run(item)}
+                      className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                        selected ? "bg-hf-surface-4 text-hf-accent-soft" : "text-white hover:bg-hf-surface-3"
+                      }`}
+                    >
+                      {item.label}
+                      {item.href || item.hint ? (
+                        <span className="ml-auto truncate text-[11px] text-hf-dim">{item.href ?? item.hint}</span>
+                      ) : null}
+                      {selected ? (
+                        <CornerDownLeft className="size-3.5 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={2} />
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
             ))
           )}
-        </ul>
+        </div>
       </div>
     </div>
     </>

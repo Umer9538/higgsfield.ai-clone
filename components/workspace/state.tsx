@@ -58,7 +58,7 @@ function initialValues(surface: Surface): Record<string, FieldValue> {
  * Every value is checked against what the control can actually hold, so a
  * hand-edited URL cannot put a studio into a state its UI cannot show.
  */
-export function presetFromUrl(surface: Surface, entries: string[]): Record<string, FieldValue> {
+function presetFromUrl(surface: Surface, entries: string[]): Record<string, FieldValue> {
   const dock = surface.dock;
   const out: Record<string, FieldValue> = {};
   if (!dock) return out;

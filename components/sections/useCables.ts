@@ -42,7 +42,7 @@ const PORT_Y = 22;
 
 const spring = (p: Point): Spring => ({ pos: { ...p }, vel: { x: 0, y: 0 } });
 
-export class CableEngine {
+class CableEngine {
   private nodes = new Map<string, HTMLElement>();
   private paths = new Map<string, SVGPathElement[]>();
   private springs = new Map<string, { c1: Spring; c2: Spring }>();

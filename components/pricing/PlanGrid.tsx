@@ -68,7 +68,7 @@ export function PlanGrid() {
           </p>
           <a
             href="/enterprise#contact-sales"
-            className="mt-5 inline-block rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+            className="mt-5 inline-block rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
           >
             Contact sales
           </a>
@@ -117,7 +117,7 @@ export function PlanGrid() {
                 toast(`${chosen.name} plan added to your cart`);
                 setChosen(null);
               }}
-              className="mt-5 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
+              className="mt-5 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-hover"
             >
               Continue to checkout
             </button>
