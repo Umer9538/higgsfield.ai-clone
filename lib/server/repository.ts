@@ -64,10 +64,32 @@ export async function createGeneration(input: NewGeneration): Promise<Generation
     src: input.src,
     poster: input.poster ?? null,
     spec: input.spec,
+    owner: input.owner ?? null,
     createdAt,
   });
 
   return { ...input, id: ref.id, createdAt };
+}
+
+export type DeleteOutcome = "deleted" | "not_found" | "forbidden";
+
+/** Only the owner that created a generation can delete it. */
+export async function deleteGeneration(id: string, owner: string): Promise<DeleteOutcome> {
+  const db = getAdminDb();
+  if (!db) {
+    const index = memory.__hfGenerations!.findIndex((item) => item.id === id);
+    if (index < 0) return "not_found";
+    if (memory.__hfGenerations![index].owner !== owner) return "forbidden";
+    memory.__hfGenerations!.splice(index, 1);
+    return "deleted";
+  }
+
+  const ref = db.collection("generations").doc(id);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) return "not_found";
+  if (snapshot.get("owner") !== owner) return "forbidden";
+  await ref.delete();
+  return "deleted";
 }
 
 /* --------------------------------- favorites -------------------------------- */
@@ -124,6 +146,26 @@ export async function toggleFavorite(input: NewFavorite): Promise<ToggleResult> 
     createdAt: record.createdAt,
   });
   return { item: record, removed: false };
+}
+
+/** Idempotent: removing a favourite that does not exist still succeeds. */
+export async function removeFavorite(owner: string, itemId: string): Promise<void> {
+  const id = favoriteId(owner, itemId);
+  const db = getAdminDb();
+  if (!db) {
+    memory.__hfFavorites = memory.__hfFavorites!.filter((item) => item.id !== id);
+    return;
+  }
+  await db.collection("favorites").doc(id).delete();
+}
+
+/** A real round trip, for /api/health: configured is not the same as reachable. */
+export async function pingDatabase(): Promise<{ reachable: boolean; latencyMs: number }> {
+  const started = performance.now();
+  const db = getAdminDb();
+  if (!db) return { reachable: false, latencyMs: 0 };
+  await db.collection("generations").limit(1).get();
+  return { reachable: true, latencyMs: Math.round(performance.now() - started) };
 }
 
 export { isFirebaseConfigured };

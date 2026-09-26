@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { GenerationResult, Surface } from "@/lib/workspace/types";
-import { addGeneratedAsset } from "@/lib/assets/store";
+import { addGeneratedAsset, linkRemoteId } from "@/lib/assets/store";
+import { useOwner } from "@/lib/identity";
 import { dockKey, useWorkspace } from "./state";
 
 export type GenerationStatus = "idle" | "running" | "done";
@@ -49,6 +50,12 @@ export function GenerationProvider({
   children: React.ReactNode;
 }) {
   const { values } = useWorkspace();
+  // Read inside the run's timer callback, so kept in a ref rather than a dep
+  const owner = useOwner();
+  const ownerRef = useRef(owner);
+  useEffect(() => {
+    ownerRef.current = owner;
+  }, [owner]);
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [saved, setSaved] = useState<SaveState>("idle");
@@ -89,7 +96,8 @@ export function GenerationProvider({
             .join(" · ");
 
           // Local store first so the library updates instantly, then persist.
-          addGeneratedAsset({ kind: result.kind, model, prompt, src: result.src, poster: result.poster, spec });
+          const owner = ownerRef.current ?? undefined;
+          const localId = addGeneratedAsset({ kind: result.kind, model, prompt, src: result.src, poster: result.poster, spec, owner });
 
           setSaved("saving");
           void fetch("/api/generations", {
@@ -103,12 +111,14 @@ export function GenerationProvider({
               src: result.src,
               poster: result.poster,
               spec,
+              owner,
             }),
           })
             .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
-            .then((data: { source?: string }) =>
-              setSaved(data.source === "firestore" ? "firestore" : "memory"),
-            )
+            .then((data: { source?: string; item?: { id: string } }) => {
+              if (data.item?.id) linkRemoteId(localId, data.item.id);
+              setSaved(data.source === "firestore" ? "firestore" : "memory");
+            })
             .catch(() => {
               // Offline or no backend: the local store already has it.
               setSaved("local");

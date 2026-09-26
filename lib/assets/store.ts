@@ -47,6 +47,18 @@ export function subscribeGenerated(onChange: () => void): () => void {
   };
 }
 
+function write(next: Asset[]) {
+  try {
+    window.localStorage.setItem(KEY, JSON.stringify(next));
+  } catch {
+    // Blocked storage: keep it in memory so this session still shows it.
+    cachedRaw = JSON.stringify(next);
+    cachedList = next;
+  }
+  window.dispatchEvent(new Event(EVENT));
+}
+
+/** Adds a generation locally and returns its local id. */
 export function addGeneratedAsset(input: {
   kind: AssetKind;
   model: string;
@@ -54,9 +66,11 @@ export function addGeneratedAsset(input: {
   src: string;
   poster?: string;
   spec: string;
-}): void {
+  owner?: string;
+}): string {
   const asset: Asset = {
-    id: `gen-${Date.now()}`,
+    id: `gen-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    owner: input.owner,
     title: `${input.kind === "video" ? "Generation" : "Render"} ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
     kind: input.kind,
     model: input.model,
@@ -67,15 +81,21 @@ export function addGeneratedAsset(input: {
     meta: input.spec,
   };
 
-  const next = [asset, ...getGeneratedSnapshot()].slice(0, 60);
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(next));
-  } catch {
-    // Blocked storage: keep it in memory so this session still shows it.
-    cachedRaw = JSON.stringify(next);
-    cachedList = next;
-  }
-  window.dispatchEvent(new Event(EVENT));
+  write([asset, ...getGeneratedSnapshot()].slice(0, 60));
+  return asset.id;
+}
+
+/**
+ * Records the backend's id for a local generation, so the library knows the
+ * two are one record (it used to match on kind + prompt + day, which merged
+ * two same-prompt generations into one).
+ */
+export function linkRemoteId(localId: string, remoteId: string): void {
+  write(getGeneratedSnapshot().map((asset) => (asset.id === localId ? { ...asset, remoteId } : asset)));
+}
+
+export function removeGeneratedAsset(id: string): void {
+  write(getGeneratedSnapshot().filter((asset) => asset.id !== id && asset.remoteId !== id));
 }
 
 export function clearGeneratedAssets(): void {

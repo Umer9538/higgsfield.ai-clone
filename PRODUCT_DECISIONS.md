@@ -319,6 +319,91 @@ listboxes use proper ARIA roles.
 
 ---
 
+## Real Backend & Persistence Architecture
+
+**Shape.** Next.js route handlers (`app/api/*`, Node runtime, never cached)
+→ a repository (`lib/server/repository.ts`) → Firestore through
+`firebase-admin` with a service account. The browser never talks to
+Firestore: credentials are server-only env vars (no `NEXT_PUBLIC_`), and
+`server-only` makes importing that module from client code a build error.
+
+**Collections.**
+
+| Collection | Document id | Fields |
+|---|---|---|
+| `generations` | Firestore auto id (20 chars) | `prompt`, `model`, `surface`, `kind` (`video`/`image`/`audio`), `src`, `poster` (nullable), `spec`, `owner` (nullable), `createdAt` (ISO) |
+| `favorites` | `${owner}__${itemId}` (deterministic) | `itemId`, `title`, `owner`, `createdAt` |
+
+The deterministic favourite id makes a toggle one read and one write with
+no query, and makes duplicates impossible. Favourites are read with an
+equality filter and sorted in memory, which avoids a composite index a fresh
+project does not have.
+
+**Endpoints.**
+
+| Method & path | Success | Errors |
+|---|---|---|
+| `GET /api/generations?limit=1..100` | 200 `{ items, source }` | 500, 503 |
+| `POST /api/generations` | 201 `{ item, source }`, with the real document id | 400 `invalid_body` / `invalid_field`, 500, 503 |
+| `DELETE /api/generations/:id?owner=` | 204 | 400 `invalid_owner`, 403 `forbidden`, 404 `not_found`, 500, 503 |
+| `GET /api/favorites?owner=` | 200 `{ items, source }` | 400, 500, 503 |
+| `POST /api/favorites` (toggle) | 201 `{ item, removed: false }` / 200 `{ item, removed: true }` | 400, 500, 503 |
+| `DELETE /api/favorites?owner=&itemId=` | 204, idempotent | 400, 500, 503 |
+| `GET /api/health` | 200 `{ status, database, durable, latencyMs }` | 503 degraded |
+
+Success bodies are unchanged from the original contract; every error is
+`{ error, code }`. Other methods get the framework's 405.
+
+**What this audit changed, and why:**
+
+- **No silent data loss in production.** Without credentials the API used
+  to fall back to server memory everywhere, so a misconfigured live
+  deployment would answer 201 and lose the record on the next cold start. On
+  the Vercel production deployment (`VERCEL_ENV=production`) a missing
+  credential now returns **503 `database_unconfigured`**, naming the
+  missing variables but never their values. Local dev, CI and preview keep the
+  memory store so they run without secrets, and say so with a startup
+  warning.
+- **`/api/health`** proves the database answers (a real Firestore
+  round-trip with its latency), not just that variables are set.
+- **Validation.** Bounded lengths on every field. `kind` and `surface` are
+  checked against real values. `src` and `poster` must be this site's own
+  `/media/` files, because the library is shared and an arbitrary URL would
+  let anyone inject content into it. `?limit` is clamped to 100, since an
+  unbounded read is an unbounded bill. Owner ids are a safe character set:
+  the API accepted any owner before, and requiring a format would have broken
+  its callers.
+- **500s no longer leak internals.** Clients get a message and a reference
+  id; the cause goes to the server log.
+- **Real deletes, with ownership.** A generation records who made it
+  (`user:<handle>` signed in, else a random `device:<uuid>`), and only that
+  owner can delete it. Sign-in is mocked, so this is advisory rather than
+  authentication; with real auth, the owner would come from a verified
+  session instead of the request.
+- **Favourites are now a feature, not just an endpoint.** Previously nothing
+  in the UI wrote a favourite. The heart on every feed card now saves to
+  Firestore, stays visible once saved, and shows on the Profile. It
+  deliberately has no local copy, so a heart that survives a reload can only
+  have come from the database. It updates optimistically and rolls back on
+  failure.
+- **Deletes persist.** Deleting in the library used to hide the card until
+  the next reload. Now your own synced generation is deleted in the backend
+  (and the toast says "Deleted everywhere"), a local-only one is removed from
+  this device, and samples or other people's work are hidden for you, which
+  also sticks.
+- **Record identity.** Local and remote copies of one generation were
+  matched on kind + prompt + day, which merged two same-prompt generations
+  into one. A local generation now stores the Firestore id the POST returns,
+  and the library matches on it.
+
+**Proven by tests (`e2e/persistence.spec.ts`):** each test writes through the
+UI or API, **wipes the browser's own storage and hard-reloads**, and asserts
+the record comes back from the server. That covers a generation from the
+studio (with a real 20-character Firestore id), a favourite, and a delete that
+stays deleted. Run against the live URL, the suite also asserts via
+`/api/health` that the store is Firestore. A contract test covers each 400,
+the 403/404 ownership paths, idempotent deletes, the page bound and 405.
+
 ## Final hardening pass
 
 Audited by tools, not by re-reading my own code.
@@ -650,7 +735,7 @@ it 276 px too low.
 
 ## How it is verified
 
-144 Playwright tests run against both the local build and the live
+149 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

@@ -15,6 +15,30 @@ const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 /** All three are required; with any missing, the repository uses memory. */
 export const isFirebaseConfigured = Boolean(projectId && clientEmail && privateKey);
 
+/** Names (never values) of the variables that are not set. */
+export const missingFirebaseEnv = [
+  ["FIREBASE_PROJECT_ID", projectId],
+  ["FIREBASE_CLIENT_EMAIL", clientEmail],
+  ["FIREBASE_PRIVATE_KEY", privateKey],
+]
+  .filter(([, value]) => !value)
+  .map(([name]) => name as string);
+
+/**
+ * The live deployment must never fall back to memory: a write would answer
+ * 201 and then vanish on the next cold start. There, a missing credential
+ * makes the API refuse with 503 instead. Local dev, CI and preview builds
+ * keep the in-memory fallback so they run without secrets.
+ */
+export const requiresDatabase = process.env.VERCEL_ENV === "production";
+
+if (!isFirebaseConfigured && !requiresDatabase) {
+  console.warn(
+    `[firebase] ${missingFirebaseEnv.join(", ")} not set — using the in-memory store. ` +
+      "Data lasts until the server restarts. See .env.example.",
+  );
+}
+
 /**
  * Cached on globalThis: Next.js hot reload re-evaluates modules, and a second
  * initializeApp for the default app throws.

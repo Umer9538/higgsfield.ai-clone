@@ -27,6 +27,7 @@ interface RemoteGeneration {
   poster?: string | null;
   spec: string;
   createdAt: string;
+  owner?: string | null;
 }
 
 /** Shape a stored generation into the card model the library renders. */
@@ -41,9 +42,25 @@ function toAsset(item: RemoteGeneration): Asset {
     src: item.src,
     poster: item.poster ?? undefined,
     meta: item.spec,
+    remoteId: item.id,
+    owner: item.owner ?? undefined,
   };
 }
+
+/** One record, however many stores it appears in: the backend id when known. */
+const identity = (asset: Asset) => asset.remoteId ?? asset.id;
+
+const HIDDEN_KEY = "hf.hiddenAssets";
+function readHidden(): string[] {
+  try {
+    return JSON.parse(window.localStorage.getItem(HIDDEN_KEY) ?? "[]") as string[];
+  } catch {
+    return [];
+  }
+}
+import { useOwner } from "@/lib/identity";
 import {
+  removeGeneratedAsset,
   getGeneratedServerSnapshot,
   getGeneratedSnapshot,
   subscribeGenerated,
@@ -76,7 +93,7 @@ function AssetCard({
 }: {
   index: number;
   asset: Asset;
-  onDelete: (id: string) => void;
+  onDelete: (asset: Asset) => void;
   onCopy: (asset: Asset) => void;
   onDownload: (asset: Asset) => void;
   copied: boolean;
@@ -142,7 +159,7 @@ function AssetCard({
             type="button"
             aria-label={`Delete ${asset.title}`}
             title="Delete"
-            onClick={() => onDelete(asset.id)}
+            onClick={() => onDelete(asset)}
             className="flex size-11 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-hf-danger md:size-8"
           >
             <Trash2 className="size-4" aria-hidden strokeWidth={1.75} />
@@ -152,6 +169,10 @@ function AssetCard({
 
       <div className="p-3">
         <p className="truncate text-xs font-medium text-white">{asset.title}</p>
+        {/* What you asked for is how you find it again */}
+        <p className="mt-0.5 truncate text-[11px] text-hf-muted" title={asset.prompt}>
+          {asset.prompt}
+        </p>
         <p className="mt-0.5 truncate text-[11px] text-hf-dim">
           {asset.model} · {asset.createdAt}
         </p>
@@ -164,7 +185,10 @@ export function AssetLibrary() {
   const [tab, setTab] = useState<Tab>("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("newest");
+  // Items you cannot delete (samples, other people's shared work) are hidden
+  // for you instead, and that sticks across reloads.
   const [deleted, setDeleted] = useState<string[]>([]);
+  const owner = useOwner();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -184,6 +208,9 @@ export function AssetLibrary() {
 
   useEffect(() => {
     let cancelled = false;
+    // Restoring a per-viewer list from storage, once, on the client
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDeleted(readHidden());
 
     fetch("/api/generations?limit=50")
       .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
@@ -201,27 +228,22 @@ export function AssetLibrary() {
     };
   }, []);
 
-  const shownKeys = useMemo(
-    () => new Set([...generated, ...remote].map((a) => `${a.kind}:${a.prompt}:${a.createdAt}`)),
-    [generated, remote],
-  );
-  const freshPending = pending.filter(
-    (asset) => !shownKeys.has(`${asset.kind}:${asset.prompt}:${asset.createdAt}`),
-  );
+  const shownKeys = useMemo(() => new Set([...generated, ...remote].map(identity)), [generated, remote]);
+  const freshPending = pending.filter((asset) => !shownKeys.has(identity(asset)) && !deleted.includes(identity(asset)));
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     // De-duplicate: a generation made in this tab is in both stores.
     const seen = new Set<string>();
     const merged = [...generated, ...remote, ...ASSETS].filter((asset) => {
-      const key = `${asset.kind}:${asset.prompt}:${asset.createdAt}`;
+      const key = identity(asset);
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     });
 
     return merged
-      .filter((asset) => !deleted.includes(asset.id))
+      .filter((asset) => !deleted.includes(identity(asset)))
       .filter((asset) => (tab === "all" || tab === "folders" ? true : asset.kind === tab))
       .filter(
         (asset) =>
@@ -236,6 +258,45 @@ export function AssetLibrary() {
           : a.createdAt.localeCompare(b.createdAt),
       );
   }, [tab, query, sort, deleted, generated, remote]);
+
+  /**
+   * Delete for real where we can: your own synced generation is deleted in
+   * the backend (DELETE /api/generations/:id) and locally; a local-only one
+   * is removed from this device. Samples and other people's shared work
+   * cannot be deleted, so they are hidden for you, and the toast says which.
+   */
+  const remove = async (asset: Asset) => {
+    const key = identity(asset);
+    const local = generated.find((item) => item.id === asset.id || (asset.remoteId && item.remoteId === asset.remoteId));
+    const mine = Boolean(asset.remoteId && owner && (asset.owner ?? local?.owner) === owner);
+
+    if (mine) {
+      const response = await fetch(`/api/generations/${encodeURIComponent(asset.remoteId!)}?owner=${encodeURIComponent(owner!)}`, {
+        method: "DELETE",
+      }).catch(() => null);
+      // 404 means it is already gone, which is the goal
+      if (!response || (!response.ok && response.status !== 404)) {
+        toast("Couldn't delete it — check your connection and try again", "info");
+        return;
+      }
+      setRemote((prev) => prev.filter((item) => identity(item) !== key));
+      setPending((prev) => prev.filter((item) => identity(item) !== key));
+    }
+    if (local) removeGeneratedAsset(local.id);
+
+    if (mine || local) {
+      toast(mine ? "Deleted everywhere" : "Deleted from this device");
+      return;
+    }
+    const next = [...deleted, key];
+    setDeleted(next);
+    try {
+      window.localStorage.setItem(HIDDEN_KEY, JSON.stringify(next));
+    } catch {
+      // blocked storage: hidden for this visit
+    }
+    toast(asset.remoteId ? "Hidden — only its creator can delete it" : "Removed from your library", "info");
+  };
 
   const download = async (asset: Asset) => {
     const filename = asset.src.split("/").pop() ?? `${asset.id}.jpg`;
@@ -367,7 +428,7 @@ export function AssetLibrary() {
               key={asset.id}
               index={index}
               asset={asset}
-              onDelete={(id) => setDeleted((prev) => [...prev, id])}
+              onDelete={(item) => void remove(item)}
               onCopy={copyPrompt}
               onDownload={download}
               copied={copiedId === asset.id}

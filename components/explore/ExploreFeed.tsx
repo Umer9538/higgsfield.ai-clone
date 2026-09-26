@@ -5,11 +5,46 @@ import Link from "next/link";
 import { ArrowUpRight, Heart, Play, Search, Wand2 } from "lucide-react";
 import { CATEGORIES, FEATURE_TAGS, RAILS, SORTS, TRENDING_PROMPTS, type FeedItem } from "@/lib/explore/content";
 import { FeedMedia } from "./FeedMedia";
+import { useFavorites } from "@/lib/favorites";
+import { useToast } from "@/components/ui/Toast";
 
 /**
  * One generation in the feed. Remix normally opens the video studio with the
  * prompt; on the home page `onRemix` loads it into the composer instead.
  */
+/**
+ * Saves the card to your favourites in the backend. Visible without hover
+ * once saved, so you can see what you kept at a glance.
+ */
+function FavoriteButton({ item }: { item: FeedItem }) {
+  const { isFavorite, toggle, ready } = useFavorites();
+  const { toast } = useToast();
+  const saved = isFavorite(item.id);
+
+  return (
+    <button
+      type="button"
+      data-favorite={item.id}
+      aria-pressed={saved}
+      aria-label={saved ? `Remove ${item.model} by ${item.author} from favorites` : `Save ${item.model} by ${item.author} to favorites`}
+      disabled={!ready}
+      onClick={async () => {
+        const result = await toggle(item.id, `${item.model} · ${item.author}`);
+        if (result === null) toast("Couldn't save that — check your connection", "info");
+        else toast(result ? "Saved to favorites" : "Removed from favorites");
+      }}
+      className={`press absolute top-2 right-2 z-10 flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] backdrop-blur transition-opacity max-md:min-h-11 motion-reduce:transition-none ${
+        saved
+          ? "bg-hf-accent text-black"
+          : "bg-black/65 text-white md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+      }`}
+    >
+      <Heart className="size-3" aria-hidden fill={saved ? "currentColor" : "none"} strokeWidth={saved ? 0 : 2} />
+      {item.likes + (saved ? 1 : 0)}
+    </button>
+  );
+}
+
 export function FeedCard({
   item,
   onRemix,
@@ -39,11 +74,9 @@ export function FeedCard({
           </span>
           {item.author}
         </span>
-        <span className="flex items-center gap-1 rounded-full bg-black/65 px-2 py-1 text-[11px] text-white backdrop-blur">
-          <Heart className="size-3" aria-hidden fill="currentColor" strokeWidth={0} />
-          {item.likes}
-        </span>
       </div>
+
+      <FavoriteButton item={item} />
 
       {/* Prompt, model badge, spec and Remix */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 motion-reduce:transition-none">

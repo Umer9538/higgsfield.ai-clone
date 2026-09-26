@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth/context";
 import { getGeneratedServerSnapshot, getGeneratedSnapshot, subscribeGenerated } from "@/lib/assets/store";
 import { SANDBOX_KEY, mediumById, studioUrl, type SandboxAnswers } from "@/lib/onboarding/sandbox";
 import { useToast } from "@/components/ui/Toast";
+import { useFavorites } from "@/lib/favorites";
 import { SignedOut } from "./SignedOut";
 
 let presetRaw: string | null | undefined;
@@ -38,6 +39,7 @@ export function ProfileView() {
   const { toast } = useToast();
   const generations = useSyncExternalStore(subscribeGenerated, getGeneratedSnapshot, getGeneratedServerSnapshot);
   const preset = useSyncExternalStore(noopSubscribe, readPreset, () => null);
+  const favorites = useFavorites();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
 
@@ -113,11 +115,12 @@ export function ProfileView() {
         </Link>
       </section>
 
-      <dl className="mt-8 grid grid-cols-3 gap-3">
+      <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { label: "Generations", value: generations.length },
           { label: "Videos", value: videos },
           { label: "Images", value: generations.length - videos },
+          { label: "Favorites", value: favorites.count },
         ].map((stat) => (
           <div key={stat.label} className="rounded-[var(--radius-media)] border border-hf-border bg-hf-surface p-4">
             <dt className="text-xs text-hf-dim">{stat.label}</dt>
@@ -127,7 +130,34 @@ export function ProfileView() {
           </div>
         ))}
       </dl>
-      <p className="mt-2 text-xs text-hf-dim">Counted from generations saved on this device.</p>
+      <p className="mt-2 text-xs text-hf-dim">
+        Generations are counted on this device; favourites come from your account in the database.
+      </p>
+
+      <section aria-labelledby="favorites-title" className="mt-10">
+        <h2 id="favorites-title" className="font-display text-xl font-bold tracking-[-0.025em] text-white">
+          Favorites
+        </h2>
+        {!favorites.ready ? (
+          <p className="mt-3 text-sm text-hf-dim">Loading…</p>
+        ) : favorites.count === 0 ? (
+          <p className="mt-3 rounded-[var(--radius-panel)] border border-dashed border-hf-border p-6 text-center text-sm text-hf-muted">
+            Tap the heart on anything in{" "}
+            <Link href="/explore" className="text-hf-accent-soft underline-offset-2 hover:underline">
+              Explore
+            </Link>{" "}
+            to keep it here.
+          </p>
+        ) : (
+          <ul aria-label="Favorites" className="mt-3 flex flex-wrap gap-2">
+            {favorites.items.map((item) => (
+              <li key={item.itemId} className="rounded-full border border-hf-border bg-hf-surface px-3 py-1.5 text-sm text-white">
+                {item.title}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section aria-labelledby="preset-title" className="mt-10">
         <h2 id="preset-title" className="font-display text-xl font-bold tracking-[-0.025em] text-white">

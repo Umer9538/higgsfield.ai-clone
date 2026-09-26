@@ -7,6 +7,12 @@ export interface GenerationRecord {
   src: string;
   poster?: string;
   spec: string;
+  /**
+   * Who made it: "user:<handle>" or "device:<id>". Deleting requires the same
+   * owner. Sign-in is mocked, so this is advisory, not authentication: with
+   * real auth it would come from a verified session, not the request body.
+   */
+  owner?: string;
   createdAt: string;
 }
 

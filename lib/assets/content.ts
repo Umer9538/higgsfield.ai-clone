@@ -11,6 +11,10 @@ export interface Asset {
   src: string;
   poster?: string;
   meta: string;
+  /** The Firestore document id, once the backend has stored it */
+  remoteId?: string;
+  /** Who created it, as the API records it; only they can delete it */
+  owner?: string;
 }
 
 const PROMPTS = [

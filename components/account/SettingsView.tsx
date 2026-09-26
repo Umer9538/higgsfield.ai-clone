@@ -20,6 +20,8 @@ const STORED = [
   { key: "hf.onboardingCompleted", what: "Whether onboarding has been shown" },
   { key: "hf.prefs", what: "Preferences on this page" },
   { key: "hf.hud", what: "Whether the performance HUD is open" },
+  { key: "hf.device", what: "A random id for this browser, so favourites work signed out" },
+  { key: "hf.hiddenAssets", what: "Library items you have hidden" },
 ];
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
@@ -160,8 +162,8 @@ export function SettingsView() {
 
       <Section id="data" title="Your data">
         <p className="text-sm text-hf-muted">
-          Higgsfield sets no cookies. These are the only things it keeps, all in this browser&apos;s local
-          storage. Generations you run are also posted to the shared demo library.
+          Higgsfield sets no cookies. In this browser&apos;s local storage it keeps only the items below.
+          In the database it keeps the generations you run (a shared demo library) and your favourites.
         </p>
         <ul aria-label="Stored in this browser" className="divide-y divide-hf-border rounded-[var(--radius-media)] border border-hf-border">
           {STORED.map((item) => (
