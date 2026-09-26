@@ -1,11 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { FAQS } from "@/lib/pricing/content";
 
+/** Stable anchor for a question, e.g. #faq-how-do-credits-work */
+export const faqId = (question: string) =>
+  `faq-${question.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
+
 export function Faq() {
   const [open, setOpen] = useState<number | null>(null);
+
+  // A link to #faq-… (e.g. from the plan footnotes) opens that answer
+  useEffect(() => {
+    const fromHash = () => {
+      const index = FAQS.findIndex((faq) => `#${faqId(faq.question)}` === window.location.hash);
+      if (index >= 0) setOpen(index);
+    };
+    queueMicrotask(fromHash);
+    window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
+  }, []);
 
   return (
     <section className="mt-16">
@@ -17,7 +32,7 @@ export function Faq() {
         {FAQS.map((faq, index) => {
           const expanded = open === index;
           return (
-            <li key={faq.question} className="overflow-hidden rounded-2xl bg-hf-surface-3">
+            <li key={faq.question} id={faqId(faq.question)} className="scroll-mt-24 overflow-hidden rounded-2xl bg-hf-surface-3">
               <h3>
                 <button
                   type="button"

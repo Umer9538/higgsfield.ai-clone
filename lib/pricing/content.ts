@@ -222,7 +222,11 @@ export const PLANS: Plan[] = [
 ];
 
 export const PLAN_FOOTNOTES = {
-  links: ["How do Higgsfield plans work?", "What are Unlimited models?"],
+  // Each opens the FAQ answer that covers it
+  links: [
+    { label: "How do Higgsfield plans work?", href: "#faq-how-do-credits-work" },
+    { label: "What are Unlimited models?", href: "#faq-how-does-unlimited-work" },
+  ],
   disclaimers: [
     "Unlimited models and Free Generations on plans are accessible only via higgsfield.ai and are not accessible via MCP/CLI, Canvas or Supercomputer.",
     "Prices exclude VAT and local taxes, calculated at checkout. Unlimited usage may be subject to dynamic speed adjustments during high-traffic periods.",

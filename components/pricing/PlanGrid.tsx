@@ -6,7 +6,6 @@ import { ArrowUpRight } from "lucide-react";
 import { PLANS, PLAN_FOOTNOTES } from "@/lib/pricing/content";
 import type { Plan } from "@/lib/pricing/content";
 import { Modal } from "@/components/ui/Modal";
-import { SmartLink } from "@/components/ui/SmartLink";
 import { useToast } from "@/components/ui/Toast";
 import { BillingToggle, type Billing } from "./BillingToggle";
 import { PlanCard } from "./PlanCard";
@@ -84,14 +83,14 @@ export function PlanGrid() {
 
           <div className="mt-6 flex flex-wrap justify-center gap-6">
             {PLAN_FOOTNOTES.links.map((link) => (
-              <SmartLink
-                key={link}
-                label={link}
+              <a
+                key={link.label}
+                href={link.href}
                 className="flex min-h-11 items-center gap-1 text-xs text-hf-muted transition-colors hover:text-white md:min-h-0"
               >
-                {link}
+                {link.label}
                 <ArrowUpRight className="size-3" aria-hidden strokeWidth={1.75} />
-              </SmartLink>
+              </a>
             ))}
           </div>
 

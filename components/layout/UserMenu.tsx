@@ -8,8 +8,8 @@ import { useAuth } from "@/lib/auth/context";
 import { useToast } from "@/components/ui/Toast";
 
 const LINKS = [
-  { href: "/assets", label: "Profile", icon: User },
-  { href: "/pricing", label: "Settings", icon: Settings },
+  { href: "/profile", label: "Profile", icon: User },
+  { href: "/settings", label: "Settings", icon: Settings },
   { href: "/welcome-quiz", label: "Onboarding", icon: Sparkles },
 ];
 

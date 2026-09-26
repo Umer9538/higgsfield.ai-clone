@@ -100,7 +100,6 @@ export const COMMUNITY = {
     { handle: "higgsfield.studio", role: "In-house studio", projects: 96 },
     { handle: "adqua", role: "Agency", projects: 40 },
   ],
-  socials: ["Discord", "X / Twitter", "Youtube", "LinkedIn", "Tiktok"],
 };
 
 /* --------------------------------- Contests --------------------------------- */

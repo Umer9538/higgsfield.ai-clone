@@ -37,7 +37,7 @@ export default function OriginalsPage() {
         {/* Rails */}
         {ORIGINALS.rails.map((rail, railIndex) => (
           <section key={rail.id} className="mt-12">
-            <RailHeading title={rail.title} link="See all" />
+            <RailHeading title={rail.title} />
             <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {ORIGINALS.films.slice(railIndex * 2, railIndex * 2 + 4).map((film, index) => (
                 <li key={`${rail.id}-${film}`}>

@@ -319,6 +319,48 @@ listboxes use proper ARIA roles.
 
 ---
 
+## Account pages and link integrity
+
+Reported from the live site: the account menu's **Profile** went to Assets
+and **Settings** went to Pricing, stand-ins from the original rebuild, and
+footer links went nowhere or to the wrong place.
+
+**Profile (`/profile`)** shows only real data: an editable display name
+(saved with the account); counts of generations, videos and images saved on
+this device; your onboarding preset with **Open this preset**, which lands in
+the studio with it applied; and recent generations. A favourites count was
+left out on purpose: nothing in the UI writes favourites yet, so it would
+always read 0.
+
+**Settings (`/settings`)** has controls that do something. Account: display
+name, email, plan, sign out. Preferences: **Reduce motion**, now a
+persisted, app-wide preference (the old palette toggle was lost on reload),
+the HUD, and re-running onboarding. **Your data**: the site sets no cookies,
+so instead of a "Cookie settings" link it lists every key it keeps in local
+storage, with a two-step clear for saved generations. Signed out, both pages
+explain themselves rather than redirecting: there is still no auth wall.
+
+**Links.** Of the footer's 44 entries, about 25 were buttons that only
+showed a toast, and some links were wrong ("Seedance 2.5" went to Explore).
+The footer now lists only destinations this app serves, each with an
+explicit href; models link to the studio where they are the default.
+Company pages, legal pages and social accounts that do not exist here were
+cut, not faked. A sweep found the same dead buttons elsewhere. The pricing
+footnotes now open the FAQ answer they ask about, "See all" on the Originals
+page (already the full collection) is gone, and so are Community's social
+buttons. A test fails if any page renders a link-shaped button that goes
+nowhere, and every footer link is checked to return 200.
+
+**Found while testing: the account menu hid under Explore's filter bar.**
+The top bar and Explore's sticky toolbar were both `z-40`, and the toolbar
+came later in the DOM, so it painted over the dropdown. It was masked
+during the page's entry animation, whose transform contained the toolbar,
+and appeared once the page settled, which is exactly when a user opens the
+menu. The top bar is now `z-45`, with the full layer scale documented where
+it is set. The regression test waits for the page to settle and checks
+what is actually under the pointer; run against the unfixed build, it
+fails.
+
 ## Signature Technical Innovations
 
 Three features built to show engineering, with one rule held throughout:
@@ -566,7 +608,7 @@ it 276 px too low.
 
 ## How it is verified
 
-100 Playwright tests run against both the local build and the live
+109 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

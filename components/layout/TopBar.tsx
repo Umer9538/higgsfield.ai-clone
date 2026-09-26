@@ -22,7 +22,11 @@ export function TopBar() {
 
   return (
     <>
-      <header className="glass sticky top-0 z-40 border-x-0 border-t-0">
+      {/* Layers: page sticky bars z-30/40 < top bar z-45 (its account menu
+          must clear them) < rail, catalog and tab bar z-50 < sheets 60–80 <
+          modals and HUD 90 < palette 95 < toasts 100. At z-40 it tied with
+          Explore's sticky filter bar, which painted over the account menu. */}
+      <header className="glass sticky top-0 z-[45] border-x-0 border-t-0">
         <div className="flex h-header items-center gap-3 px-4">
           <Link
             href="/"

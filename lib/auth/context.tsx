@@ -5,6 +5,8 @@ import { createContext, useCallback, useContext, useMemo, useSyncExternalStore }
 export interface AuthUser {
   email: string;
   handle: string;
+  /** Set from the profile page; the handle is shown until then */
+  displayName?: string;
 }
 
 interface AuthContextValue {
@@ -12,6 +14,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   signIn: (email: string) => AuthUser;
   signOut: () => void;
+  updateProfile: (patch: Pick<AuthUser, "displayName">) => void;
 }
 
 const STORAGE_KEY = "hf.auth";
@@ -89,9 +92,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(() => write(null), []);
 
+  const updateProfile = useCallback(
+    (patch: Pick<AuthUser, "displayName">) => {
+      const current = getSnapshot();
+      if (!current) return;
+      const displayName = patch.displayName?.trim();
+      write({ ...current, displayName: displayName || undefined });
+    },
+    [],
+  );
+
   const value = useMemo(
-    () => ({ user, isAuthenticated: user !== null, signIn, signOut }),
-    [user, signIn, signOut],
+    () => ({ user, isAuthenticated: user !== null, signIn, signOut, updateProfile }),
+    [user, signIn, signOut, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

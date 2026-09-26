@@ -12,6 +12,7 @@ import { useStudioContext } from "@/lib/commands/studio-context";
 import { JsonView } from "./JsonView";
 import { Modal } from "./Modal";
 import { toggleHud } from "./PerfHud";
+import { setPreference } from "@/lib/ui/preferences";
 
 export const OPEN_PALETTE_EVENT = "hf:open-palette";
 
@@ -140,9 +141,8 @@ export function CommandPalette() {
           toggleHud();
           break;
         case "toggle-motion": {
-          const root = document.documentElement;
-          const next = !root.classList.contains("reduce-motion");
-          root.classList.toggle("reduce-motion", next);
+          const next = !document.documentElement.classList.contains("reduce-motion");
+          setPreference("reducedMotion", next);
           toast(next ? "Reduced motion on" : "Reduced motion off", "info");
           break;
         }

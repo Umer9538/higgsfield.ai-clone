@@ -1,11 +1,11 @@
+import Link from "next/link";
 import { FOOTER, FOOTER_COLUMNS } from "@/lib/marketing/content";
-import { SmartLink } from "@/components/ui/SmartLink";
-import { routeFor } from "@/lib/routes";
 
 /**
  * Quiet on purpose. The reference ends every page on a full-bleed accent
  * block; here the footer sits on the same obsidian as the chrome, so the
  * largest coloured area on any page is the work, never the furniture.
+ * Every entry is a real link — see FOOTER_COLUMNS for what was cut.
  */
 export function SiteFooter() {
   return (
@@ -19,39 +19,28 @@ export function SiteFooter() {
               <span className="text-hf-accent-soft">{FOOTER.wordmark[1]}</span>
             </h2>
 
-            <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
+            <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
               {FOOTER_COLUMNS.map((column) => (
                 <div key={column.title}>
                   <h3 className="text-sm font-medium text-hf-dim">{column.title}</h3>
                   <ul className="mt-3 space-y-2.5">
                     {column.links.map((link) => (
-                      <li key={link}>
-                        <SmartLink
-                          label={link}
-                          href={routeFor(link)}
+                      <li key={link.label}>
+                        <Link
+                          href={link.href}
                           className="inline-flex min-h-11 items-center text-sm text-hf-muted transition-colors hover:text-white md:min-h-0"
-                        />
+                        >
+                          {link.label}
+                        </Link>
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
-            </div>
+            </nav>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center justify-between gap-4 text-sm">
-            <p className="text-hf-muted">{FOOTER.address}</p>
-            <ul className="flex flex-wrap items-center gap-5">
-              {FOOTER.socials.map((social) => (
-                <li key={social}>
-                  <SmartLink
-                    label={social}
-                    className="inline-flex min-h-11 items-center text-hf-muted transition-colors hover:text-hf-accent-soft md:min-h-0"
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
+          <p className="mt-12 text-sm text-hf-muted">{FOOTER.address}</p>
         </div>
       </div>
 
@@ -60,12 +49,13 @@ export function SiteFooter() {
           <p>{FOOTER.copyright}</p>
           <ul className="flex flex-wrap items-center gap-4">
             {FOOTER.legal.map((item) => (
-              <li key={item}>
-                <SmartLink
-                  label={item}
-                  href={routeFor(item)}
+              <li key={item.label}>
+                <Link
+                  href={item.href}
                   className="inline-flex min-h-11 items-center font-medium transition-colors hover:text-white md:min-h-0"
-                />
+                >
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>

@@ -44,6 +44,7 @@ export function SmartLink({
     <button
       type="button"
       onClick={() => toast(`${label} is not part of this rebuild`, "info")}
+      data-unbuilt-link
       className={className}
     >
       {content}
