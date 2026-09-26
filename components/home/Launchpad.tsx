@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowUpRight, Clapperboard, Image as ImageIcon, Video } from "lucide-react";
-import { FeedCard } from "@/components/explore/ExploreFeed";
+import { FeedCard } from "@/components/explore/FeedCard";
 import { FeedVideoToggle } from "@/components/explore/FeedMedia";
 import { useToast } from "@/components/ui/Toast";
 import { CATEGORIES, RAILS, type FeedItem } from "@/lib/explore/content";

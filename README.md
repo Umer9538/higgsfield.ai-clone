@@ -28,7 +28,7 @@ what was cut, and why, with the measurements behind each decision.
 |---|---|
 | Framework | Next.js 16.3 (App Router), React 19.2 |
 | Language | TypeScript, strict |
-| Styling | Tailwind v4; Obsidian / Electric Violet / Cyber Cyan tokens in `app/globals.css` |
+| Styling | Tailwind v4; Obsidian / Electric Violet / Cyber Cyan tokens in `app/styles/tokens.css` (cascade order in `app/globals.css`) |
 | Type | Bricolage Grotesque + Instrument Sans via `next/font` |
 | Backend | Route handlers in `app/api/*` → `firebase-admin` → Firestore |
 | Motion | CSS on transform/opacity with springs sampled into `linear()`; `motion` only on onboarding |

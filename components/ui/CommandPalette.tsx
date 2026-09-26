@@ -2,15 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Copy, CornerDownLeft, Search } from "lucide-react";
+import { CornerDownLeft, Search } from "lucide-react";
 import { COMMANDS, matches, type CommandItem } from "@/lib/commands/registry";
 import { useDialogFocus, useExclusiveOverlay, useRouteChanged, useScrollLock } from "./overlay";
 import { useAuth } from "@/lib/auth/context";
 import { useToast } from "./Toast";
 import { clearGeneratedAssets } from "@/lib/assets/store";
 import { useStudioContext } from "@/lib/commands/studio-context";
-import { JsonView } from "./JsonView";
-import { Modal } from "./Modal";
+import { JsonInspector } from "./palette/JsonInspector";
+import { useStudioCommands } from "./palette/useStudioCommands";
 import { toggleHud } from "./PerfHud";
 import { setPreference } from "@/lib/ui/preferences";
 
@@ -45,46 +45,10 @@ export function CommandPalette() {
     if (inspecting) setInspecting(null);
   }
 
+  const inspect = useCallback((metadata: Record<string, unknown>) => setInspecting(metadata), []);
+  const closeInspector = useCallback(() => setInspecting(null), []);
   // In a studio, its own commands come first: they act on what is on screen.
-  const studioCommands = useMemo<CommandItem[]>(() => {
-    if (!studio) return [];
-    return [
-      {
-        id: "studio-copy-prompt",
-        label: "Copy prompt",
-        group: "Studio",
-        keywords: "clipboard text",
-        run: () => {
-          const text = studio.prompt().trim();
-          if (!text) {
-            toast("The prompt is empty", "info");
-            return;
-          }
-          navigator.clipboard
-            .writeText(text)
-            .then(() => toast("Prompt copied"))
-            .catch(() => toast("Copy blocked by the browser", "info"));
-        },
-      },
-      {
-        id: "studio-inspect",
-        label: "Inspect generation JSON",
-        group: "Studio",
-        keywords: "metadata json settings debug developer",
-        run: () => setInspecting(studio.metadata()),
-      },
-      ...studio.looks.map<CommandItem>((look) => ({
-        id: `studio-look-${look.name}`,
-        label: `Apply look: ${look.name}`,
-        group: "Studio",
-        keywords: "preset style camera lighting palette",
-        run: () => {
-          look.apply();
-          toast(`${look.name} look applied`);
-        },
-      })),
-    ];
-  }, [studio, toast]);
+  const studioCommands = useStudioCommands(inspect);
 
   const results = useMemo(() => {
     const available = [...studioCommands, ...COMMANDS].filter((item) =>
@@ -169,28 +133,7 @@ export function CommandPalette() {
     [router, signOut, toast],
   );
 
-  const inspector = (
-    <Modal open={inspecting !== null} onClose={() => setInspecting(null)} title="Generation metadata">
-      <p className="mb-3 text-sm text-hf-muted">
-        Exactly what is configured in {studio?.label ?? "this studio"} right now — the body a real
-        render request would carry.
-      </p>
-      {inspecting ? <JsonView value={inspecting} /> : null}
-      <button
-        type="button"
-        onClick={() =>
-          navigator.clipboard
-            .writeText(JSON.stringify(inspecting, null, 2))
-            .then(() => toast("JSON copied"))
-            .catch(() => toast("Copy blocked by the browser", "info"))
-        }
-        className="press mt-3 flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-hf-border px-4 text-sm text-white hover:border-hf-accent/50"
-      >
-        <Copy className="size-4" aria-hidden strokeWidth={1.75} />
-        Copy JSON
-      </button>
-    </Modal>
-  );
+  const inspector = <JsonInspector data={inspecting} label={studio?.label} onClose={closeInspector} />;
 
   if (!open) return inspector;
 

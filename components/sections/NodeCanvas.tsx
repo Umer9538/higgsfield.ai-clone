@@ -1,85 +1,11 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Activity, GripVertical, Link2, Plus, Trash2, X } from "lucide-react";
+import { Activity, Link2, Plus, Trash2 } from "lucide-react";
+import { INITIAL, NODE_TYPES, defaults, typeOf, type CanvasNode, type NodeType } from "@/lib/canvas/nodes";
+import { NodeCard } from "./canvas/NodeCard";
 import { useToast } from "@/components/ui/Toast";
 import { useCables, type CableStats } from "./useCables";
-
-type NodeTypeId = "text-prompt" | "image-input" | "video-output";
-
-interface ParamSpec {
-  key: string;
-  label: string;
-  kind: "text" | "textarea" | "select";
-  options?: string[];
-  placeholder?: string;
-}
-
-interface NodeType {
-  id: NodeTypeId;
-  label: string;
-  kind: string;
-  params: ParamSpec[];
-}
-
-const NODE_TYPES: NodeType[] = [
-  {
-    id: "text-prompt",
-    label: "Text Prompt",
-    kind: "Prompt",
-    params: [
-      { key: "text", label: "Prompt", kind: "textarea", placeholder: "Describe the shot…" },
-    ],
-  },
-  {
-    id: "image-input",
-    label: "Image Input",
-    kind: "Reference",
-    params: [
-      { key: "source", label: "Source", kind: "text", placeholder: "Paste a URL or asset id" },
-      { key: "weight", label: "Weight", kind: "select", options: ["0.25", "0.5", "0.75", "1.0"] },
-    ],
-  },
-  {
-    id: "video-output",
-    label: "Video Output",
-    kind: "Seedance 2.5",
-    params: [
-      { key: "duration", label: "Duration", kind: "select", options: ["5s", "8s", "10s", "15s"] },
-      { key: "ratio", label: "Ratio", kind: "select", options: ["16:9", "9:16", "1:1"] },
-    ],
-  },
-];
-
-interface CanvasNode {
-  id: string;
-  type: NodeTypeId;
-  x: number;
-  y: number;
-  params: Record<string, string>;
-}
-
-function defaults(type: NodeType): Record<string, string> {
-  return Object.fromEntries(
-    type.params.map((param) => [param.key, param.kind === "select" ? (param.options?.[0] ?? "") : ""]),
-  );
-}
-
-const typeOf = (id: NodeTypeId) => NODE_TYPES.find((t) => t.id === id)!;
-
-/**
- * Credit estimate for an output node, from the Video studio's published rate
- * (45 credits for 5 seconds). Labelled "est." in the UI: it is arithmetic on
- * the pricing config, not a measurement.
- */
-const CREDITS_PER_SECOND = 9;
-const estimateCredits = (duration: string) => Math.round((parseInt(duration, 10) || 5) * CREDITS_PER_SECOND);
-
-const INITIAL: CanvasNode[] = [
-  { id: "n-text", type: "text-prompt", x: 6, y: 12, params: { text: "Neon alley, rain slick" } },
-  { id: "n-image", type: "image-input", x: 6, y: 52, params: { source: "asset-3", weight: "0.5" } },
-  { id: "n-video", type: "video-output", x: 58, y: 30, params: { duration: "5s", ratio: "16:9" } },
-];
 
 export function NodeCanvas() {
   const boardRef = useRef<HTMLDivElement>(null);
@@ -309,138 +235,25 @@ export function NodeCanvas() {
           })}
         </svg>
 
-        {nodes.map((node) => {
-          const type = typeOf(node.type);
-          const isSelected = selected === node.id;
-          const inputs = edges.filter(([, to]) => to === node.id).length;
-          const hasIn = inputs > 0;
-          const hasOut = edges.some(([from]) => from === node.id);
-          return (
-            <div
-              key={node.id}
-              ref={nodeRef(node.id)}
-              data-node={node.id}
-              onPointerDown={() => {
-                if (linkFrom !== null) startLink(node.id);
-                else setSelected(node.id);
-              }}
-              className={`absolute w-52 rounded-2xl border bg-hf-surface-2 transition-shadow ${
-                isSelected ? "border-hf-cyan" : "border-hf-border"
-              } ${dragging === node.id ? "z-10 shadow-[0_24px_48px_-12px_rgb(0_0_0/0.8)]" : ""}`}
-              style={{ left: `${node.x}%`, top: `${node.y}%` }}
-            >
-              {/* Ports, on the header's centre line where cables attach */}
-              <span
-                aria-hidden
-                className={`absolute top-[18px] -left-1 size-2 rounded-full border ${hasIn ? "border-hf-cyan bg-hf-cyan" : "border-hf-border bg-hf-surface"}`}
-              />
-              <span
-                aria-hidden
-                className={`absolute top-[18px] -right-1 size-2 rounded-full border ${hasOut ? "border-hf-cyan bg-hf-cyan" : "border-hf-border bg-hf-surface"}`}
-              />
-              <div
-                data-node-header
-                onPointerDown={(event) => beginDrag(event, node)}
-                onLostPointerCapture={() => setDragging(null)}
-                className={`flex touch-none items-center gap-1.5 border-b border-hf-border px-2 py-1.5 select-none ${
-                  linkFrom !== null ? "cursor-pointer" : dragging === node.id ? "cursor-grabbing" : "cursor-grab"
-                }`}
-              >
-                {/* Keyboard handle: focus it and use the arrow keys */}
-                <button
-                  type="button"
-                  aria-label={`Move ${type.label} node`}
-                  onKeyDown={(event) => {
-                    const step = 3;
-                    if (event.key === "ArrowLeft") nudge(node.id, -step, 0);
-                    else if (event.key === "ArrowRight") nudge(node.id, step, 0);
-                    else if (event.key === "ArrowUp") nudge(node.id, 0, -step);
-                    else if (event.key === "ArrowDown") nudge(node.id, 0, step);
-                    else return;
-                    event.preventDefault();
-                  }}
-                  className="-m-1 flex size-6 shrink-0 items-center justify-center rounded text-hf-dim hover:text-white"
-                >
-                  <GripVertical className="size-3.5" aria-hidden strokeWidth={2} />
-                </button>
-
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[10px] tracking-wide text-hf-dim uppercase">
-                    {type.kind}
-                  </span>
-                  <span className="block truncate text-xs font-medium text-white">{type.label}</span>
-                </span>
-
-                <button
-                  type="button"
-                  aria-label={`Delete ${type.label} node`}
-                  data-node-delete
-                  onClick={() => deleteNode(node.id)}
-                  className="text-hf-dim transition-colors hover:text-hf-danger"
-                >
-                  <X className="size-3.5" aria-hidden strokeWidth={2} />
-                </button>
-              </div>
-
-              {node.type === "video-output" ? (
-                <div data-node-badges className="flex flex-wrap gap-1 border-b border-hf-border px-2 py-1.5 font-mono text-[10px]">
-                  <span className={`rounded px-1.5 py-0.5 ${hasIn ? "bg-hf-cyan/15 text-hf-cyan" : "bg-hf-surface-4 text-hf-dim"}`}>
-                    {inputs} {inputs === 1 ? "input" : "inputs"}
-                  </span>
-                  <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-muted">
-                    est. {estimateCredits(node.params.duration ?? "5s")} cr
-                  </span>
-                </div>
-              ) : null}
-
-              <div className="space-y-2 p-2">
-                {type.params.map((param) => {
-                  const id = `${node.id}-${param.key}`;
-                  return (
-                    <label key={param.key} htmlFor={id} className="block">
-                      <span className="mb-1 block text-[10px] text-hf-dim">{param.label}</span>
-                      {param.kind === "select" ? (
-                        <select
-                          id={id}
-                          value={node.params[param.key] ?? ""}
-                          onChange={(event) => setParam(node.id, param.key, event.target.value)}
-                          onPointerDown={(event) => event.stopPropagation()}
-                          className="w-full rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white focus:border-hf-accent focus:outline-none"
-                        >
-                          {param.options?.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : param.kind === "textarea" ? (
-                        <textarea
-                          id={id}
-                          rows={2}
-                          value={node.params[param.key] ?? ""}
-                          placeholder={param.placeholder}
-                          onChange={(event) => setParam(node.id, param.key, event.target.value)}
-                          onPointerDown={(event) => event.stopPropagation()}
-                          className="w-full resize-none rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white placeholder:text-hf-dim focus:border-hf-accent focus:outline-none"
-                        />
-                      ) : (
-                        <input
-                          id={id}
-                          type="text"
-                          value={node.params[param.key] ?? ""}
-                          placeholder={param.placeholder}
-                          onChange={(event) => setParam(node.id, param.key, event.target.value)}
-                          onPointerDown={(event) => event.stopPropagation()}
-                          className="w-full rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white placeholder:text-hf-dim focus:border-hf-accent focus:outline-none"
-                        />
-                      )}
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+        {nodes.map((node) => (
+          <NodeCard
+            key={node.id}
+            node={node}
+            type={typeOf(node.type)}
+            selected={selected === node.id}
+            dragging={dragging === node.id}
+            linking={linkFrom !== null}
+            inputs={edges.filter(([, to]) => to === node.id).length}
+            hasOut={edges.some(([from]) => from === node.id)}
+            nodeRef={nodeRef(node.id)}
+            onPress={() => (linkFrom !== null ? startLink(node.id) : setSelected(node.id))}
+            onBeginDrag={(event) => beginDrag(event, node)}
+            onDragEnd={() => setDragging(null)}
+            onNudge={(dx, dy) => nudge(node.id, dx, dy)}
+            onDelete={() => deleteNode(node.id)}
+            onParam={(key, value) => setParam(node.id, key, value)}
+          />
+        ))}
       </div>
 
       <p className="mt-3 text-xs text-hf-dim">

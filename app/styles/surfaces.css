@@ -1,0 +1,82 @@
+/*
+ * Glass surface: translucent fill, backdrop blur and a hairline highlight on
+ * the top edge. Used for chrome that floats over media — the header, the
+ * workspace panel, the dock composer, dialogs.
+ */
+@utility glass {
+  background-color: color-mix(in srgb, var(--color-hf-surface) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid color-mix(in srgb, white 8%, transparent);
+  box-shadow: inset 0 1px 0 0 color-mix(in srgb, white 6%, transparent);
+}
+
+/*
+ * Focal surfaces only (the composers). At rest the edge is violet light
+ * fading out; while you type in it, cyan takes over and a second pixel of
+ * outline joins it, so the surface itself is the 2px focus indicator. The
+ * field inside skips its own ring (below) instead of drawing a second one.
+ */
+@utility gradient-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--color-hf-surface-2), var(--color-hf-surface-2)) padding-box,
+    linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-hf-accent) 70%, transparent),
+        color-mix(in srgb, var(--color-hf-accent) 18%, transparent) 55%,
+        color-mix(in srgb, white 6%, transparent)
+      )
+      border-box;
+  &:has(:is(input, textarea):focus) {
+    outline: 1px solid color-mix(in srgb, var(--color-hf-cyan) 55%, transparent);
+    outline-offset: 1px;
+    background:
+      linear-gradient(var(--color-hf-surface-2), var(--color-hf-surface-2)) padding-box,
+      linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--color-hf-cyan) 75%, transparent),
+          color-mix(in srgb, var(--color-hf-accent) 45%, transparent) 60%,
+          color-mix(in srgb, white 6%, transparent)
+        )
+        border-box;
+  }
+}
+
+.gradient-border :is(input, textarea):focus-visible {
+  outline: none;
+}
+
+/* The palette's only field always holds focus while it is open, and its ring
+   was clipped by the panel's rounded top edge. The open palette is the cue. */
+[data-palette-input]:focus-visible {
+  outline: none;
+}
+
+/*
+ * Sliders show how far along a value is, which is state: the filled track
+ * is cyan (set inline per slider), the thumb a white disc with a cyan halo.
+ */
+input[type="range"] {
+  accent-color: var(--color-hf-cyan);
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-hf-cyan) 45%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.5);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-hf-cyan) 45%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.5);
+}

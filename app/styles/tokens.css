@@ -1,0 +1,77 @@
+/*
+ * Design tokens. The palette is our own — Obsidian, Electric Violet, Cyber
+ * Cyan — and its reasoning lives in PRODUCT_DECISIONS.md.
+ */
+@theme {
+  /*
+   * Electric Violet. Fills use the full-strength tone; text on dark surfaces
+   * uses the lighter tint, because #8B5CF6 on #0f1113 only reaches about
+   * 4.5:1 while the tint clears 6.9:1.
+   */
+  --color-hf-accent: #8b5cf6;
+  --color-hf-accent-soft: #a78bfa;
+  /* Hover lifts rather than darkens: black text on #7C3AED (the old hover)
+     measured 3.7:1 and failed AA in every hovered primary button. #9B73F7
+     keeps black text at 6.2:1. */
+  --color-hf-accent-hover: #9b73f7;
+  --color-hf-accent-muted: #4c3a7a;
+
+  /*
+   * Cyber Cyan is state, never brand: selected, focused, configured, live,
+   * and how far along something is (progress, slider fills).
+   */
+  --color-hf-cyan: #06b6d4;
+
+  /* Functional only — destructive actions and errors. Not part of the brand. */
+  --color-hf-danger: #f43f5e;
+
+  /*
+   * Obsidian: a near-neutral ramp with only a hair of cool. The chrome must
+   * not tint the work — a coloured surround shifts how every image and clip
+   * on it is perceived, which is why grading suites use neutral grey. Each
+   * step is a layer: page, panel, raised control, pressed control, hairline.
+   */
+  --color-hf-black: #09090b;
+  --color-hf-surface: #101013;
+  --color-hf-surface-2: #16161a;
+  --color-hf-surface-3: #1e1e23;
+  --color-hf-surface-4: #27272d;
+  --color-hf-border: #303038;
+
+  /* Text */
+  --color-hf-text: #ffffff;
+  /* Measured: muted 8.1:1 and dim 5.9:1 on the panel; dim stays above 4.6:1
+     even on a pressed control */
+  --color-hf-muted: #a8a8b3;
+  --color-hf-dim: #8f8f9b;
+
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+
+  /* Top bar height at every breakpoint; tab bar on phones; side rail from md */
+  --spacing-header: 4rem;
+  --spacing-rail: 4.5rem;
+  --spacing-tabbar: 4rem;
+
+  /*
+   * Radius encodes hierarchy instead of one value everywhere: the larger the
+   * container, the softer its corner.
+   */
+  --radius-control: 0.75rem;
+  --radius-media: 1.125rem;
+  --radius-panel: 1.5rem;
+
+  /* One easing for everything that answers a click, one for reveals */
+  --ease-press: cubic-bezier(0.2, 0, 0, 1);
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /*
+   * Real springs, solved numerically and sampled into linear() so they run on
+   * the compositor like any CSS easing (no animation library, no main-thread
+   * physics). Values: x(t) of a damped spring, mass 1.
+   *   spring: stiffness 300, damping 30 — ζ 0.87, 0.4% overshoot, settles in 460ms
+   *   lift:   stiffness 420, damping 24 — ζ 0.59, 10% overshoot, settles in 560ms
+   */
+  --ease-spring: linear(0, 0.0492, 0.1613, 0.2979, 0.4356, 0.5617, 0.6701, 0.759, 0.8294, 0.8833, 0.9233, 0.9521, 0.9721, 0.9857, 0.9944, 0.9996, 1.0026, 1.0039, 1.0043, 1.0042, 1.0037, 1.0031, 1.0025, 1);
+  --ease-lift: linear(0, 0.1065, 0.3378, 0.5928, 0.8114, 0.9678, 1.0598, 1.0987, 1.1009, 1.0826, 1.0566, 1.0314, 1.0115, 0.9983, 0.9914, 0.9893, 0.9902, 0.9926, 0.9954, 0.9978, 0.9995, 1.0006, 1.001, 1);
+}

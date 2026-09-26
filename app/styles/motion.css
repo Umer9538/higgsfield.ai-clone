@@ -1,0 +1,178 @@
+/* Node canvas: dashes travel along a cable from source to target. */
+@keyframes cable-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@utility animate-cable-flow {
+  animation: cable-flow 900ms linear infinite;
+}
+
+/* Tactile press: the control gives a little under the finger. */
+@utility press {
+  transition: transform 120ms var(--ease-press);
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+}
+
+/* Primary glow on hover and focus, never at rest. */
+@utility glow {
+  &:hover:not(:disabled),
+  &:focus-visible {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-hf-accent) 55%, transparent),
+      0 10px 32px -8px color-mix(in srgb, var(--color-hf-accent) 55%, transparent);
+  }
+}
+
+/* Dialogs arrive from where the eye already is: a short scale and fade. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-reveal {
+  animation: reveal 260ms var(--ease-reveal) both;
+}
+
+/*
+ * The one orchestrated moment. While a render develops, a band of violet
+ * light sweeps across the frame like a projector warming up. Transform only,
+ * so it never moves layout.
+ */
+@keyframes light-sweep {
+  from {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  to {
+    transform: translateX(220%) skewX(-18deg);
+  }
+}
+
+@utility animate-sweep {
+  animation: light-sweep 1.8s var(--ease-reveal) infinite;
+}
+
+/*
+ * Media card hover: a spring lift to 1.02 and a violet edge glow. Only
+ * transform and opacity change — the glow is pre-rendered on ::after and
+ * faded in, instead of animating border-color and box-shadow (which repaint
+ * every frame). Touch screens get no lift, where hover would stick.
+ */
+@utility hover-glow {
+  position: relative;
+  transition: transform 560ms var(--ease-lift);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-hf-accent) 60%, transparent),
+      inset 0 0 32px -8px color-mix(in srgb, var(--color-hf-accent) 50%, transparent);
+    opacity: 0;
+    transition: opacity 220ms var(--ease-press);
+  }
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+  &:hover::after,
+  &:focus-within::after {
+    opacity: 1;
+  }
+}
+
+/* Route entry: a short fade and rise, applied by the shell's template. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@utility animate-page {
+  /* backwards, not both: once finished it leaves no transform behind, which
+     would otherwise make this the containing block for fixed dialogs */
+  animation: page-in 320ms var(--ease-reveal) backwards;
+}
+
+/* Grid items rise in sequence; --i is the item's index, capped at 12. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+@utility animate-rise {
+  animation: rise 420ms var(--ease-reveal) backwards;
+  animation-delay: calc(min(var(--i, 0), 12) * 45ms);
+}
+
+/* Flyouts and sheets, on the spec'd spring */
+@keyframes slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+@utility animate-flyout {
+  animation: slide-from-left 460ms var(--ease-spring) backwards;
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@utility animate-sheet {
+  animation: sheet-up 460ms var(--ease-spring) backwards;
+}
+
+/* Skeleton: a glass band sweeps across while media loads. */
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@utility skeleton {
+  background-color: var(--color-hf-surface-3);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      color-mix(in srgb, white 7%, transparent) 45%,
+      color-mix(in srgb, white 12%, transparent) 50%,
+      color-mix(in srgb, white 7%, transparent) 55%,
+      transparent 80%
+    );
+    animation: shimmer 1.4s var(--ease-press) infinite;
+  }
+}
+
+/* Generate while busy: a light that breathes behind the label. */
+@keyframes glow-pulse {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+@utility animate-glow-pulse {
+  animation: glow-pulse 900ms ease-in-out infinite alternate;
+}
