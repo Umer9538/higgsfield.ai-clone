@@ -220,8 +220,10 @@ export function CommandPalette() {
       >
         <div className="flex items-center gap-2.5 border-b border-hf-border px-4">
           <Search className="size-4 shrink-0 text-hf-dim" aria-hidden strokeWidth={1.75} />
+          {/* No autoFocus: React applies it before effects run, so the dialog
+              hook recorded this input, not the opener, and focus could not be
+              returned on close. The hook focuses it as the first control. */}
           <input
-            autoFocus
             role="combobox"
             aria-expanded
             aria-controls="command-results"

@@ -395,6 +395,38 @@ until a round comes back clean.
   layout shift, gave two different press scales, and still said favourites
   were missing. All corrected.
 
+**Round 2, re-auditing round 1's own fixes.** Most held (8 of 9 backend,
+12 of 15 UI). What had not, and what the fixes themselves broke:
+
+- **Memory-mode regression.** The blocked-storage fix stopped reading from
+  storage but only updated its cache on failure, so a later write that
+  succeeded (sign-out after a quota error) never reached the screen. Writes
+  now update the cache on both paths, and a success leaves memory mode.
+- **Focus, again.** The palette's input used `autoFocus`, which React applies
+  before effects run, so the dialog hook recorded the input as the opener and
+  could never return focus. Disabling the heart while its request was in
+  flight blurred it and dropped a keyboard user's place; it now uses
+  `aria-disabled` and keeps focus. "View all" handed focus to a control
+  hidden under the two sticky bars; it now scrolls first. "Back to all
+  models" returns focus to the rail you came from.
+- **A live region hiding in plain sight.** `<output>` is implicitly
+  `role=status`, so removing `aria-live` changed nothing; it is now
+  explicitly off.
+- **Edge cases.** A save that landed after its generation was deleted
+  resurrected it (the delete now completes when the save lands). Setting a
+  favourite checked only the new id and could duplicate a legacy one. Legacy
+  ids that Firestore reserves are skipped. The favourites loader cleared
+  another owner's in-flight marker, and a late response could overwrite
+  newer clicks. The 20 px billing switch got a 40 px hit area (now centred at
+  44 px). The video toggle had the same double label-and-pressed pattern as
+  the heart.
+- **Deliberately kept:** frame-step buttons are hidden on phones. Touch users
+  scrub; restoring them at 390 px clips Fullscreen again.
+
+New tests pin each focus fix: the palette returns focus to its opener, the
+heart keeps focus through a save, and "View all" lands on a visible control
+whose Back returns to the rail.
+
 **Not changed, on purpose:** preview deployments keep the in-memory
 fallback (production refuses without a database). Ownership stays advisory
 while sign-in is mocked. Generations made by earlier test runs before owners
@@ -820,7 +852,7 @@ it 276 px too low.
 
 ## How it is verified
 
-150 Playwright tests run against both the local build and the live
+153 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, layout shift
 under 0.1 on every route (measured 0.003), 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

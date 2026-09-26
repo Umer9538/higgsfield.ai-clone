@@ -30,7 +30,10 @@ function FavoriteButton({ item }: { item: FeedItem }) {
       // One label; aria-pressed carries the state (swapping both read as
       // "Remove from favorites, pressed")
       aria-label={`Favorite ${item.model} by ${item.author}`}
-      disabled={!ready || isPending(item.id)}
+      // Not \`disabled\` while saving: disabling the focused button blurs it and
+      // drops a keyboard user's place. toggle() already ignores repeat clicks.
+      disabled={!ready}
+      aria-disabled={isPending(item.id) || undefined}
       onClick={async () => {
         const result = await toggle(item.id, `${item.model} · ${item.author}`);
         if (result === null) toast("Couldn't save that — check your connection", "info");
@@ -244,7 +247,12 @@ export function ExploreFeed() {
           <button
             ref={backRef}
             type="button"
-            onClick={() => setFocused(null)}
+            onClick={() => {
+              const from = focused;
+              setFocused(null);
+              // Back to the rail you came from, rather than dropping focus
+              requestAnimationFrame(() => document.getElementById(`rail-${from}`)?.focus());
+            }}
             className="flex min-h-11 items-center gap-1.5 rounded-full border border-hf-accent/50 px-3 text-xs text-hf-accent-soft transition-colors hover:bg-hf-accent/10 md:min-h-0 md:py-1.5"
           >
             Back to all models
@@ -261,7 +269,12 @@ export function ExploreFeed() {
           <section key={rail.id} className="mt-14">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="font-display text-xl font-bold tracking-[-0.025em] text-hf-accent-soft sm:text-2xl">
+                <h2
+                  id={`rail-${rail.id}`}
+                  tabIndex={-1}
+                  // Clears the top bar and the sticky toolbar when focused
+                  className="scroll-mt-44 font-display text-xl font-bold tracking-[-0.025em] text-hf-accent-soft focus:outline-none sm:text-2xl"
+                >
                   {rail.title}
                 </h2>
                 <p className="mt-1.5 text-sm text-hf-muted">{rail.sub}</p>
@@ -311,9 +324,11 @@ export function ExploreFeed() {
                       data-rail-cta
                       onClick={() => {
                         setFocused(rail.id);
-                        // This button unmounts as the feed narrows; hand focus
-                        // to "Back to all models" instead of dropping it to <body>
-                        requestAnimationFrame(() => backRef.current?.focus());
+                        // This button unmounts as the feed narrows. Scroll to the
+                        // top, then hand focus to "Back to all models" without
+                        // letting focus() scroll it under the two sticky bars.
+                        window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+                        requestAnimationFrame(() => backRef.current?.focus({ preventScroll: true }));
                       }}
                       className="flex min-h-11 items-center gap-1.5 rounded-full bg-hf-accent px-5 text-sm font-semibold text-black shadow-lg transition-colors hover:bg-hf-accent-hover"
                     >

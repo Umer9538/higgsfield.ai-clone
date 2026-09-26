@@ -170,3 +170,55 @@ test("phone switches keep their shape and still get a 44px touch target", async 
   expect(await knob.evaluate((el) => getComputedStyle(el).transitionProperty)).toContain("transform");
 });
 
+test.describe("focus is never dropped", () => {
+  test("closing the palette returns focus to what opened it", async ({ page }) => {
+    await page.goto("/pricing");
+    const search = page.getByRole("banner").getByRole("button", { name: "Search" });
+    await search.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("dialog", { name: "Command palette" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "Command palette" })).toHaveCount(0);
+    await expect(search).toBeFocused();
+  });
+
+  test("a keyboard user keeps focus on the heart through a save", async ({ page }) => {
+    await page.goto("/explore");
+    const heart = page.locator("main article").first().locator("[data-favorite]");
+    await expect(heart).toBeEnabled();
+    await heart.focus();
+    const saved = page.waitForResponse((r) => r.url().endsWith("/api/favorites") && r.request().method() === "POST");
+    await page.keyboard.press("Enter");
+    await saved;
+    await expect(heart).toHaveAttribute("aria-pressed", "true");
+    await expect(heart).toBeFocused();
+    await page.keyboard.press("Enter"); // and back, so the test leaves nothing behind
+    await expect(heart).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("View all hands focus to a visible Back control, and Back returns to the rail", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/explore");
+    const viewAll = page.locator("[data-rail-cta]").first();
+    await viewAll.scrollIntoViewIfNeeded();
+    await viewAll.focus();
+    await page.keyboard.press("Enter");
+
+    const back = page.getByRole("button", { name: "Back to all models" });
+    await expect(back).toBeFocused();
+    // Not hidden under the top bar and the sticky toolbar (WCAG 2.4.11)
+    await expect
+      .poll(() =>
+        back.evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return !!hit && (hit === el || el.contains(hit));
+        }),
+      )
+      .toBe(true);
+
+    await page.keyboard.press("Enter");
+    await expect.poll(() => page.evaluate(() => document.activeElement?.id ?? "")).toMatch(/^rail-/);
+  });
+});
+

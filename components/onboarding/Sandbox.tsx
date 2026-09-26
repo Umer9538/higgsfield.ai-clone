@@ -253,7 +253,9 @@ export function Sandbox() {
                   <p role="status" className="sr-only">
                     {announcement}
                   </p>
-                  <output data-live-prompt className="mt-1.5 block text-base leading-relaxed text-white">
+                  {/* <output> is implicitly a polite live region; off, or it re-reads
+                      on every keystroke. Tag changes are announced above. */}
+                  <output data-live-prompt aria-live="off" className="mt-1.5 block text-base leading-relaxed text-white">
                     {promptParts(subject, picks).map((part, index) => (
                       <span key={index}>
                         {index > 0 ? <span className="text-hf-dim">, </span> : null}

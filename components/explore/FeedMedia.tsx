@@ -212,18 +212,23 @@ export function FeedMedia({ item }: { item: FeedItem }) {
   );
 }
 
-/** Pause or resume every feed video; the choice is remembered. */
+/**
+ * Pause or resume every feed video; the choice is remembered. One label with
+ * aria-pressed carrying the state. Hidden when reduced motion is on (either
+ * setting), where the feed already shows stills and it would do nothing.
+ */
 export function FeedVideoToggle() {
-  const { pauseVideo } = usePreferences();
+  const { pauseVideo, reducedMotion } = usePreferences();
+  if (reducedMotion) return null;
   return (
     <button
       type="button"
       aria-pressed={pauseVideo}
       onClick={() => setPreference("pauseVideo", !pauseVideo)}
-      className="press flex min-h-11 items-center gap-1.5 rounded-lg border border-hf-border px-3 text-sm text-hf-muted transition-colors hover:text-white sm:min-h-9"
+      className="press flex min-h-11 items-center gap-1.5 rounded-lg border border-hf-border px-3 text-sm text-hf-muted transition-colors hover:text-white motion-reduce:hidden sm:min-h-9"
     >
       {pauseVideo ? <Play className="size-3.5" aria-hidden fill="currentColor" strokeWidth={0} /> : <Pause className="size-3.5" aria-hidden fill="currentColor" strokeWidth={0} />}
-      {pauseVideo ? "Play videos" : "Pause videos"}
+      Pause videos
     </button>
   );
 }

@@ -30,9 +30,14 @@ function newId(prefix: string) {
 function favoriteId(owner: string, itemId: string) {
   return `f|${owner}|${itemId}`;
 }
-/** The earlier scheme, still cleaned up so old records cannot linger. */
-function legacyFavoriteId(owner: string, itemId: string) {
-  return `${owner}__${itemId}`.replace(/[/\s]/g, "_");
+/**
+ * The earlier scheme, still read and cleaned up so old records cannot linger.
+ * null when that id would be one Firestore reserves (__name__), which only a
+ * crafted owner/item pair produces and no old record can have.
+ */
+function legacyFavoriteId(owner: string, itemId: string): string | null {
+  const id = `${owner}__${itemId}`.replace(/[/\s]/g, "_");
+  return /^__.*__$/.test(id) ? null : id;
 }
 
 /* -------------------------------- generations ------------------------------- */
@@ -141,12 +146,13 @@ export async function toggleFavorite(input: NewFavorite): Promise<ToggleResult> 
   // A transaction, so two concurrent toggles cannot both read "absent" and
   // both write (a double-click used to end up saved instead of unchanged)
   const ref = db.collection("favorites").doc(id);
-  const legacy = db.collection("favorites").doc(legacyFavoriteId(input.owner, input.itemId));
+  const legacyId = legacyFavoriteId(input.owner, input.itemId);
+  const legacy = legacyId ? db.collection("favorites").doc(legacyId) : null;
   return db.runTransaction(async (tx) => {
-    const [existing, old] = await Promise.all([tx.get(ref), tx.get(legacy)]);
-    if (existing.exists || old.exists) {
+    const [existing, old] = await Promise.all([tx.get(ref), legacy ? tx.get(legacy) : Promise.resolve(null)]);
+    if (existing.exists || old?.exists) {
       if (existing.exists) tx.delete(ref);
-      if (old.exists) tx.delete(legacy);
+      if (legacy && old?.exists) tx.delete(legacy);
       return { item: record, removed: true };
     }
     tx.set(ref, { itemId: record.itemId, title: record.title, owner: record.owner, createdAt: record.createdAt });
@@ -172,8 +178,14 @@ export async function setFavorite(input: NewFavorite, favorite: boolean): Promis
   }
   // Only written when absent, so the original createdAt is kept
   const ref = db.collection("favorites").doc(id);
-  const existing = await ref.get();
-  if (!existing.exists) {
+  const legacyId = legacyFavoriteId(input.owner, input.itemId);
+  const [existing, old] = await Promise.all([
+    ref.get(),
+    legacyId ? db.collection("favorites").doc(legacyId).get() : Promise.resolve(null),
+  ]);
+  // A favourite under the old id already counts; writing a new one would
+  // list the same item twice
+  if (!existing.exists && !old?.exists) {
     await ref.set({ itemId: record.itemId, title: record.title, owner: record.owner, createdAt: record.createdAt });
   }
   return { item: record, removed: false };
@@ -189,7 +201,8 @@ export async function removeFavorite(owner: string, itemId: string): Promise<voi
   }
   const batch = db.batch();
   batch.delete(db.collection("favorites").doc(id));
-  batch.delete(db.collection("favorites").doc(legacyFavoriteId(owner, itemId)));
+  const legacyId = legacyFavoriteId(owner, itemId);
+  if (legacyId) batch.delete(db.collection("favorites").doc(legacyId));
   await batch.commit();
 }
 

@@ -63,7 +63,7 @@ npx playwright test  # builds on :3100 and runs the suite
 
 ## Tests
 
-150 Playwright tests across nine files: critical user paths, responsive layouts and touch
+153 Playwright tests across nine files: critical user paths, responsive layouts and touch
 targets, accessibility (axe on every route and key overlay states, focus behaviour), motion rules
 (every keyframe animation must be transform/opacity only), the API contract, and persistence
 round trips that wipe the browser's storage, hard-reload and expect the record back from the

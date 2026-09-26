@@ -137,7 +137,12 @@ body {
   [role="switch"]::before {
     content: "";
     position: absolute;
-    inset: -10px -4px;
+    /* 44px tall whatever the switch's own height (a fixed -10px gave the
+       20px billing switch only 40px) */
+    top: calc(50% - 22px);
+    bottom: calc(50% - 22px);
+    left: -4px;
+    right: -4px;
   }
 
   /* Icon-only controls need width too */

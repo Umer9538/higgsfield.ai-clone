@@ -56,12 +56,17 @@ export function subscribeGenerated(onChange: () => void): () => void {
 }
 
 function write(next: Asset[]) {
+  // The cache is updated on both paths: once in memory mode, reads come only
+  // from it, so a write that succeeds must land there too
+  cachedList = next;
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(next));
+    const raw = JSON.stringify(next);
+    window.localStorage.setItem(KEY, raw);
+    cachedRaw = raw;
+    memoryOnly = false;
   } catch {
     // Blocked storage: keep it in memory so this session still shows it.
     memoryOnly = true;
-    cachedList = next;
   }
   window.dispatchEvent(new Event(EVENT));
 }
@@ -102,16 +107,23 @@ export function linkRemoteId(localId: string, remoteId: string): void {
   write(getGeneratedSnapshot().map((asset) => (asset.id === localId ? { ...asset, remoteId } : asset)));
 }
 
+/*
+ * Local ids deleted before their save to the backend finished. When that
+ * save lands, the new remote record must be deleted rather than linked, or
+ * the sync pill brings the deleted generation straight back.
+ */
+const deletedBeforeSync = new Set<string>();
+
 export function removeGeneratedAsset(id: string): void {
+  const target = getGeneratedSnapshot().find((asset) => asset.id === id || asset.remoteId === id);
+  if (target && !target.remoteId) deletedBeforeSync.add(target.id);
   write(getGeneratedSnapshot().filter((asset) => asset.id !== id && asset.remoteId !== id));
 }
 
+export function wasDeletedBeforeSync(localId: string): boolean {
+  return deletedBeforeSync.has(localId);
+}
+
 export function clearGeneratedAssets(): void {
-  try {
-    window.localStorage.removeItem(KEY);
-  } catch {
-    memoryOnly = true;
-    cachedList = EMPTY;
-  }
-  window.dispatchEvent(new Event(EVENT));
+  write(EMPTY);
 }

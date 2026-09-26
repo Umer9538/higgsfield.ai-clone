@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { GenerationResult, Surface } from "@/lib/workspace/types";
-import { addGeneratedAsset, linkRemoteId } from "@/lib/assets/store";
+import { addGeneratedAsset, linkRemoteId, wasDeletedBeforeSync } from "@/lib/assets/store";
 import { useOwner } from "@/lib/identity";
 import { dockKey, useWorkspace } from "./state";
 
@@ -118,7 +118,15 @@ export function GenerationProvider({
           })
             .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
             .then((data: { source?: string; item?: { id: string } }) => {
-              if (data.item?.id) linkRemoteId(localId, data.item.id);
+              const remoteId = data.item?.id;
+              if (remoteId && wasDeletedBeforeSync(localId) && owner) {
+                // Deleted while this save was in flight: finish the delete
+                void fetch(`/api/generations/${encodeURIComponent(remoteId)}?owner=${encodeURIComponent(owner)}`, {
+                  method: "DELETE",
+                }).catch(() => undefined);
+              } else if (remoteId) {
+                linkRemoteId(localId, remoteId);
+              }
               setSaved(data.source === "firestore" ? "firestore" : "memory");
             })
             .catch(() => {

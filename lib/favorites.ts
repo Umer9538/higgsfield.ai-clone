@@ -49,7 +49,9 @@ async function hydrate(owner: string) {
     const response = await fetch(`/api/favorites?owner=${encodeURIComponent(owner)}`);
     if (!response.ok) throw new Error(String(response.status));
     const data = (await response.json()) as { items: { itemId: string; title: string }[] };
-    if (state.owner === owner) {
+    // Only into a store still waiting for this owner: a duplicate response
+    // must not overwrite clicks made since the first one landed
+    if (state.owner === owner && !state.loaded) {
       set({ ...state, loaded: true, items: new Map(data.items.map((f) => [f.itemId, f.title])) });
     }
   } catch {
@@ -58,7 +60,8 @@ async function hydrate(owner: string) {
       if (state.owner === owner && !state.loaded) void hydrate(owner);
     }, RETRY_MS);
   } finally {
-    inflight = null;
+    // Only clear our own marker: an owner switch may have started another
+    if (inflight === owner) inflight = null;
   }
 }
 

@@ -67,15 +67,19 @@ function subscribe(onChange: () => void): () => void {
 }
 
 function write(user: AuthUser | null) {
+  // Updated on both paths: in memory mode reads come only from the cache, so
+  // a later write that succeeds (e.g. sign-out after a quota failure) must
+  // land there as well
+  cachedUser = user;
   try {
-    if (user) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    const raw = user ? JSON.stringify(user) : null;
+    if (raw) window.localStorage.setItem(STORAGE_KEY, raw);
     else window.localStorage.removeItem(STORAGE_KEY);
+    cachedRaw = raw;
+    memoryOnly = false;
   } catch {
     // Blocked storage: keep it in memory so sign-in still works in this tab.
-    // (Setting cachedRaw alone did not: the next read found storage empty and
-    // reset the user to null.)
     memoryOnly = true;
-    cachedUser = user;
   }
   window.dispatchEvent(new Event(EVENT));
 }
