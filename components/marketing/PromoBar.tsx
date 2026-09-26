@@ -29,7 +29,7 @@ export function PromoBar() {
   const seconds = remaining % 60;
 
   return (
-    <div className="relative bg-gradient-to-r from-hf-lime via-[#e8ff4d] to-hf-lime text-black">
+    <div className="relative bg-gradient-to-r from-hf-accent via-[#e8ff4d] to-hf-accent text-black">
       <div className="flex items-center gap-3 px-4 py-2.5 pr-10 sm:justify-center">
         <span className="hidden shrink-0 items-center gap-2 sm:flex">
           <span className="rounded bg-hf-pink px-1.5 py-0.5 text-[10px] font-semibold text-white uppercase">

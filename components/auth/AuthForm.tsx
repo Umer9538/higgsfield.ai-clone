@@ -90,11 +90,11 @@ export function AuthForm({
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="mt-1.5 h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+              className="mt-1.5 h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
             />
             <button
               type="submit"
-              className="mt-5 h-11 w-full rounded-xl bg-hf-lime text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              className="mt-5 h-11 w-full rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
             >
               Send code
             </button>
@@ -131,7 +131,7 @@ export function AuthForm({
                       (sibling as HTMLInputElement | undefined)?.focus();
                     }
                   }}
-                  className="h-12 w-full rounded-lg border border-hf-border bg-hf-surface-2 text-center text-lg font-semibold text-white focus:border-hf-lime focus:outline-none"
+                  className="h-12 w-full rounded-lg border border-hf-border bg-hf-surface-2 text-center text-lg font-semibold text-white focus:border-hf-accent focus:outline-none"
                 />
               ))}
             </div>
@@ -139,7 +139,7 @@ export function AuthForm({
             <button
               type="submit"
               disabled={!filled}
-              className="mt-5 h-11 w-full rounded-xl bg-hf-lime text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep disabled:cursor-not-allowed disabled:bg-hf-lime-muted disabled:text-black/60"
+              className="mt-5 h-11 w-full rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep disabled:cursor-not-allowed disabled:bg-hf-accent-muted disabled:text-black/60"
             >
               Verify and continue
             </button>
@@ -166,7 +166,7 @@ export function AuthForm({
             key={provider.id}
             type="button"
             onClick={() => complete(`${provider.id}.creator@higgsfield.ai`)}
-            className="flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-white text-sm font-medium text-black transition-opacity hover:opacity-90"
+            className="flex h-11 w-full items-center justify-center gap-2.5 rounded-2xl bg-white text-sm font-medium text-black transition-opacity hover:opacity-90"
           >
             <span aria-hidden className="text-base leading-none">
               {provider.mark}
@@ -199,7 +199,7 @@ export function AuthForm({
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="you@studio.com"
-            className="h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+            className="h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
           />
         </div>
 
@@ -214,14 +214,14 @@ export function AuthForm({
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="At least 6 characters"
-          className="mt-1.5 h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+          className="mt-1.5 h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
         />
 
         {mode === "signin" ? (
           <button
             type="button"
             onClick={() => setStage("forgot")}
-            className="mt-2 flex min-h-11 items-center text-xs text-hf-lime hover:underline"
+            className="mt-2 flex min-h-11 items-center text-xs text-hf-accent-soft hover:underline"
           >
             Forgot password?
           </button>
@@ -230,7 +230,7 @@ export function AuthForm({
         <button
           type="submit"
           disabled={busy}
-          className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-hf-lime text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep disabled:opacity-70"
+          className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep disabled:opacity-70"
         >
           {busy ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
           {mode === "signin" ? "Sign in" : "Create account"}
@@ -242,7 +242,7 @@ export function AuthForm({
         <button
           type="button"
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="font-medium text-hf-lime hover:underline"
+          className="font-medium text-hf-accent-soft hover:underline"
         >
           {mode === "signin" ? "Sign up" : "Sign in"}
         </button>

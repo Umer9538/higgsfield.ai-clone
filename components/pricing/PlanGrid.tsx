@@ -27,7 +27,7 @@ export function PlanGrid() {
       </p>
 
       <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
-        <div role="tablist" className="flex gap-1 rounded-xl border border-hf-border bg-hf-surface p-1">
+        <div role="tablist" className="flex gap-1 rounded-2xl border border-hf-border bg-hf-surface p-1">
           {(["individual", "business"] as const).map((option) => (
             <button
               key={option}
@@ -37,7 +37,7 @@ export function PlanGrid() {
               onClick={() => setAudience(option)}
               className={`rounded-lg px-4 py-2 text-sm font-medium capitalize transition-colors ${
                 audience === option
-                  ? "bg-hf-surface-4 text-hf-lime"
+                  ? "bg-hf-surface-4 text-hf-accent-soft"
                   : "text-hf-muted hover:text-white"
               }`}
             >
@@ -49,7 +49,7 @@ export function PlanGrid() {
         <div className="flex flex-wrap items-center gap-3">
           <a
             href="#calculator"
-            className="flex items-center gap-1.5 rounded-full border border-hf-border bg-hf-surface px-3.5 py-2 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+            className="flex items-center gap-1.5 rounded-full border border-hf-border bg-hf-surface px-3.5 py-2 text-sm text-white transition-colors hover:border-hf-accent/50 hover:text-hf-accent-soft"
           >
             <Sparkles className="size-3.5" aria-hidden strokeWidth={1.75} />
             Not sure which plan?
@@ -59,7 +59,7 @@ export function PlanGrid() {
       </div>
 
       {audience === "business" ? (
-        <div className="mt-6 rounded-2xl border border-hf-border bg-hf-surface p-8 text-center">
+        <div className="mt-6 rounded-3xl border border-hf-border bg-hf-surface p-8 text-center">
           <h2 className="font-display text-xl font-bold tracking-tight text-white uppercase">
             Business plans
           </h2>
@@ -69,7 +69,7 @@ export function PlanGrid() {
           </p>
           <a
             href="/enterprise#contact-sales"
-            className="mt-5 inline-block rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+            className="mt-5 inline-block rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
           >
             Contact sales
           </a>
@@ -118,7 +118,7 @@ export function PlanGrid() {
                 toast(`${chosen.name} plan added to your cart`);
                 setChosen(null);
               }}
-              className="mt-5 w-full rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              className="mt-5 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
             >
               Continue to checkout
             </button>

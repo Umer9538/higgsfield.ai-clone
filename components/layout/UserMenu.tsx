@@ -40,7 +40,7 @@ export function UserMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex size-9 items-center justify-center rounded-full bg-hf-surface-4 text-xs font-bold text-hf-lime uppercase ring-2 ring-hf-lime"
+        className="flex size-9 items-center justify-center rounded-full bg-hf-surface-4 text-xs font-bold text-hf-accent-soft uppercase ring-2 ring-hf-accent"
       >
         {user?.handle.slice(0, 1) ?? "?"}
       </button>
@@ -49,7 +49,7 @@ export function UserMenu() {
         <div
           role="menu"
           aria-label="Account menu"
-          className="absolute top-full right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
+          className="absolute top-full right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
         >
           <p className="truncate border-b border-hf-border px-3 py-2.5 text-xs text-hf-dim">
             {user?.email}

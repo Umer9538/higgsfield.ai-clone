@@ -47,11 +47,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <div
             key={item.id}
             data-toast
-            className="pointer-events-auto flex w-full max-w-sm items-center gap-2.5 rounded-xl border border-hf-border bg-hf-surface-3 px-4 py-3 shadow-lg"
+            className="pointer-events-auto flex w-full max-w-sm items-center gap-2.5 rounded-2xl border border-hf-border bg-hf-surface-3 px-4 py-3 shadow-lg"
           >
             <span
               className={`flex size-5 shrink-0 items-center justify-center rounded-full ${
-                item.tone === "success" ? "bg-hf-lime text-black" : "bg-hf-surface-4 text-hf-lime"
+                item.tone === "success" ? "bg-hf-accent text-black" : "bg-hf-surface-4 text-hf-accent-soft"
               }`}
             >
               {item.tone === "success" ? (

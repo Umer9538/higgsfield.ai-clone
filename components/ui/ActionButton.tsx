@@ -7,8 +7,8 @@ import { downloadAsset } from "@/lib/ui/download";
 type Variant = "lime" | "outline" | "ghost" | "white";
 
 const VARIANTS: Record<Variant, string> = {
-  lime: "bg-hf-lime text-black hover:bg-hf-lime-deep font-semibold",
-  outline: "border border-hf-border text-white hover:border-hf-lime/50 hover:text-hf-lime",
+  lime: "bg-hf-accent text-black hover:bg-hf-accent-deep font-semibold",
+  outline: "border border-hf-border text-white hover:border-hf-accent/50 hover:text-hf-accent-soft",
   ghost: "text-hf-muted hover:text-white",
   white: "bg-white text-black hover:bg-white/90 font-medium",
 };
@@ -53,7 +53,7 @@ export function ActionButton({
         }
         if (toggleLabel) setDone((prev) => !prev);
       }}
-      className={`rounded-xl px-5 py-3 text-sm transition-colors ${VARIANTS[variant]} ${className}`}
+      className={`rounded-2xl px-5 py-3 text-sm transition-colors ${VARIANTS[variant]} ${className}`}
     >
       {done && toggleLabel ? toggleLabel : children}
     </button>

@@ -10,7 +10,7 @@ import { routeFor } from "@/lib/routes";
 export function SiteFooter() {
   return (
     <footer className="mt-16">
-      <div className="bg-hf-lime text-black">
+      <div className="bg-hf-accent text-black">
         <div className="px-4 py-12 sm:py-16">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
             <h2 className="font-display text-4xl leading-[0.95] font-bold tracking-tight uppercase sm:text-5xl">

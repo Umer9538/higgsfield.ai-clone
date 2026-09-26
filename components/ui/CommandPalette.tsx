@@ -100,7 +100,7 @@ export function CommandPalette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-hf-border bg-hf-surface shadow-2xl"
+        className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border border-hf-border bg-hf-surface shadow-2xl"
       >
         <div className="flex items-center gap-2.5 border-b border-hf-border px-4">
           <Search className="size-4 shrink-0 text-hf-dim" aria-hidden strokeWidth={1.75} />
@@ -160,7 +160,7 @@ export function CommandPalette() {
                           onMouseEnter={() => setActive(index)}
                           onClick={() => run(item)}
                           className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                            selected ? "bg-hf-surface-4 text-hf-lime" : "text-white hover:bg-hf-surface-3"
+                            selected ? "bg-hf-surface-4 text-hf-accent-soft" : "text-white hover:bg-hf-surface-3"
                           }`}
                         >
                           {item.label}
@@ -168,7 +168,7 @@ export function CommandPalette() {
                             <span className="ml-auto truncate text-[11px] text-hf-dim">{item.href}</span>
                           ) : null}
                           {selected ? (
-                            <CornerDownLeft className="size-3.5 shrink-0 text-hf-lime" aria-hidden strokeWidth={2} />
+                            <CornerDownLeft className="size-3.5 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={2} />
                           ) : null}
                         </button>
                       </li>

@@ -22,10 +22,10 @@ export function GenerateButton({
       disabled={inactive}
       onClick={start}
       aria-busy={busy}
-      className={`flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-base font-semibold text-black transition-colors ${
+      className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-base font-semibold text-black transition-colors ${
         inactive
-          ? "cursor-not-allowed bg-hf-lime-muted text-black/60"
-          : "bg-hf-lime hover:bg-hf-lime-deep"
+          ? "cursor-not-allowed bg-hf-accent-muted text-black/60"
+          : "bg-hf-accent hover:bg-hf-accent-deep"
       } ${className}`}
     >
       {busy ? "Generating…" : "Generate"}

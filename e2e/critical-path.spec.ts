@@ -221,7 +221,9 @@ test("genjutsu and effects use the panel shell; studios use the dock", async ({ 
   await expect(page.getByPlaceholder(/Describe your scene/)).toBeVisible();
 });
 
-const LIME = "rgb(209, 254, 23)";
+// Electric Violet #8B5CF6 for fills, #A78BFA for text on dark surfaces.
+const ACCENT = "rgb(139, 92, 246)";
+const ACCENT_SOFT = "rgb(167, 139, 250)";
 
 test("header shows signed-out controls by default on every public page", async ({ page }) => {
   for (const route of ["/", "/pricing", "/ai/video", "/mcp", "/supercomputer"]) {
@@ -382,25 +384,25 @@ test("onboarding prompts once: first sign-up detours, later sign-ups do not", as
   await expect(page).toHaveURL(/\/explore$/);
 });
 
-test("lime renders as #d1fe17 on the active link, New badge and Generate", async ({ page }) => {
+test("the accent renders as Electric Violet on the active link, New badge and Generate", async ({ page }) => {
   await page.goto("/ai/genjutsu");
 
   const active = page
     .getByRole("navigation", { name: "Main" })
     .getByRole("link", { name: /^Genjutsu/ });
-  await expect(active).toHaveCSS("color", LIME);
+  await expect(active).toHaveCSS("color", ACCENT_SOFT);
 
   // New badge: solid lime background, black text
   const newBadge = page
     .getByRole("navigation", { name: "Main" })
     .getByText("New", { exact: true })
     .first();
-  await expect(newBadge).toHaveCSS("background-color", LIME);
+  await expect(newBadge).toHaveCSS("background-color", ACCENT);
   await expect(newBadge).toHaveCSS("color", "rgb(0, 0, 0)");
 
   // Primary action: solid lime background, black text
   const generate = page.getByRole("button", { name: /^Generate/ });
-  await expect(generate).toHaveCSS("background-color", LIME);
+  await expect(generate).toHaveCSS("background-color", ACCENT);
   await expect(generate).toHaveCSS("color", "rgb(0, 0, 0)");
 });
 
@@ -869,7 +871,7 @@ test("supercomputer tabs filter the showcase grid, not just the label", async ({
     await expect(label).toContainText(`Showing ${count} ${expected} projects`);
 
     // Every rendered card belongs to the chosen category
-    const badges = await cards.locator("span.text-hf-lime").allTextContents();
+    const badges = await cards.locator("span.text-hf-accent-soft").allTextContents();
     expect(new Set(badges.map((b) => b.trim()))).toEqual(new Set([tab]));
   }
 

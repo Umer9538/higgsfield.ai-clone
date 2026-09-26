@@ -18,7 +18,7 @@ export default function OriginalsPage() {
       <AppHeader activeNav="originals" />
       <main className="mx-auto max-w-6xl px-4 py-10">
         {/* Feature hero */}
-        <section className="relative overflow-hidden rounded-2xl border border-hf-border">
+        <section className="relative overflow-hidden rounded-3xl border border-hf-border">
           <div className="relative aspect-[21/9] w-full bg-gradient-to-br from-hf-surface-4 via-hf-surface-3 to-hf-black">
             <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10">
               <h1 className="font-display text-3xl leading-tight font-bold tracking-tight text-white uppercase sm:text-4xl lg:text-5xl">
@@ -61,7 +61,7 @@ export default function OriginalsPage() {
           <RailHeading title={ORIGINALS.comingSoon.title} />
           <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
             {ORIGINALS.films.slice(4, 8).map((film, index) => (
-              <li key={film} className="rounded-xl border border-hf-border bg-hf-surface p-3">
+              <li key={film} className="rounded-2xl border border-hf-border bg-hf-surface p-3">
                 <MediaTile src={tile(index + 9)} />
                 <p className="mt-2 truncate text-xs font-medium text-white">{film}</p>
                 <ActionButton
@@ -85,12 +85,12 @@ export default function OriginalsPage() {
             {ORIGINALS.winners.entries.map((entry, index) => (
               <li
                 key={entry.handle}
-                className={`rounded-2xl border p-5 ${
-                  index === 0 ? "border-hf-lime/40 bg-hf-lime/5" : "border-hf-border bg-hf-surface"
+                className={`rounded-3xl border p-5 ${
+                  index === 0 ? "border-hf-accent/40 bg-hf-accent/5" : "border-hf-border bg-hf-surface"
                 }`}
               >
                 <Trophy
-                  className={`size-4 ${index === 0 ? "text-hf-lime" : "text-hf-dim"}`}
+                  className={`size-4 ${index === 0 ? "text-hf-accent-soft" : "text-hf-dim"}`}
                   aria-hidden
                   strokeWidth={1.75}
                 />
@@ -105,7 +105,7 @@ export default function OriginalsPage() {
         </section>
 
         {/* Promo */}
-        <section className="mt-12 overflow-hidden rounded-2xl border border-hf-border bg-gradient-to-r from-[#161c07] to-hf-black p-6 sm:p-8">
+        <section className="mt-12 overflow-hidden rounded-3xl border border-hf-border bg-gradient-to-r from-[#161c07] to-hf-black p-6 sm:p-8">
           <span className="rounded bg-hf-pink px-2 py-0.5 text-[11px] font-semibold text-white">
             {ORIGINALS.promo.badge}
           </span>

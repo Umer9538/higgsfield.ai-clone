@@ -22,7 +22,7 @@ export function ContactSales() {
           <ul className="mt-6 space-y-2.5">
             {SALES_FEATURES.map((feature) => (
               <li key={feature} className="flex items-start gap-2.5 text-sm text-white">
-                <Check className="mt-0.5 size-4 shrink-0 text-hf-lime" aria-hidden strokeWidth={2.5} />
+                <Check className="mt-0.5 size-4 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={2.5} />
                 {feature}
               </li>
             ))}
@@ -41,9 +41,9 @@ export function ContactSales() {
                     type="button"
                     aria-pressed={active}
                     onClick={() => setTier(option.id)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+                    className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition-colors ${
                       active
-                        ? "border-hf-lime/60 bg-hf-lime/10"
+                        ? "border-hf-accent/60 bg-hf-accent/10"
                         : "border-hf-border bg-hf-surface hover:border-hf-border"
                     }`}
                   >
@@ -51,14 +51,14 @@ export function ContactSales() {
                       <span className="flex items-center gap-2 text-sm font-medium text-white">
                         {option.label}
                         {option.featured ? (
-                          <span className="rounded bg-hf-lime px-1.5 py-0.5 text-[10px] font-semibold text-black">
+                          <span className="rounded bg-hf-accent px-1.5 py-0.5 text-[10px] font-semibold text-black">
                             Popular
                           </span>
                         ) : null}
                       </span>
                       <span className="mt-0.5 block text-xs text-hf-dim">{option.seats}</span>
                     </span>
-                    <span className={`text-xs ${active ? "text-hf-lime" : "text-hf-muted"}`}>
+                    <span className={`text-xs ${active ? "text-hf-accent-soft" : "text-hf-muted"}`}>
                       {option.credits}
                     </span>
                   </button>
@@ -69,7 +69,7 @@ export function ContactSales() {
         </div>
 
         <form
-          className="rounded-2xl border border-hf-border bg-hf-surface p-5 sm:p-6"
+          className="rounded-3xl border border-hf-border bg-hf-surface p-5 sm:p-6"
           onSubmit={(event) => {
             event.preventDefault();
             setSent(true);
@@ -86,7 +86,7 @@ export function ContactSales() {
                   name={field.id}
                   type={field.type}
                   required={field.id !== "website"}
-                  className="mt-1.5 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 py-2.5 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+                  className="mt-1.5 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 py-2.5 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
                 />
               </div>
             ))}
@@ -99,7 +99,7 @@ export function ContactSales() {
                 id="reason"
                 name="reason"
                 defaultValue={CONTACT_REASONS[0]}
-                className="mt-1.5 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 py-2.5 text-sm text-white focus:border-hf-lime/50 focus:outline-none"
+                className="mt-1.5 w-full rounded-lg border border-hf-border bg-hf-surface-2 px-3 py-2.5 text-sm text-white focus:border-hf-accent/50 focus:outline-none"
               >
                 {CONTACT_REASONS.map((reason) => (
                   <option key={reason} value={reason}>
@@ -112,7 +112,7 @@ export function ContactSales() {
 
           <button
             type="submit"
-            className="mt-6 w-full rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+            className="mt-6 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
           >
             Contact Sales
           </button>
@@ -120,7 +120,7 @@ export function ContactSales() {
           {sent ? (
             <p
               role="status"
-              className="mt-3 rounded-lg bg-hf-lime/10 px-3 py-2.5 text-center text-xs text-hf-lime"
+              className="mt-3 rounded-lg bg-hf-accent/10 px-3 py-2.5 text-center text-xs text-hf-accent-soft"
             >
               Thanks — a specialist will be in touch about the {CREDIT_TIERS.find((t) => t.id === tier)?.label} volume.
             </p>

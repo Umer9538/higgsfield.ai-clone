@@ -24,7 +24,7 @@ export function BillingToggle({
         aria-label="Bill annually"
         onClick={() => onChange(annual ? "monthly" : "annual")}
         className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-          annual ? "bg-hf-lime" : "bg-hf-surface-4"
+          annual ? "bg-hf-accent" : "bg-hf-surface-4"
         }`}
       >
         <span

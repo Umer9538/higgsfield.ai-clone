@@ -25,8 +25,8 @@ export default function CanvasPage() {
           <RailHeading title={CANVAS.stepsTitle} />
           <ol className="mt-4 grid gap-4 sm:grid-cols-3">
             {CANVAS.steps.map((step) => (
-              <li key={step.title} className="rounded-2xl border border-hf-border bg-hf-surface p-5">
-                <span className="text-xs text-hf-lime">{step.step}</span>
+              <li key={step.title} className="rounded-3xl border border-hf-border bg-hf-surface p-5">
+                <span className="text-xs text-hf-accent-soft">{step.step}</span>
                 <h3 className="mt-2 text-sm font-semibold text-white">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-hf-muted">{step.body}</p>
               </li>
@@ -34,7 +34,7 @@ export default function CanvasPage() {
           </ol>
         </section>
 
-        <section className="mt-14 rounded-2xl border border-hf-border bg-hf-surface p-6 sm:p-8">
+        <section className="mt-14 rounded-3xl border border-hf-border bg-hf-surface p-6 sm:p-8">
           <h2 className="font-display text-xl font-bold tracking-tight text-white uppercase">
             {CANVAS.featureTitle}
           </h2>

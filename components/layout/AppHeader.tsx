@@ -53,7 +53,7 @@ function NavBadge({ tone }: { tone: Badge }) {
   return (
     <span
       className={`rounded px-1.5 py-0.5 text-[10px] leading-none font-semibold ${
-        tone === "New" ? "bg-hf-lime text-black" : "bg-hf-lime/15 text-hf-lime"
+        tone === "New" ? "bg-hf-accent text-black" : "bg-hf-accent/15 text-hf-accent-soft"
       }`}
     >
       {tone}
@@ -112,7 +112,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={`flex shrink-0 items-center gap-1.5 transition-colors ${
-                    active ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+                    active ? "font-medium text-hf-accent-soft" : "text-hf-muted hover:text-white"
                   }`}
                 >
                   {content}
@@ -146,7 +146,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
           <Link
             href="/pricing"
             aria-current={activeNav === "pricing" ? "page" : undefined}
-            className="relative hidden items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-hf-lime/50 sm:flex"
+            className="relative hidden items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-hf-accent/50 sm:flex"
           >
             <Diamond className="size-3.5" aria-hidden strokeWidth={1.75} />
             Pricing
@@ -161,7 +161,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
                 href="/enterprise"
                 aria-current={activeNav === "enterprise" ? "page" : undefined}
                 className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
-                  activeNav === "enterprise" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+                  activeNav === "enterprise" ? "font-medium text-hf-accent-soft" : "text-hf-muted hover:text-white"
                 }`}
               >
                 <Sparkles className="size-3.5" aria-hidden strokeWidth={1.75} />
@@ -172,10 +172,10 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
                 href="/assets"
                 aria-current={activeNav === "assets" ? "page" : undefined}
                 className={`hidden items-center gap-1.5 text-sm transition-colors lg:flex ${
-                  activeNav === "assets" ? "font-medium text-hf-lime" : "text-hf-muted hover:text-white"
+                  activeNav === "assets" ? "font-medium text-hf-accent-soft" : "text-hf-muted hover:text-white"
                 }`}
               >
-                <span className="size-4 rounded bg-hf-lime/70" aria-hidden />
+                <span className="size-4 rounded bg-hf-accent/70" aria-hidden />
                 Assets
               </Link>
 
@@ -204,7 +204,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
               <button
                 type="button"
                 onClick={() => setAuthMode("signup")}
-                className="flex min-h-11 items-center rounded-full bg-hf-lime px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+                className="flex min-h-11 items-center rounded-full bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
               >
                 Sign up
               </button>
@@ -221,7 +221,7 @@ export function AppHeader({ activeNav }: { activeNav?: string }) {
               type="search"
               autoFocus
               placeholder="Search models, presets and creators"
-              className="w-full rounded-lg border border-hf-border bg-hf-surface px-3 py-2 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+              className="w-full rounded-lg border border-hf-border bg-hf-surface px-3 py-2 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
             />
           </label>
         </div>

@@ -67,7 +67,7 @@ function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
   const progress = duration > 0 ? (current / duration) * 100 : 0;
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-hf-border bg-black">
+    <div className="group relative overflow-hidden rounded-2xl border border-hf-border bg-black">
       <video
         ref={videoRef}
         src={src}
@@ -87,7 +87,7 @@ function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
           aria-label="Play"
           className="absolute inset-0 flex items-center justify-center bg-black/30"
         >
-          <span className="flex size-14 items-center justify-center rounded-full bg-hf-lime text-black">
+          <span className="flex size-14 items-center justify-center rounded-full bg-hf-accent text-black">
             <Play className="size-6 translate-x-0.5" aria-hidden fill="currentColor" strokeWidth={0} />
           </span>
         </button>
@@ -107,7 +107,7 @@ function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
             video.currentTime = Number(event.target.value);
             setCurrent(Number(event.target.value));
           }}
-          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/25 accent-hf-lime"
+          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/25 accent-hf-accent"
           style={{
             background: `linear-gradient(to right, #d1fe17 ${progress}%, rgba(255,255,255,0.25) ${progress}%)`,
           }}
@@ -204,13 +204,13 @@ export function ResultCard({ result }: { result: GenerationResult }) {
     <div className="mx-auto max-w-3xl">
       <div className="flex items-center justify-between gap-4">
         <p className="flex items-center gap-2 text-sm font-medium text-white">
-          <span className="size-1.5 rounded-full bg-hf-lime" aria-hidden />
+          <span className="size-1.5 rounded-full bg-hf-accent" aria-hidden />
           Generation complete
         </p>
         <button
           type="button"
           onClick={reset}
-          className="flex items-center gap-1.5 rounded-full border border-hf-border px-3 py-1.5 text-xs text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+          className="flex items-center gap-1.5 rounded-full border border-hf-border px-3 py-1.5 text-xs text-white transition-colors hover:border-hf-accent/50 hover:text-hf-accent-soft"
         >
           <RotateCcw className="size-3.5" aria-hidden strokeWidth={1.75} />
           New generation
@@ -221,7 +221,7 @@ export function ResultCard({ result }: { result: GenerationResult }) {
         {result.kind === "video" ? (
           <VideoPlayer src={result.src} poster={result.poster} />
         ) : (
-          <div className="overflow-hidden rounded-xl border border-hf-border">
+          <div className="overflow-hidden rounded-2xl border border-hf-border">
             <Image
               src={result.src}
               alt="Generated result"

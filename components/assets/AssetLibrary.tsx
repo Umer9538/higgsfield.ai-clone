@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { downloadAsset } from "@/lib/ui/download";
@@ -17,6 +17,32 @@ import {
   Wand2,
 } from "lucide-react";
 import { ASSETS, FOLDERS, type Asset, type AssetKind } from "@/lib/assets/content";
+
+interface RemoteGeneration {
+  id: string;
+  prompt: string;
+  model: string;
+  kind: AssetKind;
+  src: string;
+  poster?: string | null;
+  spec: string;
+  createdAt: string;
+}
+
+/** Shape a stored generation into the card model the library renders. */
+function toAsset(item: RemoteGeneration): Asset {
+  return {
+    id: item.id,
+    title: `${item.kind === "video" ? "Generation" : "Render"} ${item.createdAt.slice(11, 16)}`,
+    kind: item.kind,
+    model: item.model,
+    prompt: item.prompt,
+    createdAt: item.createdAt.slice(0, 10),
+    src: item.src,
+    poster: item.poster ?? undefined,
+    meta: item.spec,
+  };
+}
 import {
   getGeneratedServerSnapshot,
   getGeneratedSnapshot,
@@ -54,7 +80,7 @@ function AssetCard({
   copied: boolean;
 }) {
   return (
-    <li className="group relative overflow-hidden rounded-xl border border-hf-border bg-hf-surface">
+    <li className="group relative overflow-hidden rounded-2xl border border-hf-border bg-hf-surface">
       <div className="relative aspect-video w-full bg-hf-surface-3">
         {asset.kind === "audio" ? (
           <span className="flex h-full items-center justify-center text-hf-dim">
@@ -94,7 +120,7 @@ function AssetCard({
             className="flex size-11 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur transition-colors hover:bg-white/25 md:size-8"
           >
             {copied ? (
-              <Check className="size-4 text-hf-lime" aria-hidden strokeWidth={2.5} />
+              <Check className="size-4 text-hf-accent-soft" aria-hidden strokeWidth={2.5} />
             ) : (
               <Copy className="size-4" aria-hidden strokeWidth={1.75} />
             )}
@@ -103,7 +129,7 @@ function AssetCard({
             href={`/ai/${asset.kind === "audio" ? "audio" : asset.kind}?prompt=${encodeURIComponent(asset.prompt)}`}
             aria-label={`Open ${asset.title} in Studio`}
             title="Open in Studio"
-            className="flex size-11 items-center justify-center rounded-lg bg-hf-lime text-black transition-colors hover:bg-hf-lime-deep md:size-8"
+            className="flex size-11 items-center justify-center rounded-lg bg-hf-accent text-black transition-colors hover:bg-hf-accent-deep md:size-8"
           >
             <Wand2 className="size-4" aria-hidden strokeWidth={1.75} />
           </Link>
@@ -144,9 +170,52 @@ export function AssetLibrary() {
     getGeneratedServerSnapshot,
   );
 
+  // Anything persisted by the backend, including from another device.
+  // Fetched items wait in `pending` until the user merges them: inserting them
+  // after first paint pushed the whole grid down (measured CLS 0.366).
+  const [remote, setRemote] = useState<Asset[]>([]);
+  const [pending, setPending] = useState<Asset[]>([]);
+  const [source, setSource] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/generations?limit=50")
+      .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
+      .then((data: { items?: RemoteGeneration[]; source?: string }) => {
+        if (cancelled) return;
+        setSource(data.source ?? null);
+        setPending((data.items ?? []).map(toAsset));
+      })
+      .catch(() => {
+        // Backend unavailable: the local store still renders.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const shownKeys = useMemo(
+    () => new Set([...generated, ...remote].map((a) => `${a.kind}:${a.prompt}:${a.createdAt}`)),
+    [generated, remote],
+  );
+  const freshPending = pending.filter(
+    (asset) => !shownKeys.has(`${asset.kind}:${asset.prompt}:${asset.createdAt}`),
+  );
+
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return [...generated, ...ASSETS]
+    // De-duplicate: a generation made in this tab is in both stores.
+    const seen = new Set<string>();
+    const merged = [...generated, ...remote, ...ASSETS].filter((asset) => {
+      const key = `${asset.kind}:${asset.prompt}:${asset.createdAt}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    return merged
       .filter((asset) => !deleted.includes(asset.id))
       .filter((asset) => (tab === "all" || tab === "folders" ? true : asset.kind === tab))
       .filter(
@@ -161,7 +230,7 @@ export function AssetLibrary() {
           ? b.createdAt.localeCompare(a.createdAt)
           : a.createdAt.localeCompare(b.createdAt),
       );
-  }, [tab, query, sort, deleted, generated]);
+  }, [tab, query, sort, deleted, generated, remote]);
 
   const download = async (asset: Asset) => {
     const filename = asset.src.split("/").pop() ?? `${asset.id}.jpg`;
@@ -200,7 +269,7 @@ export function AssetLibrary() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search assets"
-              className="w-52 rounded-lg border border-hf-border bg-hf-surface py-2 pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+              className="w-52 rounded-lg border border-hf-border bg-hf-surface py-2 pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
             />
           </label>
 
@@ -210,7 +279,7 @@ export function AssetLibrary() {
               value={sort}
               onChange={(event) => setSort(event.target.value as Sort)}
               aria-label="Sort assets"
-              className="rounded-lg border border-hf-border bg-hf-surface px-3 py-2 text-sm text-white focus:border-hf-lime/50 focus:outline-none"
+              className="rounded-lg border border-hf-border bg-hf-surface px-3 py-2 text-sm text-white focus:border-hf-accent/50 focus:outline-none"
             >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -218,6 +287,25 @@ export function AssetLibrary() {
           </label>
         </div>
       </div>
+
+      {freshPending.length > 0 ? (
+        <button
+          type="button"
+          data-sync-pill
+          onClick={() => {
+            setRemote((prev) => [...freshPending, ...prev]);
+            setPending([]);
+            toast(`${freshPending.length} synced ${freshPending.length === 1 ? "generation" : "generations"} added`);
+          }}
+          className="mt-5 flex min-h-11 items-center gap-2 rounded-full border border-hf-cyan/50 bg-hf-cyan/10 px-4 text-sm text-hf-cyan transition-colors hover:bg-hf-cyan/20 md:min-h-0 md:py-2"
+        >
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-hf-cyan opacity-60 motion-reduce:animate-none" />
+            <span className="relative inline-flex size-2 rounded-full bg-hf-cyan" />
+          </span>
+          {freshPending.length} synced {freshPending.length === 1 ? "generation" : "generations"} — show
+        </button>
+      ) : null}
 
       <div role="tablist" aria-label="Asset type" className="mt-6 flex flex-wrap gap-1">
         {TABS.map((item) => {
@@ -230,7 +318,7 @@ export function AssetLibrary() {
               aria-selected={active}
               onClick={() => setTab(item.id)}
               className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                active ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
               }`}
             >
               {item.label}
@@ -250,9 +338,9 @@ export function AssetLibrary() {
                   setQuery("");
                   toast(`Opened ${folder.name}`);
                 }}
-                className="flex w-full items-center gap-3 rounded-xl border border-hf-border bg-hf-surface p-4 text-left transition-colors hover:border-hf-lime/40 hover:bg-hf-surface-3"
+                className="flex w-full items-center gap-3 rounded-2xl border border-hf-border bg-hf-surface p-4 text-left transition-colors hover:border-hf-accent/40 hover:bg-hf-surface-3"
               >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-hf-surface-4 text-hf-lime">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-hf-surface-4 text-hf-accent-soft">
                   <Folder className="size-4" aria-hidden strokeWidth={1.75} />
                 </span>
                 <span className="min-w-0">
@@ -264,7 +352,7 @@ export function AssetLibrary() {
           ))}
         </ul>
       ) : visible.length === 0 ? (
-        <p className="mt-10 rounded-2xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
+        <p className="mt-10 rounded-3xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
           No assets match that search.
         </p>
       ) : (
@@ -282,9 +370,20 @@ export function AssetLibrary() {
         </ul>
       )}
 
-      <p aria-live="polite" className="mt-6 text-xs text-hf-dim">
-        {tab === "folders" ? `${FOLDERS.length} folders` : `${visible.length} assets`}
-      </p>
+      <div className="mt-6 flex items-center gap-2 text-xs text-hf-dim">
+        <p aria-live="polite">
+          {tab === "folders" ? `${FOLDERS.length} folders` : `${visible.length} assets`}
+        </p>
+        {/* Sibling, not inside the count: the count line is a stable contract. */}
+        {source ? (
+          <span
+            data-asset-source
+            className="rounded-full border border-hf-border px-2 py-0.5 text-[10px] tracking-wide uppercase"
+          >
+            {source}
+          </span>
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export function Faq() {
         {FAQS.map((faq, index) => {
           const expanded = open === index;
           return (
-            <li key={faq.question} className="overflow-hidden rounded-xl bg-hf-surface-3">
+            <li key={faq.question} className="overflow-hidden rounded-2xl bg-hf-surface-3">
               <h3>
                 <button
                   type="button"
@@ -30,7 +30,7 @@ export function Faq() {
                   <span className="text-sm font-medium text-white">{faq.question}</span>
                   <ChevronDown
                     className={`size-4 shrink-0 text-hf-muted transition-transform ${
-                      expanded ? "rotate-180 text-hf-lime" : ""
+                      expanded ? "rotate-180 text-hf-accent-soft" : ""
                     }`}
                     aria-hidden
                     strokeWidth={1.75}
@@ -56,7 +56,7 @@ export function Faq() {
         <span className="text-sm text-hf-muted">Are you ready?</span>
         <a
           href="#top"
-          className="rounded-lg bg-hf-lime px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+          className="rounded-lg bg-hf-accent px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
         >
           Choose your plan
         </a>

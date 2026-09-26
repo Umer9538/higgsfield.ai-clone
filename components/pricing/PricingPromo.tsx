@@ -6,7 +6,7 @@ import { PRICING_PROMO } from "@/lib/pricing/content";
 
 function Segment({ value, unit }: { value: number; unit: string }) {
   return (
-    <div className="min-w-[68px] rounded-xl bg-black/45 px-3 py-2 text-center">
+    <div className="min-w-[68px] rounded-2xl bg-black/45 px-3 py-2 text-center">
       <p className="font-display text-xl leading-none font-bold text-white tabular-nums">
         {value.toString().padStart(2, "0")}
       </p>
@@ -28,7 +28,7 @@ export function PricingPromo() {
   const seconds = remaining % 60;
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-hf-border">
+    <section className="relative overflow-hidden rounded-3xl border border-hf-border">
       <div className="absolute inset-0 bg-gradient-to-r from-[#2a0d1f] via-[#3d1030] to-[#5c1038]" />
 
       <div className="relative flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
@@ -47,7 +47,7 @@ export function PricingPromo() {
           <p className="mt-4 text-xs text-white/55 sm:text-sm">{PRICING_PROMO.note}</p>
         </div>
 
-        <div className="shrink-0 rounded-2xl border border-hf-pink/40 bg-black/30 p-4">
+        <div className="shrink-0 rounded-3xl border border-hf-pink/40 bg-black/30 p-4">
           <p className="flex items-center gap-1.5 text-xs text-white/70">
             <Hourglass className="size-3.5 text-hf-pink" aria-hidden strokeWidth={1.75} />
             {PRICING_PROMO.countdownLabel}

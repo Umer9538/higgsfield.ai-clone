@@ -12,7 +12,7 @@ function Headline({ text, highlight }: { text: string; highlight?: string }) {
       {highlight ? (
         <>
           {" "}
-          <span className="text-hf-lime">{highlight}</span>
+          <span className="text-hf-accent-soft">{highlight}</span>
         </>
       ) : null}
     </h1>
@@ -22,7 +22,7 @@ function Headline({ text, highlight }: { text: string; highlight?: string }) {
 /** Media tile. Assets are mirrored into public/media so nothing hotlinks at runtime. */
 function Tile({ src, className = "", sizes = "33vw" }: { src: string; className?: string; sizes?: string }) {
   return (
-    <div className={`relative overflow-hidden rounded-xl border border-hf-border bg-hf-surface-3 ${className}`}>
+    <div className={`relative overflow-hidden rounded-2xl border border-hf-border bg-hf-surface-3 ${className}`}>
       <Image src={src} alt="" fill sizes={sizes} className="object-cover" />
     </div>
   );
@@ -50,7 +50,7 @@ export function ContentPane({ content }: { content: Content }) {
         </div>
 
         {content.footer ? (
-          <div className="mt-8 rounded-2xl border border-hf-border bg-hf-surface p-5">
+          <div className="mt-8 rounded-3xl border border-hf-border bg-hf-surface p-5">
             <p className="text-sm font-medium text-white">{content.footer.title}</p>
             <p className="mt-1 text-sm text-hf-muted">{content.footer.sub}</p>
           </div>
@@ -66,12 +66,12 @@ export function ContentPane({ content }: { content: Content }) {
   if (content.kind === "library") {
     return (
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-2xl border border-hf-border bg-hf-surface p-6 sm:p-8">
+        <div className="rounded-3xl border border-hf-border bg-hf-surface p-6 sm:p-8">
           <Headline text={content.headline} highlight={content.highlight} />
           <p className="mt-3 max-w-md text-sm leading-relaxed text-hf-muted">{content.sub}</p>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-hf-border bg-hf-surface p-5 sm:p-6">
+        <div className="mt-6 rounded-3xl border border-hf-border bg-hf-surface p-5 sm:p-6">
           <p className="text-sm font-medium text-white">{content.sectionTitle}</p>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {Array.from({ length: content.count }).map((_, index) => (
@@ -160,7 +160,7 @@ function CarouselPane({
           type="button"
           aria-label="Previous preset"
           onClick={() => step(-1)}
-          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:border-hf-lime/50 hover:text-white"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:border-hf-accent/50 hover:text-white"
         >
           <ChevronLeft className="size-4" aria-hidden strokeWidth={1.75} />
         </button>
@@ -175,7 +175,7 @@ function CarouselPane({
               aria-current={i === index ? "true" : undefined}
               onClick={() => setIndex(i)}
               className={`relative size-11 shrink-0 overflow-hidden rounded-full border transition-colors ${
-                i === index ? "border-hf-lime" : "border-hf-border hover:border-hf-lime/50"
+                i === index ? "border-hf-accent" : "border-hf-border hover:border-hf-accent/50"
               }`}
             >
               <Image
@@ -193,7 +193,7 @@ function CarouselPane({
           type="button"
           aria-label="Next preset"
           onClick={() => step(1)}
-          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:border-hf-lime/50 hover:text-white"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-hf-border text-hf-muted transition-colors hover:border-hf-accent/50 hover:text-white"
         >
           <ChevronRight className="size-4" aria-hidden strokeWidth={1.75} />
         </button>

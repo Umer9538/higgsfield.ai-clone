@@ -18,7 +18,7 @@ export function SelectRow({ label, value }: { label: string; value: string }) {
         aria-expanded={open}
         aria-haspopup="listbox"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between gap-3 rounded-xl border border-hf-border bg-hf-surface-2 px-3.5 py-3 text-left transition-colors hover:bg-hf-surface-3"
+        className="flex w-full items-center justify-between gap-3 rounded-2xl border border-hf-border bg-hf-surface-2 px-3.5 py-3 text-left transition-colors hover:bg-hf-surface-3"
       >
         <span className="min-w-0">
           <span className="block text-xs text-hf-dim">{label}</span>
@@ -35,7 +35,7 @@ export function SelectRow({ label, value }: { label: string; value: string }) {
         <ul
           role="listbox"
           aria-label={label}
-          className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
+          className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-2xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
         >
           {options.map((option) => (
             <li key={option}>
@@ -51,7 +51,7 @@ export function SelectRow({ label, value }: { label: string; value: string }) {
               >
                 {option}
                 {option === current ? (
-                  <Check className="size-3.5 text-hf-lime" aria-hidden strokeWidth={3} />
+                  <Check className="size-3.5 text-hf-accent-soft" aria-hidden strokeWidth={3} />
                 ) : null}
               </button>
             </li>
@@ -76,11 +76,11 @@ export function ValueRow({
     <button
       type="button"
       onClick={() => setCurrent(nextPillValue(current))}
-      className="flex w-full items-center justify-between gap-3 rounded-xl border border-hf-border bg-hf-surface-2 px-3.5 py-3 transition-colors hover:bg-hf-surface-3"
+      className="flex w-full items-center justify-between gap-3 rounded-2xl border border-hf-border bg-hf-surface-2 px-3.5 py-3 transition-colors hover:bg-hf-surface-3"
     >
       <span className="text-sm font-medium text-white">{label}</span>
       <span className="flex items-center gap-1.5">
-        <span className={`text-sm font-medium ${accent ? "text-hf-lime" : "text-hf-muted"}`}>
+        <span className={`text-sm font-medium ${accent ? "text-hf-accent-soft" : "text-hf-muted"}`}>
           {current}
         </span>
         <ChevronRight className="size-4 text-hf-dim" aria-hidden strokeWidth={1.75} />
@@ -104,7 +104,7 @@ export function PillRow({ items }: { items: { icon: IconName; label: string }[] 
               prev.map((value, i) => (i === index ? nextPillValue(value) : value)),
             )
           }
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-hf-border bg-hf-surface-2 px-3 py-2.5 text-sm text-white transition-colors hover:border-hf-lime/40 hover:bg-hf-surface-3"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl border border-hf-border bg-hf-surface-2 px-3 py-2.5 text-sm text-white transition-colors hover:border-hf-accent/40 hover:bg-hf-surface-3"
         >
           <Icon name={item.icon} className="size-3.5 text-hf-dim" />
           {values[index]}
@@ -120,7 +120,7 @@ export function Stepper({ label, value }: { label: string; value: string }) {
   const [count, setCount] = useState(() => Number(value.split("/")[0] ?? 1));
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-hf-border bg-hf-surface-2 px-3.5 py-2.5">
+    <div className="flex items-center justify-between rounded-2xl border border-hf-border bg-hf-surface-2 px-3.5 py-2.5">
       <span className="text-sm font-medium text-white">{label}</span>
       <span className="flex items-center gap-3">
         <button
@@ -153,7 +153,7 @@ export function Accordion({ label, icon }: { label: string; icon?: IconName }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-xl border border-hf-border bg-hf-surface-2">
+    <div className="rounded-2xl border border-hf-border bg-hf-surface-2">
       <button
         type="button"
         aria-expanded={open}

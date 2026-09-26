@@ -21,7 +21,7 @@ export function ToggleRow({
   const [mode, setMode] = useField<string>(`${id}:mode`, segmented?.[0]?.value ?? "");
 
   return (
-    <div className="rounded-xl border border-hf-border bg-hf-surface-2 p-3.5">
+    <div className="rounded-2xl border border-hf-border bg-hf-surface-2 p-3.5">
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-medium text-white">{label}</span>
         <button
@@ -31,7 +31,7 @@ export function ToggleRow({
           aria-label={label}
           onClick={() => setOn(!on)}
           className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-            on ? "bg-hf-lime" : "bg-hf-surface-4"
+            on ? "bg-hf-accent" : "bg-hf-surface-4"
           }`}
         >
           <span
@@ -52,7 +52,7 @@ export function ToggleRow({
                 type="button"
                 onClick={() => setMode(option.value)}
                 className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors ${
-                  active ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                  active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
                 }`}
               >
                 {option.icon ? <Icon name={option.icon} className="size-3.5" /> : null}

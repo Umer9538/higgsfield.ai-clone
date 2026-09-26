@@ -16,8 +16,8 @@ const THEME: Record<PlanId, { shell: string; cta: string; name: string }> = {
     name: "text-white",
   },
   pro: {
-    shell: "border-hf-lime/25 bg-gradient-to-b from-[#161c07] to-hf-surface",
-    cta: "bg-hf-lime text-black hover:bg-hf-lime-deep",
+    shell: "border-hf-accent/25 bg-gradient-to-b from-[#161c07] to-hf-surface",
+    cta: "bg-hf-accent text-black hover:bg-hf-accent-deep",
     name: "text-white",
   },
   max: {
@@ -28,7 +28,7 @@ const THEME: Record<PlanId, { shell: string; cta: string; name: string }> = {
 };
 
 const BADGE_TONE = {
-  lime: "bg-hf-lime/15 text-hf-lime",
+  lime: "bg-hf-accent/15 text-hf-accent-soft",
   pink: "bg-hf-pink text-white",
   neutral: "bg-hf-surface-4 text-hf-muted",
   green: "bg-[#1a4d1a] text-[#6ee76e]",
@@ -38,7 +38,7 @@ function Row({ row, dimmed }: { row: FeatureRow; dimmed?: boolean }) {
   return (
     <li className="flex items-center gap-2 py-1.5 text-xs">
       {row.included ? (
-        <Check className="size-3.5 shrink-0 text-hf-lime" aria-hidden strokeWidth={2.5} />
+        <Check className="size-3.5 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={2.5} />
       ) : (
         <X className="size-3.5 shrink-0 text-hf-dim" aria-hidden strokeWidth={2.5} />
       )}
@@ -81,7 +81,7 @@ export function PlanCard({
   const locked = plan.id === "basic";
 
   return (
-    <article role="listitem" className={`flex flex-col rounded-2xl border p-5 ${theme.shell}`}>
+    <article role="listitem" className={`flex flex-col rounded-3xl border p-5 ${theme.shell}`}>
       <header>
         <div className="flex flex-wrap items-center gap-2">
           <h3 className={`font-display text-xl font-bold tracking-tight uppercase ${theme.name}`}>
@@ -103,9 +103,9 @@ export function PlanCard({
       </header>
 
       {/* Credits */}
-      <div className="mt-4 rounded-xl border border-hf-border bg-black/35 p-3.5">
+      <div className="mt-4 rounded-2xl border border-hf-border bg-black/35 p-3.5">
         <p className="flex items-center gap-1.5 text-sm font-semibold text-white">
-          <Sparkles className="size-3.5 text-hf-lime" aria-hidden strokeWidth={2} />
+          <Sparkles className="size-3.5 text-hf-accent-soft" aria-hidden strokeWidth={2} />
           {credits.toLocaleString()} credits/mo.
         </p>
         <ul className="mt-2 space-y-1">
@@ -126,7 +126,7 @@ export function PlanCard({
               value={stepIndex}
               aria-label={`${plan.name} monthly credits`}
               onChange={(event) => setStepIndex(Number(event.target.value))}
-              className="h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-lime"
+              className="h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-accent"
               style={{
                 background: `linear-gradient(to right, #d1fe17 ${(stepIndex / (steps.length - 1)) * 100}%, #292b2c ${(stepIndex / (steps.length - 1)) * 100}%)`,
               }}
@@ -164,7 +164,7 @@ export function PlanCard({
       <button
         type="button"
         onClick={() => onSelect?.(plan)}
-        className={`mt-4 w-full rounded-xl px-5 py-3 text-sm font-semibold transition-colors ${theme.cta}`}
+        className={`mt-4 w-full rounded-2xl px-5 py-3 text-sm font-semibold transition-colors ${theme.cta}`}
       >
         Get {plan.name}
       </button>
@@ -180,7 +180,7 @@ export function PlanCard({
       </p>
 
       {/* Unlimited */}
-      <section className="mt-5 rounded-xl border border-hf-border p-3.5">
+      <section className="mt-5 rounded-2xl border border-hf-border p-3.5">
         <h4 className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-hf-muted uppercase">
           <Lock className="size-3" aria-hidden strokeWidth={2} />
           Unlimited & free gens
@@ -196,7 +196,7 @@ export function PlanCard({
             type="button"
             onClick={() => setShowMore((prev) => !prev)}
             aria-expanded={showMore}
-            className="mt-1.5 flex min-h-11 w-full items-center gap-1 text-[11px] font-medium text-hf-lime md:min-h-0"
+            className="mt-1.5 flex min-h-11 w-full items-center gap-1 text-[11px] font-medium text-hf-accent-soft md:min-h-0"
           >
             {showMore ? "\u2212" : "+"} {plan.unlimitedMore}
             <ChevronRight
@@ -221,7 +221,7 @@ export function PlanCard({
 
       {/* Seedance */}
       <section
-        className={`mt-3 rounded-xl border p-3.5 ${
+        className={`mt-3 rounded-2xl border p-3.5 ${
           plan.seedance.available ? "border-[#1d4ed8]/40 bg-[#0b1c3d]" : "border-hf-border"
         }`}
       >

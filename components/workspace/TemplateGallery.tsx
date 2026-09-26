@@ -38,7 +38,7 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
                 aria-selected={active}
                 onClick={() => setCategory(item)}
                 className={`flex min-h-11 items-center rounded-lg px-3.5 text-sm font-medium transition-colors md:min-h-0 md:py-2 ${
-                  active ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                  active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
                 }`}
               >
                 {item}
@@ -58,7 +58,7 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
                 aria-selected={active}
                 onClick={() => setKind(item)}
                 className={`flex min-h-11 items-center rounded-md px-3 text-sm transition-colors md:min-h-0 md:py-1.5 ${
-                  active ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                  active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
                 }`}
               >
                 {item}
@@ -74,7 +74,7 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
       </p>
 
       {shown.length === 0 ? (
-        <p className="mt-6 rounded-2xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
+        <p className="mt-6 rounded-3xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
           No templates match that combination.
         </p>
       ) : (
@@ -84,7 +84,7 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
               <button
                 type="button"
                 onClick={() => toast(`“${item.title}” loaded into the composer`)}
-                className="group block w-full overflow-hidden rounded-xl border border-hf-border bg-hf-surface text-left transition-colors hover:border-hf-lime/40"
+                className="group block w-full overflow-hidden rounded-2xl border border-hf-border bg-hf-surface text-left transition-colors hover:border-hf-accent/40"
               >
                 <span className="relative block aspect-[4/3]">
                   <Image
@@ -98,7 +98,7 @@ export function TemplateGallery({ templates }: { templates: NonNullable<Surface[
                 <span className="block p-3">
                   <span className="block truncate text-xs font-medium text-white">{item.title}</span>
                   <span className="mt-1 flex items-center gap-1.5 text-[11px] text-hf-dim">
-                    <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-lime">
+                    <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-accent-soft">
                       {item.category}
                     </span>
                     {item.kind}

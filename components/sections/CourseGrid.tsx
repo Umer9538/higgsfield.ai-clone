@@ -41,7 +41,7 @@ export function CourseGrid() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search courses"
-            className="h-11 w-full rounded-lg border border-hf-border bg-hf-surface pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+            className="h-11 w-full rounded-lg border border-hf-border bg-hf-surface pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
           />
         </label>
 
@@ -56,7 +56,7 @@ export function CourseGrid() {
                 aria-selected={active}
                 onClick={() => setCategory(item)}
                 className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                  active ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                  active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
                 }`}
               >
                 {item}
@@ -83,7 +83,7 @@ export function CourseGrid() {
         </p>
 
         {courses.length === 0 ? (
-          <p className="mt-6 rounded-2xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
+          <p className="mt-6 rounded-3xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
             No courses match that search.
           </p>
         ) : null}
@@ -92,7 +92,7 @@ export function CourseGrid() {
           {courses.map((course, index) => (
             <li
               key={course.id}
-              className="flex flex-col overflow-hidden rounded-2xl border border-hf-border bg-hf-surface"
+              className="flex flex-col overflow-hidden rounded-3xl border border-hf-border bg-hf-surface"
             >
               <MediaTile src={tile(index + 6)} />
               <div className="flex flex-1 flex-col p-4">
@@ -100,7 +100,7 @@ export function CourseGrid() {
                 <p className="mt-2 flex-1 text-xs leading-relaxed text-hf-muted">{course.body}</p>
 
                 <ul className="mt-4 flex flex-wrap items-center gap-2 text-[11px] text-hf-dim">
-                  <li className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-lime">
+                  <li className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-accent-soft">
                     {course.category}
                   </li>
                   <li className="rounded bg-hf-surface-4 px-1.5 py-0.5">{course.level}</li>
@@ -118,7 +118,7 @@ export function CourseGrid() {
                   <button
                     type="button"
                     onClick={() => toast(`Enrolled in “${course.title}”`)}
-                    className="flex items-center gap-1.5 rounded-lg bg-hf-lime px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+                    className="flex items-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-hf-accent-deep"
                   >
                     <PlayCircle className="size-3.5" aria-hidden strokeWidth={2} />
                     Start now for free
@@ -126,7 +126,7 @@ export function CourseGrid() {
                   <button
                     type="button"
                     onClick={() => setDetail(course)}
-                    className="rounded-lg border border-hf-border px-3 py-2 text-xs text-white transition-colors hover:border-hf-lime/50"
+                    className="rounded-lg border border-hf-border px-3 py-2 text-xs text-white transition-colors hover:border-hf-accent/50"
                   >
                     View details
                   </button>
@@ -160,7 +160,7 @@ export function CourseGrid() {
                 toast(`Enrolled in “${detail.title}”`);
                 setDetail(null);
               }}
-              className="mt-5 w-full rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              className="mt-5 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
             >
               Start now for free
             </button>

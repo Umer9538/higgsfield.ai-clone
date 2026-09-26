@@ -20,8 +20,8 @@ export function Dropzone({
     <button
       type="button"
       onClick={() => input.current?.click()}
-      className={`w-full rounded-xl border border-dashed bg-hf-surface-2 px-4 py-6 text-center transition-colors hover:bg-hf-surface-3 ${
-        files.length ? "border-hf-lime/60" : "border-hf-border hover:border-hf-lime/40"
+      className={`w-full rounded-2xl border border-dashed bg-hf-surface-2 px-4 py-6 text-center transition-colors hover:bg-hf-surface-3 ${
+        files.length ? "border-hf-accent/60" : "border-hf-border hover:border-hf-accent/40"
       }`}
     >
       <input
@@ -81,8 +81,8 @@ function DropzoneTile({
     <button
       type="button"
       onClick={() => input.current?.click()}
-      className={`rounded-xl border border-dashed bg-hf-surface-2 px-3 py-6 text-center transition-colors hover:bg-hf-surface-3 ${
-        file ? "border-hf-lime/60" : "border-hf-border hover:border-hf-lime/40"
+      className={`rounded-2xl border border-dashed bg-hf-surface-2 px-3 py-6 text-center transition-colors hover:bg-hf-surface-3 ${
+        file ? "border-hf-accent/60" : "border-hf-border hover:border-hf-accent/40"
       }`}
     >
       <input

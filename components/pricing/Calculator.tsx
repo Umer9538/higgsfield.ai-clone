@@ -50,7 +50,7 @@ export function Calculator() {
       </h2>
       <p className="mt-2 text-sm text-hf-muted">{CALCULATOR.intro}</p>
 
-      <div className="mt-4 grid gap-4 rounded-2xl border border-hf-border bg-hf-surface p-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] sm:p-6">
+      <div className="mt-4 grid gap-4 rounded-3xl border border-hf-border bg-hf-surface p-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] sm:p-6">
         {/* Steps */}
         <div className="space-y-8">
           <div>
@@ -71,16 +71,16 @@ export function Calculator() {
                     type="button"
                     aria-pressed={active}
                     onClick={() => setGoals((prev) => toggle(prev, goal.id))}
-                    className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left text-xs transition-colors ${
+                    className={`flex items-center justify-between gap-2 rounded-2xl border px-3 py-2.5 text-left text-xs transition-colors ${
                       active
-                        ? "border-hf-lime/60 bg-hf-lime/10 text-white"
+                        ? "border-hf-accent/60 bg-hf-accent/10 text-white"
                         : "border-hf-border bg-hf-surface-2 text-hf-muted hover:text-white"
                     }`}
                   >
                     {goal.label}
                     <span
                       className={`flex size-4 shrink-0 items-center justify-center rounded border ${
-                        active ? "border-hf-lime bg-hf-lime text-black" : "border-hf-border"
+                        active ? "border-hf-accent bg-hf-accent text-black" : "border-hf-border"
                       }`}
                     >
                       {active ? <Check className="size-3" aria-hidden strokeWidth={3} /> : null}
@@ -115,7 +115,7 @@ export function Calculator() {
                       onChange={(event) =>
                         setCounts((prev) => ({ ...prev, [slider.id]: Number(event.target.value) }))
                       }
-                      className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-lime"
+                      className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full accent-hf-accent"
                       style={{
                         background: `linear-gradient(to right, #d1fe17 ${percent}%, #292b2c ${percent}%)`,
                       }}
@@ -146,7 +146,7 @@ export function Calculator() {
               <span className="ml-auto flex items-center gap-1.5 rounded-lg bg-hf-surface-4 px-2.5 py-1 text-[11px] text-white">
                 <Plus className="size-3" aria-hidden strokeWidth={2.5} />
                 Add features
-                <span className="rounded-full bg-hf-lime px-1.5 text-[10px] font-semibold text-black">
+                <span className="rounded-full bg-hf-accent px-1.5 text-[10px] font-semibold text-black">
                   {features.length}
                 </span>
               </span>
@@ -182,16 +182,16 @@ export function Calculator() {
         </div>
 
         {/* Recommendation */}
-        <aside className="rounded-2xl border border-hf-border bg-hf-black p-5">
+        <aside className="rounded-3xl border border-hf-border bg-hf-black p-5">
           <p className="text-center text-xs text-hf-muted">We recommend {plan.name} plan</p>
           <p className="mt-2 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-lime/15 px-2.5 py-1 text-[11px] font-medium text-hf-lime">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-accent/15 px-2.5 py-1 text-[11px] font-medium text-hf-accent-soft">
               See why
               <Info className="size-3" aria-hidden strokeWidth={2} />
             </span>
           </p>
 
-          <div className="mt-5 rounded-2xl border border-hf-lime/25 bg-gradient-to-b from-[#161c07] to-hf-surface p-4">
+          <div className="mt-5 rounded-3xl border border-hf-accent/25 bg-gradient-to-b from-[#161c07] to-hf-surface p-4">
             <div className="flex items-center gap-2">
               <h3 className="font-display text-lg font-bold tracking-tight text-white uppercase">
                 {plan.name}
@@ -207,7 +207,7 @@ export function Calculator() {
             <div className="mt-4">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-hf-muted">Expected monthly usage</span>
-                <span className="text-hf-lime tabular-nums">
+                <span className="text-hf-accent-soft tabular-nums">
                   {credits.toLocaleString()}/{ceiling.toLocaleString()} credits
                 </span>
               </div>
@@ -219,14 +219,14 @@ export function Calculator() {
                 aria-label="Expected credit usage"
                 className="mt-2 h-1.5 overflow-hidden rounded-full bg-hf-surface-4"
               >
-                <div className="h-full rounded-full bg-hf-lime" style={{ width: `${usage}%` }} />
+                <div className="h-full rounded-full bg-hf-accent" style={{ width: `${usage}%` }} />
               </div>
             </div>
 
             <ul className="mt-4 space-y-1.5">
               {plan.capabilities.slice(0, 3).map((row) => (
                 <li key={row.label} className="flex items-center gap-2 text-[11px] text-white">
-                  <Check className="size-3 shrink-0 text-hf-lime" aria-hidden strokeWidth={3} />
+                  <Check className="size-3 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={3} />
                   {row.label}
                 </li>
               ))}
@@ -245,7 +245,7 @@ export function Calculator() {
             <button
               type="button"
               onClick={() => toast(`${plan.name} plan added to your cart`)}
-              className="mt-3 w-full rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              className="mt-3 w-full rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
             >
               Get {plan.name}
             </button>

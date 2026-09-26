@@ -9,12 +9,12 @@ export function GeneratingState() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <div className="rounded-2xl border border-hf-border bg-hf-surface p-6 sm:p-8">
+      <div className="rounded-3xl border border-hf-border bg-hf-surface p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="flex items-center gap-2 text-sm font-medium text-white">
               <Loader2
-                className="size-4 animate-spin text-hf-lime motion-reduce:animate-none"
+                className="size-4 animate-spin text-hf-accent-soft motion-reduce:animate-none"
                 aria-hidden
                 strokeWidth={2}
               />
@@ -46,7 +46,7 @@ export function GeneratingState() {
             className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-hf-surface-4"
           >
             <div
-              className="h-full rounded-full bg-hf-lime transition-[width] duration-100 ease-linear"
+              className="h-full rounded-full bg-hf-accent transition-[width] duration-100 ease-linear"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -61,9 +61,9 @@ export function GeneratingState() {
                 <span
                   className={`flex size-5 shrink-0 items-center justify-center rounded-full border ${
                     complete
-                      ? "border-hf-lime bg-hf-lime text-black"
+                      ? "border-hf-accent bg-hf-accent text-black"
                       : active
-                        ? "border-hf-lime text-hf-lime"
+                        ? "border-hf-accent text-hf-accent-soft"
                         : "border-hf-border text-hf-dim"
                   }`}
                 >

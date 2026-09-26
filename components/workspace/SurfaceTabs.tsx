@@ -19,7 +19,7 @@ export function SurfaceTabs({
             aria-current={active ? "page" : undefined}
             className={`-mb-px shrink-0 border-b-2 py-3.5 text-sm font-medium transition-colors ${
               active
-                ? "border-hf-lime text-white"
+                ? "border-hf-accent text-white"
                 : "border-transparent text-hf-muted hover:text-white"
             }`}
           >

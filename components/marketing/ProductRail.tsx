@@ -5,8 +5,8 @@ import { PRODUCT_TILES, PROMO_PANEL } from "@/lib/marketing/content";
 
 const BADGE_TONES: Record<"top" | "new" | "free", string> = {
   top: "bg-hf-pink text-white",
-  new: "bg-hf-lime text-black",
-  free: "bg-hf-lime/15 text-hf-lime",
+  new: "bg-hf-accent text-black",
+  free: "bg-hf-accent/15 text-hf-accent-soft",
 };
 
 export function ProductRail() {
@@ -14,13 +14,13 @@ export function ProductRail() {
     <section id="products" aria-label="Products" className="scroll-mt-20 px-4 pt-10">
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Promo panel */}
-        <div className="relative flex min-h-64 flex-col justify-between overflow-hidden rounded-2xl border border-hf-border p-6 sm:p-8">
+        <div className="relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-hf-border p-6 sm:p-8">
           <div className="absolute inset-0 bg-gradient-to-br from-[#3a1d5c] via-hf-surface-3 to-hf-black" />
           <div className="relative">
             <h2 className="font-display text-2xl leading-tight font-bold tracking-tight uppercase sm:text-3xl">
               <span className="text-white">{PROMO_PANEL.headline}</span>
               <br />
-              <span className="text-hf-lime">{PROMO_PANEL.highlight}</span>
+              <span className="text-hf-accent-soft">{PROMO_PANEL.highlight}</span>
             </h2>
             <p className="mt-3 max-w-sm text-sm text-hf-muted">{PROMO_PANEL.sub}</p>
           </div>
@@ -43,7 +43,7 @@ export function ProductRail() {
             <li key={tile.id}>
               <Link
                 href={tile.href}
-                className="flex h-full flex-col justify-between gap-4 rounded-2xl border border-hf-border bg-hf-surface p-4 transition-colors hover:border-hf-lime/40 hover:bg-hf-surface-3"
+                className="flex h-full flex-col justify-between gap-4 rounded-3xl border border-hf-border bg-hf-surface p-4 transition-colors hover:border-hf-accent/40 hover:bg-hf-surface-3"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="size-6 rounded-md bg-hf-surface-4" aria-hidden />
@@ -87,7 +87,7 @@ export function SectionHeading({
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 className="font-display text-2xl font-bold tracking-tight text-hf-lime uppercase sm:text-3xl">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-hf-accent-soft uppercase sm:text-3xl">
           {title}
         </h2>
         <p className="mt-2 max-w-xl text-sm text-hf-muted">{sub}</p>
@@ -95,7 +95,7 @@ export function SectionHeading({
       {cta ? (
         <Link
           href="/ai/effects"
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-hf-border px-4 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-hf-border px-4 text-sm text-white transition-colors hover:border-hf-accent/50 hover:text-hf-accent-soft"
         >
           {cta}
           <ArrowRight className="size-4" aria-hidden strokeWidth={1.75} />

@@ -34,15 +34,15 @@ export function PluginDirectory() {
 
   return (
     <>
-      <section className="rounded-2xl border border-hf-border bg-gradient-to-br from-hf-surface-3 to-hf-black p-6 sm:p-8">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-lime/15 px-2.5 py-1 text-[11px] font-semibold text-hf-lime">
-          <span className="size-1.5 rounded-full bg-hf-lime" aria-hidden />
+      <section className="rounded-3xl border border-hf-border bg-gradient-to-br from-hf-surface-3 to-hf-black p-6 sm:p-8">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-accent/15 px-2.5 py-1 text-[11px] font-semibold text-hf-accent-soft">
+          <span className="size-1.5 rounded-full bg-hf-accent" aria-hidden />
           {PLUGINS.status}
         </span>
         <h1 className="mt-4 font-display text-3xl leading-tight font-bold tracking-tight text-white uppercase sm:text-4xl">
           {PLUGINS.headline[0]}
           <br />
-          <span className="text-hf-lime">{active.name}</span>
+          <span className="text-hf-accent-soft">{active.name}</span>
         </h1>
         <button
           type="button"
@@ -50,7 +50,7 @@ export function PluginDirectory() {
             if (!installed.includes(active.id)) toggle(active.id);
             toast(`${active.name} plugin installed`);
           }}
-          className="mt-6 flex items-center gap-2 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+          className="mt-6 flex items-center gap-2 rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
         >
           <Download className="size-4" aria-hidden strokeWidth={2} />
           {PLUGINS.cta}
@@ -68,8 +68,8 @@ export function PluginDirectory() {
             return (
               <li key={item.id}>
                 <div
-                  className={`rounded-2xl border p-4 transition-colors ${
-                    selected ? "border-hf-lime/50 bg-hf-lime/5" : "border-hf-border bg-hf-surface"
+                  className={`rounded-3xl border p-4 transition-colors ${
+                    selected ? "border-hf-accent/50 bg-hf-accent/5" : "border-hf-border bg-hf-surface"
                   }`}
                 >
                   <button
@@ -96,7 +96,7 @@ export function PluginDirectory() {
                       aria-label={`${isInstalled ? "Uninstall" : "Install"} ${item.name}`}
                       className={`flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors md:min-h-0 md:py-2 ${
                         isInstalled
-                          ? "bg-hf-lime/15 text-hf-lime"
+                          ? "bg-hf-accent/15 text-hf-accent-soft"
                           : "bg-hf-surface-4 text-white hover:bg-hf-border"
                       }`}
                     >
@@ -114,7 +114,7 @@ export function PluginDirectory() {
                       type="button"
                       aria-label={`Details for ${item.name}`}
                       onClick={() => setDetails(item)}
-                      className="flex min-h-11 items-center justify-center rounded-lg border border-hf-border px-3 text-xs text-white transition-colors hover:border-hf-lime/50 md:min-h-0 md:py-2"
+                      className="flex min-h-11 items-center justify-center rounded-lg border border-hf-border px-3 text-xs text-white transition-colors hover:border-hf-accent/50 md:min-h-0 md:py-2"
                     >
                       Details
                     </button>
@@ -126,7 +126,7 @@ export function PluginDirectory() {
         </ul>
       </section>
 
-      <section className="mt-12 rounded-2xl border border-hf-border bg-hf-surface p-6">
+      <section className="mt-12 rounded-3xl border border-hf-border bg-hf-surface p-6">
         <h2 className="font-display text-lg font-bold tracking-tight text-white uppercase">
           {PLUGINS.bridge.title}
         </h2>
@@ -140,7 +140,7 @@ export function PluginDirectory() {
               aria-selected={client === name}
               onClick={() => setClient(name)}
               className={`rounded-lg px-3.5 py-2 text-sm transition-colors ${
-                client === name ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                client === name ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
               }`}
             >
               {name}
@@ -148,8 +148,8 @@ export function PluginDirectory() {
           ))}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-hf-border bg-hf-surface-2 px-3 py-2.5">
-          <code className="min-w-0 flex-1 truncate font-mono text-xs text-hf-lime">
+        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-hf-border bg-hf-surface-2 px-3 py-2.5">
+          <code className="min-w-0 flex-1 truncate font-mono text-xs text-hf-accent-soft">
             {PLUGINS.bridge.url}
           </code>
           <button
@@ -159,7 +159,7 @@ export function PluginDirectory() {
             className="flex shrink-0 items-center gap-1.5 rounded-lg bg-hf-surface-4 px-2.5 py-1.5 text-xs text-white transition-colors hover:bg-hf-border"
           >
             {copied ? (
-              <Check className="size-3.5 text-hf-lime" aria-hidden strokeWidth={3} />
+              <Check className="size-3.5 text-hf-accent-soft" aria-hidden strokeWidth={3} />
             ) : (
               <Copy className="size-3.5" aria-hidden strokeWidth={1.75} />
             )}
@@ -170,7 +170,7 @@ export function PluginDirectory() {
         <ol className="mt-4 space-y-2">
           {PLUGINS.bridge.steps.map((step, index) => (
             <li key={step} className="flex gap-3 text-sm text-hf-muted">
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-hf-surface-4 text-[11px] text-hf-lime">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-hf-surface-4 text-[11px] text-hf-accent-soft">
                 {index + 1}
               </span>
               {step}
@@ -178,7 +178,7 @@ export function PluginDirectory() {
           ))}
         </ol>
 
-        <p className="mt-4 rounded-xl bg-hf-surface-2 px-4 py-3 text-sm text-hf-muted italic">
+        <p className="mt-4 rounded-2xl bg-hf-surface-2 px-4 py-3 text-sm text-hf-muted italic">
           “{PLUGINS.bridge.example}”
         </p>
 
@@ -186,7 +186,7 @@ export function PluginDirectory() {
           <span className="text-sm font-medium text-white">Connector</span>
           <span
             className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-              connected ? "bg-hf-lime/15 text-hf-lime" : "bg-hf-surface-4 text-hf-dim"
+              connected ? "bg-hf-accent/15 text-hf-accent-soft" : "bg-hf-surface-4 text-hf-dim"
             }`}
           >
             {connected ? "Connected" : "Not connected"}
@@ -202,7 +202,7 @@ export function PluginDirectory() {
               toast(connected ? `${client} connector disabled` : `${client} connector enabled`);
             }}
             className={`relative ml-auto h-6 w-11 shrink-0 rounded-full transition-colors ${
-              connected ? "bg-hf-lime" : "bg-hf-surface-4"
+              connected ? "bg-hf-accent" : "bg-hf-surface-4"
             }`}
           >
             <span
@@ -244,14 +244,14 @@ export function PluginDirectory() {
                       : `${details.name} installed`,
                   );
                 }}
-                className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-hf-lime px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-hf-accent px-4 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
               >
                 {installed.includes(details.id) ? "Uninstall" : "Install"}
               </button>
               <button
                 type="button"
                 onClick={() => toast(`${details.name} is up to date`, "info")}
-                className="flex min-h-11 items-center gap-1.5 rounded-xl border border-hf-border px-4 text-sm text-white transition-colors hover:border-hf-lime/50"
+                className="flex min-h-11 items-center gap-1.5 rounded-2xl border border-hf-border px-4 text-sm text-white transition-colors hover:border-hf-accent/50"
               >
                 <RefreshCw className="size-4" aria-hidden strokeWidth={1.75} />
                 Check for updates
@@ -259,7 +259,7 @@ export function PluginDirectory() {
               <button
                 type="button"
                 onClick={() => toast("Opening the plugin documentation", "info")}
-                className="flex min-h-11 items-center gap-1.5 rounded-xl border border-hf-border px-4 text-sm text-white transition-colors hover:border-hf-lime/50"
+                className="flex min-h-11 items-center gap-1.5 rounded-2xl border border-hf-border px-4 text-sm text-white transition-colors hover:border-hf-accent/50"
               >
                 <BookOpen className="size-4" aria-hidden strokeWidth={1.75} />
                 Docs

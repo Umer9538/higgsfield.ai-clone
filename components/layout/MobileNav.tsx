@@ -75,7 +75,7 @@ export function MobileNav({
             <input
               type="search"
               placeholder="Search models and presets"
-              className="h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-lime/50 focus:outline-none"
+              className="h-11 w-full rounded-lg border border-hf-border bg-hf-surface-2 pr-3 pl-9 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
             />
           </label>
         </div>
@@ -90,7 +90,7 @@ export function MobileNav({
                   {item.badge ? (
                     <span
                       className={`ml-auto rounded px-1.5 py-0.5 text-[10px] leading-none font-semibold ${
-                        item.badge === "New" ? "bg-hf-lime text-black" : "bg-hf-lime/15 text-hf-lime"
+                        item.badge === "New" ? "bg-hf-accent text-black" : "bg-hf-accent/15 text-hf-accent-soft"
                       }`}
                     >
                       {item.badge}
@@ -107,7 +107,7 @@ export function MobileNav({
                       onClick={onClose}
                       aria-current={active ? "page" : undefined}
                       className={`flex min-h-11 items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                        active ? "bg-hf-surface-3 font-medium text-hf-lime" : "text-white hover:bg-hf-surface-3"
+                        active ? "bg-hf-surface-3 font-medium text-hf-accent-soft" : "text-white hover:bg-hf-surface-3"
                       }`}
                     >
                       {content}
@@ -150,7 +150,7 @@ export function MobileNav({
               onClick={onClose}
               className="flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-hf-border text-sm text-white"
             >
-              <span className="size-4 rounded bg-hf-lime/70" aria-hidden />
+              <span className="size-4 rounded bg-hf-accent/70" aria-hidden />
               Assets
             </Link>
           </div>

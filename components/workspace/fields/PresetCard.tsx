@@ -19,7 +19,7 @@ export function PresetCard({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-hf-border">
+    <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-hf-border">
       <Image src={image} alt="" fill sizes="390px" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
 
@@ -34,7 +34,7 @@ export function PresetCard({
       </button>
 
       <div className="absolute right-3 bottom-3 left-3">
-        <p className="font-display text-lg leading-none font-bold tracking-tight text-hf-lime uppercase">
+        <p className="font-display text-lg leading-none font-bold tracking-tight text-hf-accent-soft uppercase">
           {current}
         </p>
         <p className="mt-1.5 truncate text-xs text-hf-muted">{sublabel}</p>
@@ -44,7 +44,7 @@ export function PresetCard({
         <ul
           role="listbox"
           aria-label="Preset"
-          className="absolute inset-x-2 top-12 z-20 max-h-40 overflow-y-auto rounded-xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
+          className="absolute inset-x-2 top-12 z-20 max-h-40 overflow-y-auto rounded-2xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
         >
           {PRESETS.map((preset) => (
             <li key={preset}>
@@ -60,7 +60,7 @@ export function PresetCard({
               >
                 {preset}
                 {preset.toUpperCase() === current.toUpperCase() ? (
-                  <Check className="size-3 text-hf-lime" aria-hidden strokeWidth={3} />
+                  <Check className="size-3 text-hf-accent-soft" aria-hidden strokeWidth={3} />
                 ) : null}
               </button>
             </li>

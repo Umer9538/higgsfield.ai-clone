@@ -63,7 +63,7 @@ export function PluginPage() {
             (colour, index) => (
               <span
                 key={colour + index}
-                className={`size-11 rounded-2xl border border-black/40 ${index === 3 ? "z-10 scale-115" : ""}`}
+                className={`size-11 rounded-3xl border border-black/40 ${index === 3 ? "z-10 scale-115" : ""}`}
                 style={{ backgroundColor: colour }}
                 aria-hidden
               />
@@ -71,23 +71,23 @@ export function PluginPage() {
           )}
         </div>
 
-        <h1 className="mt-8 font-display text-3xl font-bold tracking-tight text-hf-lime uppercase sm:text-4xl lg:text-5xl">
+        <h1 className="mt-8 font-display text-3xl font-bold tracking-tight text-hf-accent-soft uppercase sm:text-4xl lg:text-5xl">
           Higgsfield plugin for ChatGPT
         </h1>
         <p className="mt-3 text-sm text-hf-muted sm:text-base">
           Create stunning images and videos without leaving ChatGPT
         </p>
 
-        <p className="mx-auto mt-6 flex w-fit flex-wrap items-center justify-center gap-2 rounded-xl bg-hf-lime/10 px-4 py-3 text-sm text-hf-lime">
+        <p className="mx-auto mt-6 flex w-fit flex-wrap items-center justify-center gap-2 rounded-2xl bg-hf-accent/10 px-4 py-3 text-sm text-hf-accent-soft">
           <Tag className="size-4 shrink-0" aria-hidden strokeWidth={1.75} />
           Connect MCP &amp; access 3-day free trial plan with 100 credits
-          <span className="rounded bg-hf-lime px-2 py-0.5 text-[11px] font-bold text-black italic">
+          <span className="rounded bg-hf-accent px-2 py-0.5 text-[11px] font-bold text-black italic">
             FREE 100 CREDITS
           </span>
         </p>
       </div>
 
-      <section className="mt-10 overflow-hidden rounded-2xl border border-hf-border bg-hf-surface">
+      <section className="mt-10 overflow-hidden rounded-3xl border border-hf-border bg-hf-surface">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hf-border p-3">
           <div role="tablist" aria-label="Client" className="flex flex-wrap gap-1">
             {CLIENTS.map((name) => (
@@ -137,7 +137,7 @@ export function PluginPage() {
                 {step.code ? (
                   <pre
                     data-step-code
-                    className="mt-4 overflow-x-auto rounded-lg border border-hf-border bg-hf-black px-3 py-2.5 font-mono text-[11px] leading-relaxed text-hf-lime"
+                    className="mt-4 overflow-x-auto rounded-lg border border-hf-border bg-hf-black px-3 py-2.5 font-mono text-[11px] leading-relaxed text-hf-accent-soft"
                   >
                     {step.code.join("\n")}
                   </pre>
@@ -182,8 +182,8 @@ export function PluginPage() {
         </h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {HOW_IT_WORKS.map((item, index) => (
-            <div key={item.title} className="rounded-2xl border border-hf-border bg-hf-surface p-5">
-              <span className="font-display text-sm font-bold text-hf-lime">0{index + 1}</span>
+            <div key={item.title} className="rounded-3xl border border-hf-border bg-hf-surface p-5">
+              <span className="font-display text-sm font-bold text-hf-accent-soft">0{index + 1}</span>
               <h3 className="mt-3 text-sm font-medium text-white">{item.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-hf-muted">{item.body}</p>
             </div>

@@ -20,11 +20,11 @@ export function PromptToggle({
   const [on, setOn] = useField(id, defaultOn);
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-hf-border bg-hf-surface-2 px-3.5 py-3">
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-hf-border bg-hf-surface-2 px-3.5 py-3">
       <span className="flex items-center gap-2 text-sm font-medium">
         <span className={on ? "text-white" : "text-hf-dim"}>{label}</span>
         {badge ? (
-          <span className="flex items-center gap-1 rounded bg-hf-lime/15 px-1.5 py-0.5 text-[10px] font-semibold text-hf-lime">
+          <span className="flex items-center gap-1 rounded bg-hf-accent/15 px-1.5 py-0.5 text-[10px] font-semibold text-hf-accent-soft">
             <Sparkles className="size-2.5" aria-hidden strokeWidth={2.5} />
             {badge}
           </span>
@@ -38,7 +38,7 @@ export function PromptToggle({
         aria-label={label}
         onClick={() => setOn(!on)}
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-          on ? "bg-hf-lime" : "bg-hf-surface-4"
+          on ? "bg-hf-accent" : "bg-hf-surface-4"
         }`}
       >
         <span
@@ -55,7 +55,7 @@ export function LinkRow({ label, icon }: { label: string; icon?: string }) {
   return (
     <Link
       href="/chatgpt-plugin"
-      className="flex items-center justify-between gap-3 rounded-xl border border-hf-border bg-hf-surface-2 px-3.5 py-3 text-sm font-medium text-white transition-colors hover:bg-hf-surface-3"
+      className="flex items-center justify-between gap-3 rounded-2xl border border-hf-border bg-hf-surface-2 px-3.5 py-3 text-sm font-medium text-white transition-colors hover:bg-hf-surface-3"
     >
       <span className="flex items-center gap-2">
         <span className="flex size-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">

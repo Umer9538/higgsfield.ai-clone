@@ -36,10 +36,10 @@ function ChoiceCard({
       role={multi ? "checkbox" : "radio"}
       aria-checked={selected}
       onClick={onSelect}
-      className={`flex min-h-11 w-full flex-col items-start rounded-2xl border p-4 text-left transition-colors ${
+      className={`flex min-h-11 w-full flex-col items-start rounded-3xl border p-4 text-left transition-colors ${
         selected
-          ? "border-hf-lime bg-hf-lime/10"
-          : "border-hf-border bg-hf-surface-2 hover:border-hf-lime/40"
+          ? "border-hf-accent bg-hf-accent/10"
+          : "border-hf-border bg-hf-surface-2 hover:border-hf-accent/40"
       }`}
     >
       <span className="flex w-full items-start justify-between gap-2">
@@ -47,7 +47,7 @@ function ChoiceCard({
         <span
           className={`flex size-5 shrink-0 items-center justify-center border ${
             multi ? "rounded" : "rounded-full"
-          } ${selected ? "border-hf-lime bg-hf-lime text-black" : "border-hf-border"}`}
+          } ${selected ? "border-hf-accent bg-hf-accent text-black" : "border-hf-border"}`}
         >
           {selected ? <Check className="size-3" aria-hidden strokeWidth={3} /> : null}
         </span>
@@ -123,7 +123,7 @@ export function Quiz() {
               <li
                 key={index}
                 aria-current={index === step ? "step" : undefined}
-                className={`h-1 w-8 rounded-full ${index <= step ? "bg-hf-lime" : "bg-hf-surface-4"}`}
+                className={`h-1 w-8 rounded-full ${index <= step ? "bg-hf-accent" : "bg-hf-surface-4"}`}
               />
             ))}
           </ol>
@@ -220,10 +220,10 @@ export function Quiz() {
                   setClaimed(!claimed);
                   if (!claimed) toast("54% sign-up discount claimed");
                 }}
-                className={`mt-8 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 py-4 text-sm transition-colors ${
+                className={`mt-8 flex min-h-11 w-full items-center justify-center gap-2 rounded-3xl border px-4 py-4 text-sm transition-colors ${
                   claimed
-                    ? "border-hf-lime bg-hf-lime/10 text-hf-lime"
-                    : "border-dashed border-hf-border text-white hover:border-hf-lime/50"
+                    ? "border-hf-accent bg-hf-accent/10 text-hf-accent-soft"
+                    : "border-dashed border-hf-border text-white hover:border-hf-accent/50"
                 }`}
               >
                 <Tag className="size-4" aria-hidden strokeWidth={1.75} />
@@ -241,7 +241,7 @@ export function Quiz() {
             type="button"
             disabled={!canAdvance}
             onClick={() => (step === STEPS - 1 ? finish() : setStep(step + 1))}
-            className="h-12 w-full rounded-xl bg-hf-lime text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep disabled:cursor-not-allowed disabled:bg-hf-lime-muted disabled:text-black/60"
+            className="h-12 w-full rounded-2xl bg-hf-accent text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep disabled:cursor-not-allowed disabled:bg-hf-accent-muted disabled:text-black/60"
           >
             {step === STEPS - 1 ? "Finish and start creating" : "Continue"}
           </button>

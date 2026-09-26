@@ -161,7 +161,7 @@ export function NodeCanvas() {
             aria-expanded={picker}
             aria-haspopup="menu"
             onClick={() => setPicker((prev) => !prev)}
-            className="flex items-center gap-1.5 rounded-lg bg-hf-lime px-3 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+            className="flex items-center gap-1.5 rounded-lg bg-hf-accent px-3 py-2 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
           >
             <Plus className="size-4" aria-hidden strokeWidth={2.5} />
             Add node
@@ -171,7 +171,7 @@ export function NodeCanvas() {
             <ul
               role="menu"
               aria-label="Node type"
-              className="absolute top-full left-0 z-40 mt-1 w-52 overflow-hidden rounded-xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
+              className="absolute top-full left-0 z-40 mt-1 w-52 overflow-hidden rounded-2xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
             >
               {NODE_TYPES.map((type) => (
                 <li key={type.id}>
@@ -195,7 +195,7 @@ export function NodeCanvas() {
           onClick={() => startLink(selected)}
           aria-pressed={linkFrom !== null}
           className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-colors ${
-            linkFrom ? "border-hf-lime bg-hf-lime/10 text-hf-lime" : "border-hf-border text-white hover:border-hf-lime/50"
+            linkFrom ? "border-hf-accent bg-hf-accent/10 text-hf-accent-soft" : "border-hf-border text-white hover:border-hf-accent/50"
           }`}
         >
           <Link2 className="size-4" aria-hidden strokeWidth={1.75} />
@@ -222,7 +222,7 @@ export function NodeCanvas() {
         onPointerMove={(event) => dragging && move(dragging, event.clientX, event.clientY)}
         onPointerUp={() => setDragging(null)}
         onPointerLeave={() => setDragging(null)}
-        className="relative h-[520px] w-full touch-none overflow-hidden rounded-2xl border border-hf-border bg-hf-surface"
+        className="relative h-[520px] w-full touch-none overflow-hidden rounded-3xl border border-hf-border bg-hf-surface"
         style={{
           backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px)",
           backgroundSize: "22px 22px",
@@ -258,8 +258,8 @@ export function NodeCanvas() {
                 if (linkFrom !== null) startLink(node.id);
                 else setSelected(node.id);
               }}
-              className={`absolute w-52 rounded-xl border bg-hf-surface-2 ${
-                isSelected ? "border-hf-lime" : "border-hf-border"
+              className={`absolute w-52 rounded-2xl border bg-hf-surface-2 ${
+                isSelected ? "border-hf-accent" : "border-hf-border"
               }`}
               style={{ left: `${node.x}%`, top: `${node.y}%` }}
             >
@@ -317,7 +317,7 @@ export function NodeCanvas() {
                           value={node.params[param.key] ?? ""}
                           onChange={(event) => setParam(node.id, param.key, event.target.value)}
                           onPointerDown={(event) => event.stopPropagation()}
-                          className="w-full rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white focus:border-hf-lime focus:outline-none"
+                          className="w-full rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white focus:border-hf-accent focus:outline-none"
                         >
                           {param.options?.map((option) => (
                             <option key={option} value={option}>
@@ -333,7 +333,7 @@ export function NodeCanvas() {
                           placeholder={param.placeholder}
                           onChange={(event) => setParam(node.id, param.key, event.target.value)}
                           onPointerDown={(event) => event.stopPropagation()}
-                          className="w-full resize-none rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white placeholder:text-hf-dim focus:border-hf-lime focus:outline-none"
+                          className="w-full resize-none rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white placeholder:text-hf-dim focus:border-hf-accent focus:outline-none"
                         />
                       ) : (
                         <input
@@ -343,7 +343,7 @@ export function NodeCanvas() {
                           placeholder={param.placeholder}
                           onChange={(event) => setParam(node.id, param.key, event.target.value)}
                           onPointerDown={(event) => event.stopPropagation()}
-                          className="w-full rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white placeholder:text-hf-dim focus:border-hf-lime focus:outline-none"
+                          className="w-full rounded-md border border-hf-border bg-hf-surface-3 px-2 py-1 text-[11px] text-white placeholder:text-hf-dim focus:border-hf-accent focus:outline-none"
                         />
                       )}
                     </label>

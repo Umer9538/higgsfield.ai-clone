@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/Toast";
 
 function Cell({ value }: { value: string | boolean }) {
   if (value === true) {
-    return <Check className="size-4 text-hf-lime" aria-label="Included" strokeWidth={2.5} />;
+    return <Check className="size-4 text-hf-accent-soft" aria-label="Included" strokeWidth={2.5} />;
   }
   if (value === false) {
     return <X className="size-4 text-hf-dim" aria-label="Not included" strokeWidth={2.5} />;
@@ -31,7 +31,7 @@ export function ComparisonMatrix() {
       </h2>
       <p className="mt-2 text-sm text-hf-muted">See in details what plan suits you best</p>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-hf-border">
+      <div className="mt-6 overflow-hidden rounded-3xl border border-hf-border">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] border-collapse text-left">
             <caption className="sr-only">Feature comparison across Basic, Pro and Max plans</caption>
@@ -68,7 +68,7 @@ export function ComparisonMatrix() {
                         onClick={() => toast(`${plan.name} plan added to your cart`)}
                         className={`mt-3 w-full rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${
                           plan.bestValue
-                            ? "bg-hf-lime text-black hover:bg-hf-lime-deep"
+                            ? "bg-hf-accent text-black hover:bg-hf-accent-deep"
                             : "bg-hf-surface-4 text-white hover:bg-hf-border"
                         }`}
                       >
@@ -124,7 +124,7 @@ export function ComparisonMatrix() {
           aria-expanded={expanded}
           aria-controls="compare"
           onClick={() => setExpanded((prev) => !prev)}
-          className="flex items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface px-4 py-2 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+          className="flex items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface px-4 py-2 text-sm text-white transition-colors hover:border-hf-accent/50 hover:text-hf-accent-soft"
         >
           {expanded ? "Hide comparison" : "Compare Features"}
           <ChevronDown

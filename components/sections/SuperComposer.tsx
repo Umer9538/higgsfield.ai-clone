@@ -30,7 +30,7 @@ export function SuperComposer() {
 
   return (
     <>
-      <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-hf-border bg-hf-surface-2 p-3">
+      <div className="mx-auto mt-8 max-w-2xl rounded-3xl border border-hf-border bg-hf-surface-2 p-3">
         <input
           type="text"
           value={prompt}
@@ -53,7 +53,7 @@ export function SuperComposer() {
 
           <span className="flex items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface-3 px-2.5 py-1.5 text-xs text-white">
             Auto
-            <span className="font-semibold text-hf-lime">Free</span>
+            <span className="font-semibold text-hf-accent-soft">Free</span>
           </span>
 
           <span className="ml-auto flex items-center gap-2">
@@ -64,7 +64,7 @@ export function SuperComposer() {
               type="button"
               aria-label="Send"
               onClick={send}
-              className="flex size-8 items-center justify-center rounded-full bg-hf-lime text-black transition-colors hover:bg-hf-lime-deep"
+              className="flex size-8 items-center justify-center rounded-full bg-hf-accent text-black transition-colors hover:bg-hf-accent-deep"
             >
               <ArrowUp className="size-4" aria-hidden strokeWidth={2.5} />
             </button>
@@ -90,10 +90,10 @@ export function SuperComposer() {
           {sent.map((item, index) => (
             <li
               key={`${item}-${index}`}
-              className="rounded-xl border border-hf-border bg-hf-surface px-4 py-3 text-sm text-white"
+              className="rounded-2xl border border-hf-border bg-hf-surface px-4 py-3 text-sm text-white"
             >
               {item}
-              <span className="mt-1 block text-xs text-hf-lime">Queued · Ask mode</span>
+              <span className="mt-1 block text-xs text-hf-accent-soft">Queued · Ask mode</span>
             </li>
           ))}
         </ul>
@@ -114,7 +114,7 @@ export function SuperComposer() {
             aria-selected={filter === item}
             onClick={() => setFilter(item)}
             className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-              filter === item ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+              filter === item ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
             }`}
           >
             {item}
@@ -130,7 +130,7 @@ export function SuperComposer() {
           filter could only ever change the label. */}
       <ul aria-label="Showcase" className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((item) => (
-          <li key={item.id} className="overflow-hidden rounded-2xl border border-hf-border bg-hf-surface">
+          <li key={item.id} className="overflow-hidden rounded-3xl border border-hf-border bg-hf-surface">
             <div className="relative aspect-[4/3]">
               <Image
                 src={item.image}
@@ -143,7 +143,7 @@ export function SuperComposer() {
             <div className="p-4">
               <p className="text-sm font-medium text-white">{item.title}</p>
               <p className="mt-1 flex items-center gap-2 text-xs text-hf-dim">
-                <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-lime">
+                <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-hf-accent-soft">
                   {item.category}
                 </span>
                 by {item.author}
@@ -154,7 +154,7 @@ export function SuperComposer() {
       </ul>
 
       {shown.length === 0 ? (
-        <p className="mt-8 rounded-2xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
+        <p className="mt-8 rounded-3xl border border-hf-border bg-hf-surface p-10 text-center text-sm text-hf-muted">
           Nothing in this category yet.
         </p>
       ) : null}

@@ -42,7 +42,7 @@ export function RailHeading({ title, link }: { title: string; link?: string }) {
         <SmartLink
           label={link}
           href={routeFor(link)}
-          className="inline-flex min-h-11 shrink-0 items-center text-xs text-hf-muted transition-colors hover:text-hf-lime md:min-h-0"
+          className="inline-flex min-h-11 shrink-0 items-center text-xs text-hf-muted transition-colors hover:text-hf-accent-soft md:min-h-0"
         />
       ) : null}
     </div>
@@ -62,7 +62,7 @@ export function MediaTile({
 }) {
   return (
     <div className="group">
-      <div className={`relative w-full overflow-hidden rounded-xl border border-hf-border ${className}`}>
+      <div className={`relative w-full overflow-hidden rounded-2xl border border-hf-border ${className}`}>
         <Image
           src={src}
           alt=""

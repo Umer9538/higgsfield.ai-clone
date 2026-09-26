@@ -76,16 +76,29 @@ export function GenerationProvider({
         if (result) {
           const promptField = surface?.fields.find((field) => field.kind === "prompt");
           const prompt = promptField ? String(values[promptField.id] ?? "") : "";
-          addGeneratedAsset({
-            kind: result.kind,
-            model: result.meta.find((m) => m.label === "Model")?.value ?? surface.label,
-            prompt,
-            src: result.src,
-            poster: result.poster,
-            spec: result.meta
-              .filter((m) => m.label !== "Model")
-              .map((m) => m.value)
-              .join(" · "),
+          const model = result.meta.find((m) => m.label === "Model")?.value ?? surface.label;
+          const spec = result.meta
+            .filter((m) => m.label !== "Model")
+            .map((m) => m.value)
+            .join(" · ");
+
+          // Local store first so the library updates instantly, then persist.
+          addGeneratedAsset({ kind: result.kind, model, prompt, src: result.src, poster: result.poster, spec });
+
+          void fetch("/api/generations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: prompt || "Untitled generation",
+              model,
+              surface: surface.id,
+              kind: result.kind,
+              src: result.src,
+              poster: result.poster,
+              spec,
+            }),
+          }).catch(() => {
+            // Offline or no backend: the local store already has it.
           });
         }
       }

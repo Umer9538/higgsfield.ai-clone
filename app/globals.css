@@ -5,10 +5,18 @@
  * See docs/higgsfield-reference.md for provenance.
  */
 @theme {
-  /* Signature accent. The site's whole identity sits on this colour. */
-  --color-hf-lime: #d1fe17;
-  --color-hf-lime-deep: #9de500;
-  --color-hf-lime-muted: #829b19;
+  /*
+   * Electric Violet. Fills use the full-strength tone; text on dark surfaces
+   * uses the lighter tint, because #8B5CF6 on #0f1113 only reaches about
+   * 4.5:1 while the tint clears 6.9:1.
+   */
+  --color-hf-accent: #8b5cf6;
+  --color-hf-accent-soft: #a78bfa;
+  --color-hf-accent-deep: #7c3aed;
+  --color-hf-accent-muted: #4c3a7a;
+
+  /* Secondary, used sparingly for highlights alongside the violet */
+  --color-hf-cyan: #06b6d4;
 
   /* Surface ramp, darkest to lightest */
   --color-hf-black: #000000;
@@ -33,6 +41,10 @@
 
   /* Header is 4rem on mobile, 5rem from md up */
   --spacing-header: 4rem;
+
+  /* Softer than the reference: cards and panels sit on a rounder scale */
+  --radius-card: 1rem;
+  --radius-panel: 1.5rem;
 }
 
 html {

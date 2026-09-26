@@ -52,7 +52,7 @@ export function PromptField({
   };
 
   return (
-    <div className="rounded-xl border border-hf-border bg-hf-surface-2 p-3 focus-within:border-hf-lime/40">
+    <div className="rounded-2xl border border-hf-border bg-hf-surface-2 p-3 focus-within:border-hf-accent/40">
       {label ? (
         <div className="flex items-start justify-between gap-2">
           <label htmlFor={id} className="text-sm font-medium text-white">
@@ -82,7 +82,7 @@ export function PromptField({
             <button
               type="button"
               onClick={enhance}
-              className="flex items-center gap-1.5 rounded-lg bg-hf-lime/15 px-2 py-1 text-xs font-medium text-hf-lime transition-colors hover:bg-hf-lime/25"
+              className="flex items-center gap-1.5 rounded-lg bg-hf-accent/15 px-2 py-1 text-xs font-medium text-hf-accent-soft transition-colors hover:bg-hf-accent/25"
             >
               <Sparkles className="size-3.5" aria-hidden strokeWidth={2} />
               Magic Enhance
@@ -95,7 +95,7 @@ export function PromptField({
                 aria-pressed={chip.label === "On" ? audioOn : undefined}
                 className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs transition-colors ${
                   chip.label === "On" && audioOn
-                    ? "bg-hf-lime/15 text-hf-lime"
+                    ? "bg-hf-accent/15 text-hf-accent-soft"
                     : "bg-hf-surface-4 text-hf-muted hover:text-white"
                 }`}
               >

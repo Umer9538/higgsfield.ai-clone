@@ -23,7 +23,7 @@ function useCountdown(deadline: string) {
 
 function Segment({ value, unit }: { value: string; unit: string }) {
   return (
-    <div className="min-w-[64px] rounded-xl border border-hf-border bg-hf-surface-2 px-3 py-2 text-center">
+    <div className="min-w-[64px] rounded-2xl border border-hf-border bg-hf-surface-2 px-3 py-2 text-center">
       <p className="font-display text-xl leading-none font-bold text-white tabular-nums">{value}</p>
       <p className="mt-1 text-[10px] text-hf-dim">{unit}</p>
     </div>
@@ -54,7 +54,7 @@ export function ContestBoard() {
               aria-selected={active}
               onClick={() => setTab(item)}
               className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                active ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
               }`}
             >
               {item}
@@ -63,14 +63,14 @@ export function ContestBoard() {
         })}
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-hf-lime/30 bg-hf-lime/5 px-4 py-3">
-        <AlertCircle className="size-4 shrink-0 text-hf-lime" aria-hidden strokeWidth={2} />
+      <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-hf-accent/30 bg-hf-accent/5 px-4 py-3">
+        <AlertCircle className="size-4 shrink-0 text-hf-accent-soft" aria-hidden strokeWidth={2} />
         <span className="text-sm font-medium text-white">{CONTESTS.notice.label}</span>
         <span className="text-xs text-hf-muted">{CONTESTS.notice.body}</span>
         <button
           type="button"
           onClick={() => toast("Final cut upload opened")}
-          className="ml-auto shrink-0 rounded-lg border border-hf-border px-3 py-1.5 text-xs text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+          className="ml-auto shrink-0 rounded-lg border border-hf-border px-3 py-1.5 text-xs text-white transition-colors hover:border-hf-accent/50 hover:text-hf-accent-soft"
         >
           {CONTESTS.notice.cta}
         </button>
@@ -83,9 +83,9 @@ export function ContestBoard() {
             {CONTESTS.timeline.map((entry, index) => (
               <li
                 key={entry.label}
-                className="flex items-center gap-4 rounded-xl border border-hf-border bg-hf-surface px-4 py-3.5"
+                className="flex items-center gap-4 rounded-2xl border border-hf-border bg-hf-surface px-4 py-3.5"
               >
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-hf-surface-4 text-xs text-hf-lime">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-hf-surface-4 text-xs text-hf-accent-soft">
                   {index + 1}
                 </span>
                 <span className="text-sm font-medium text-white">{entry.label}</span>
@@ -106,7 +106,7 @@ export function ContestBoard() {
               "Final cuts may be updated until the extended deadline of Sep 14.",
             ].map((rule) => (
               <li key={rule} className="flex gap-2.5">
-                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-hf-lime" aria-hidden />
+                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-hf-accent" aria-hidden />
                 {rule}
               </li>
             ))}
@@ -114,13 +114,13 @@ export function ContestBoard() {
         </section>
       ) : (
         <>
-          <section className="mt-8 overflow-hidden rounded-2xl border border-hf-border bg-gradient-to-br from-[#1a1405] via-hf-surface to-hf-black p-6 sm:p-8">
+          <section className="mt-8 overflow-hidden rounded-3xl border border-hf-border bg-gradient-to-br from-[#1a1405] via-hf-surface to-hf-black p-6 sm:p-8">
             <h2 className="font-display text-2xl font-bold tracking-tight text-white uppercase sm:text-3xl">
               {CONTESTS.active.title}
             </h2>
             <p className="mt-2 text-sm text-hf-muted">{CONTESTS.active.tagline}</p>
 
-            <p className="mt-6 font-display text-4xl font-bold tracking-tight text-hf-lime sm:text-5xl">
+            <p className="mt-6 font-display text-4xl font-bold tracking-tight text-hf-accent-soft sm:text-5xl">
               {CONTESTS.active.prizePool}
             </p>
             <p className="text-xs text-hf-muted">
@@ -140,7 +140,7 @@ export function ContestBoard() {
             <button
               type="button"
               onClick={() => setEntered(true)}
-              className="mt-6 rounded-xl bg-hf-lime px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+              className="mt-6 rounded-2xl bg-hf-accent px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
             >
               {entered ? "Festival project created" : CONTESTS.active.cta}
             </button>
@@ -152,12 +152,12 @@ export function ContestBoard() {
               {CONTESTS.prizes.map((prize, index) => (
                 <li
                   key={prize.place}
-                  className={`rounded-2xl border p-5 ${
-                    index === 0 ? "border-hf-lime/40 bg-hf-lime/5" : "border-hf-border bg-hf-surface"
+                  className={`rounded-3xl border p-5 ${
+                    index === 0 ? "border-hf-accent/40 bg-hf-accent/5" : "border-hf-border bg-hf-surface"
                   }`}
                 >
                   <Trophy
-                    className={`size-4 ${index === 0 ? "text-hf-lime" : "text-hf-dim"}`}
+                    className={`size-4 ${index === 0 ? "text-hf-accent-soft" : "text-hf-dim"}`}
                     aria-hidden
                     strokeWidth={1.75}
                   />
@@ -176,7 +176,7 @@ export function ContestBoard() {
               {CONTESTS.past.map((contest) => (
                 <li
                   key={contest.title}
-                  className="rounded-2xl border border-hf-border bg-hf-surface p-5 opacity-80"
+                  className="rounded-3xl border border-hf-border bg-hf-surface p-5 opacity-80"
                 >
                   <span className="rounded bg-hf-surface-4 px-1.5 py-0.5 text-[10px] text-hf-dim">
                     {contest.status}

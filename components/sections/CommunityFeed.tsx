@@ -23,7 +23,7 @@ export function CommunityFeed() {
               aria-selected={active}
               onClick={() => setTab(item)}
               className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                active ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                active ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
               }`}
             >
               {item}
@@ -33,13 +33,13 @@ export function CommunityFeed() {
       </div>
 
       {/* Contest banner */}
-      <section className="mt-6 overflow-hidden rounded-2xl border border-hf-border">
+      <section className="mt-6 overflow-hidden rounded-3xl border border-hf-border">
         <div className="relative bg-gradient-to-r from-[#1a1405] via-[#2a2208] to-hf-black p-6 sm:p-8">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-lime/15 px-2.5 py-1 text-[11px] font-semibold text-hf-lime">
-            <span className="size-1.5 rounded-full bg-hf-lime" aria-hidden />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-hf-accent/15 px-2.5 py-1 text-[11px] font-semibold text-hf-accent-soft">
+            <span className="size-1.5 rounded-full bg-hf-accent" aria-hidden />
             {COMMUNITY.banner.label}
           </span>
-          <p className="mt-4 font-display text-3xl font-bold tracking-tight text-hf-lime sm:text-4xl">
+          <p className="mt-4 font-display text-3xl font-bold tracking-tight text-hf-accent-soft sm:text-4xl">
             {COMMUNITY.banner.prize}
           </p>
           <h2 className="mt-1 font-display text-xl font-bold tracking-tight text-white uppercase">
@@ -49,7 +49,7 @@ export function CommunityFeed() {
           <p className="mt-3 text-xs text-hf-dim">{COMMUNITY.banner.dates}</p>
           <a
             href="/contests"
-            className="mt-5 inline-block rounded-xl bg-hf-lime px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-hf-lime-deep"
+            className="mt-5 inline-block rounded-2xl bg-hf-accent px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-hf-accent-deep"
           >
             {COMMUNITY.banner.cta}
           </a>
@@ -84,9 +84,9 @@ export function CommunityFeed() {
           {COMMUNITY.creators.map((creator) => (
             <li
               key={creator.handle}
-              className="flex items-center gap-3 rounded-xl border border-hf-border bg-hf-surface p-4"
+              className="flex items-center gap-3 rounded-2xl border border-hf-border bg-hf-surface p-4"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-hf-surface-4 text-sm font-semibold text-hf-lime uppercase">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-hf-surface-4 text-sm font-semibold text-hf-accent-soft uppercase">
                 {creator.handle.slice(0, 1)}
               </span>
               <span className="min-w-0 flex-1">
@@ -109,8 +109,8 @@ export function CommunityFeed() {
                 }
                 className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs transition-colors ${
                   following.includes(creator.handle)
-                    ? "border-hf-lime bg-hf-lime/15 text-hf-lime"
-                    : "border-hf-border text-white hover:border-hf-lime/50 hover:text-hf-lime"
+                    ? "border-hf-accent bg-hf-accent/15 text-hf-accent-soft"
+                    : "border-hf-border text-white hover:border-hf-accent/50 hover:text-hf-accent-soft"
                 }`}
               >
                 {following.includes(creator.handle) ? "Following" : "Follow"}
@@ -120,7 +120,7 @@ export function CommunityFeed() {
         </ul>
       </section>
 
-      <section className="mt-14 rounded-2xl border border-hf-border bg-hf-surface p-6 text-center">
+      <section className="mt-14 rounded-3xl border border-hf-border bg-hf-surface p-6 text-center">
         <h2 className="font-display text-lg font-bold tracking-tight text-white uppercase">
           Join the conversation
         </h2>
@@ -131,8 +131,8 @@ export function CommunityFeed() {
                 label={social}
                 className={`inline-flex min-h-11 items-center rounded-lg px-4 py-2 text-sm transition-colors md:min-h-0 ${
                   social === "Discord"
-                    ? "bg-hf-lime font-semibold text-black hover:bg-hf-lime-deep"
-                    : "border border-hf-border text-white hover:border-hf-lime/50"
+                    ? "bg-hf-accent font-semibold text-black hover:bg-hf-accent-deep"
+                    : "border border-hf-border text-white hover:border-hf-accent/50"
                 }`}
               />
             </li>

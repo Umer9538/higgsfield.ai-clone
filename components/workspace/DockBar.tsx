@@ -33,7 +33,7 @@ export function DockBar({ surface }: { surface: Surface }) {
     <div className="sticky bottom-0 px-4 pb-4">
       {/* Setting tiles above the composer, as in Cinema Studio */}
       {setup ? (
-        <div className="mx-auto mb-2.5 hidden max-w-4xl flex-wrap gap-2 rounded-2xl border border-hf-border bg-hf-surface-2 p-2 sm:flex">
+        <div className="mx-auto mb-2.5 hidden max-w-4xl flex-wrap gap-2 rounded-3xl border border-hf-border bg-hf-surface-2 p-2 sm:flex">
           {setup.map((item) => (
             <div key={item.label} className="relative flex-1">
               <button
@@ -47,9 +47,9 @@ export function DockBar({ surface }: { surface: Surface }) {
                   }
                   setOpenSetup((prev) => (prev === item.label ? null : item.label));
                 }}
-                className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition-colors ${
+                className={`flex w-full items-center gap-2 rounded-2xl px-3 py-2 text-left transition-colors ${
                   setupValues[item.label] && setupValues[item.label] !== "Auto"
-                    ? "bg-hf-lime/10 ring-1 ring-hf-lime/40 ring-inset"
+                    ? "bg-hf-accent/10 ring-1 ring-hf-accent/40 ring-inset"
                     : "bg-hf-surface-3 hover:bg-hf-surface-4"
                 }`}
               >
@@ -68,7 +68,7 @@ export function DockBar({ surface }: { surface: Surface }) {
                 <ul
                   role="listbox"
                   aria-label={item.label}
-                  className="absolute bottom-full left-0 z-40 mb-2 w-48 overflow-hidden rounded-xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
+                  className="absolute bottom-full left-0 z-40 mb-2 w-48 overflow-hidden rounded-2xl border border-hf-border bg-hf-surface-3 py-1 shadow-lg"
                 >
                   {SETUP_OPTIONS[item.label].map((option) => (
                     <li key={option}>
@@ -97,7 +97,7 @@ export function DockBar({ surface }: { surface: Surface }) {
       <div className="mx-auto flex max-w-4xl flex-col items-stretch gap-2.5 sm:flex-row">
         {/* Mode rail beside the composer */}
         {rail ? (
-          <div className="flex shrink-0 flex-row gap-1 rounded-2xl border border-hf-border bg-hf-surface-2 p-1.5 sm:flex-col">
+          <div className="flex shrink-0 flex-row gap-1 rounded-3xl border border-hf-border bg-hf-surface-2 p-1.5 sm:flex-col">
             {rail.map((item) => (
               <button
                 key={item.label}
@@ -116,8 +116,8 @@ export function DockBar({ surface }: { surface: Surface }) {
                     toast(`Switched to ${item.label.toLowerCase()} — ${nextModel}`);
                   }
                 }}
-                className={`flex flex-1 flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-[11px] transition-colors sm:w-16 sm:flex-none ${
-                  mode === item.label ? "bg-hf-surface-4 text-hf-lime" : "text-hf-muted hover:text-white"
+                className={`flex flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2.5 text-[11px] transition-colors sm:w-16 sm:flex-none ${
+                  mode === item.label ? "bg-hf-surface-4 text-hf-accent-soft" : "text-hf-muted hover:text-white"
                 }`}
               >
                 <Icon name={item.icon} className="size-4" />
@@ -127,7 +127,7 @@ export function DockBar({ surface }: { surface: Surface }) {
           </div>
         ) : null}
 
-      <div className="min-w-0 flex-1 rounded-2xl border border-hf-border bg-hf-surface-2 p-3">
+      <div className="min-w-0 flex-1 rounded-3xl border border-hf-border bg-hf-surface-2 p-3">
         <div className="flex items-center gap-2.5">
           <button
             type="button"
@@ -158,7 +158,7 @@ export function DockBar({ surface }: { surface: Surface }) {
                   prev.map((value, i) => (i === index ? nextPillValue(value) : value)),
                 )
               }
-              className="flex items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface-3 px-2.5 py-1.5 text-xs text-white transition-colors hover:border-hf-lime/40 hover:bg-hf-surface-4"
+              className="flex items-center gap-1.5 rounded-lg border border-hf-border bg-hf-surface-3 px-2.5 py-1.5 text-xs text-white transition-colors hover:border-hf-accent/40 hover:bg-hf-surface-4"
             >
               <Icon name={pill.icon} className="size-3.5 text-hf-dim" />
               {pillValues[index]}
@@ -201,9 +201,9 @@ export function DockBar({ surface }: { surface: Surface }) {
                       prev.includes(slot) ? prev.filter((s) => s !== slot) : [...prev, slot],
                     )
                   }
-                  className={`flex w-24 flex-col items-center gap-1 rounded-xl border px-3 py-2 text-[10px] tracking-wide uppercase transition-colors ${
+                  className={`flex w-24 flex-col items-center gap-1 rounded-2xl border px-3 py-2 text-[10px] tracking-wide uppercase transition-colors ${
                     filled.includes(slot)
-                      ? "border-hf-lime/60 bg-hf-lime/10 text-hf-lime"
+                      ? "border-hf-accent/60 bg-hf-accent/10 text-hf-accent-soft"
                       : "border-hf-border bg-hf-surface-3 text-hf-muted hover:text-white"
                   }`}
                 >

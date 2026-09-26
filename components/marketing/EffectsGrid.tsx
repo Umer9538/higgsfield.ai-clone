@@ -11,7 +11,7 @@ export function EffectsGrid() {
       <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         {EFFECTS.presets.map((preset) => (
           <li key={preset.name}>
-            <Link href="/ai/effects" className="group relative block overflow-hidden rounded-xl border border-hf-border">
+            <Link href="/ai/effects" className="group relative block overflow-hidden rounded-2xl border border-hf-border">
               <div className="relative aspect-video w-full overflow-hidden">
                 <Image
                   src={preset.image}
@@ -28,7 +28,7 @@ export function EffectsGrid() {
                   {preset.name}
                 </h3>
                 {/* Revealed on hover, and always readable for keyboard users */}
-                <span className="flex min-h-11 shrink-0 items-center rounded-full bg-hf-lime px-3 py-1 text-[11px] font-semibold text-black transition-opacity md:min-h-0 md:opacity-0 md:group-hover:opacity-100 md:group-focus-visible:opacity-100 motion-reduce:transition-none">
+                <span className="flex min-h-11 shrink-0 items-center rounded-full bg-hf-accent px-3 py-1 text-[11px] font-semibold text-black transition-opacity md:min-h-0 md:opacity-0 md:group-hover:opacity-100 md:group-focus-visible:opacity-100 motion-reduce:transition-none">
                   Recreate
                 </span>
               </div>
@@ -40,7 +40,7 @@ export function EffectsGrid() {
       <div className="mt-6 flex justify-center">
         <Link
           href="/ai/effects"
-          className="flex min-h-11 items-center rounded-full border border-hf-border px-5 text-sm text-white transition-colors hover:border-hf-lime/50 hover:text-hf-lime"
+          className="flex min-h-11 items-center rounded-full border border-hf-border px-5 text-sm text-white transition-colors hover:border-hf-accent/50 hover:text-hf-accent-soft"
         >
           {EFFECTS.footerCta}
         </Link>
