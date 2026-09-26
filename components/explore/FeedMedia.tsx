@@ -5,11 +5,10 @@ import Image from "next/image";
 import type { FeedItem } from "@/lib/explore/content";
 
 /**
- * Concurrency cap. A browser opens ~6 connections per host, and a streaming
- * video holds one open for as long as it plays. Letting every visible card
- * stream starved page navigations: measured 231ms to leave a page without
- * video versus 23.5s to leave the feed. Four at a time keeps the grid alive
- * while leaving connections free for everything else.
+ * Concurrency cap. Streaming video competes with navigation for the
+ * connection: letting every visible card stream measured 23.5s to leave the
+ * feed against 231ms for a page without video. Four at a time keeps the grid
+ * alive; clips are also 6-second loops (~0.3MB) so each stream is short.
  */
 const MAX_CONCURRENT = 4;
 
@@ -32,6 +31,10 @@ const visible = new Map<string, Entry>();
  * prominent card showing a still while cards further down played.
  */
 function sync() {
+  if (Date.now() < suspendedUntil) {
+    visible.forEach((entry) => entry.setStreaming(false));
+    return;
+  }
   const ranked = [...visible.values()]
     .map((entry) => ({ entry, box: entry.el.getBoundingClientRect() }))
     .sort((a, b) =>
@@ -43,7 +46,50 @@ function sync() {
   ranked.forEach(({ entry }, index) => entry.setStreaming(index < MAX_CONCURRENT));
 }
 
+/**
+ * Navigation intent. Even four streams can crowd out the next page on a slow
+ * link: measured on the deployment, leaving the home feed took 17.6s against
+ * 117ms from a page without video. So the moment a press lands on something
+ * that navigates, every stream is aborted and the navigation gets the whole
+ * connection. If nothing navigates, streaming resumes shortly after.
+ */
+const RESUME_AFTER_MS = 3000;
+let suspendedUntil = 0;
+let listening = false;
+
+const NAVIGATES = 'a[href]:not([href^="#"]):not([target="_blank"]), button[type="submit"]';
+
+function suspend() {
+  suspendedUntil = Date.now() + RESUME_AFTER_MS;
+  visible.forEach((entry) => entry.setStreaming(false));
+  window.setTimeout(sync, RESUME_AFTER_MS + 50);
+}
+
+function listenForIntent() {
+  if (listening) return;
+  listening = true;
+  const target = (event: Event) => event.target as Element | null;
+  document.addEventListener(
+    "pointerdown",
+    (event) => {
+      if (target(event)?.closest?.(NAVIGATES)) suspend();
+    },
+    true,
+  );
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key !== "Enter") return;
+      const el = target(event);
+      // Links and submits, a composer's Enter-to-create, and the ⌘K palette
+      if (el?.closest?.(`${NAVIGATES}, form, [role="dialog"]`)) suspend();
+    },
+    true,
+  );
+}
+
 function enter(id: string, entry: Entry) {
+  listenForIntent();
   visible.set(id, entry);
   sync();
 }

@@ -302,3 +302,22 @@ test("leaving the feed is not blocked by streaming video", async ({ page }) => {
   await page.waitForURL(/\/ai\/video\?prompt=/, { timeout: 15_000 });
   expect(Date.now() - started).toBeLessThan(10_000);
 });
+
+test("leaving the home page is not blocked by its video feed", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  // Let the feed start streaming before trying to leave
+  await expect(page.locator("main video[src]").first()).toBeAttached({ timeout: 15_000 });
+
+  const started = Date.now();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Learn", exact: true }).click();
+  await page.waitForURL(/\/academy$/, { timeout: 15_000 });
+  expect(Date.now() - started).toBeLessThan(5_000);
+
+  // Pressing a link aborts every stream at once
+  await page.goBack();
+  await expect(page.locator("main video[src]").first()).toBeAttached({ timeout: 15_000 });
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Learn", exact: true }).dispatchEvent("pointerdown");
+  await expect(page.locator("main video[src]")).toHaveCount(0);
+});
+
