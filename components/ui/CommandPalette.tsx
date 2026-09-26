@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CornerDownLeft, Search } from "lucide-react";
 import { COMMANDS, matches, type CommandItem } from "@/lib/commands/registry";
+import { useExclusiveOverlay, useScrollLock } from "./overlay";
 import { useAuth } from "@/lib/auth/context";
 import { useToast } from "./Toast";
 import { clearGeneratedAssets } from "@/lib/assets/store";
@@ -21,6 +22,9 @@ export function CommandPalette() {
   const listRef = useRef<HTMLUListElement>(null);
 
   const router = useRouter();
+  const closePalette = useCallback(() => setOpen(false), []);
+  useExclusiveOverlay("command-palette", open, closePalette);
+  useScrollLock(open);
   const { isAuthenticated, signOut } = useAuth();
   const { toast } = useToast();
 
@@ -124,6 +128,7 @@ export function CommandPalette() {
             aria-expanded
             aria-controls="command-results"
             aria-label="Search commands"
+            data-palette-input
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);

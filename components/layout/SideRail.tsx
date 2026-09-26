@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SECTIONS, sectionFor } from "@/lib/nav";
+import { useExclusiveOverlay, useRouteScopedOpen, useScrollLock } from "@/components/ui/overlay";
 import { CreateCatalog } from "./CreateCatalog";
 import { Logo } from "./Logo";
 import { SectionIcon } from "./SectionIcon";
@@ -22,21 +23,26 @@ const ITEM =
 export function SideRail() {
   const pathname = usePathname();
   const current = sectionFor(pathname);
-  const [catalogOpen, setCatalogOpen] = useState(false);
+  // Scoped to the route: following any link — a rail item, the catalog, the
+  // palette, the browser's back button — closes the catalog by construction.
+  const { open: catalogOpen, toggle: toggleCatalog, close: closeCatalog } = useRouteScopedOpen();
   const createRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useExclusiveOverlay("create-catalog", catalogOpen, closeCatalog);
+  useScrollLock(catalogOpen);
 
   useEffect(() => {
     if (!catalogOpen) return;
     panelRef.current?.querySelector<HTMLElement>("a")?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      setCatalogOpen(false);
+      closeCatalog();
       createRef.current?.focus();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [catalogOpen]);
+  }, [catalogOpen, closeCatalog]);
 
   return (
     <nav
@@ -45,6 +51,7 @@ export function SideRail() {
     >
       <Link
         href="/"
+        onClick={closeCatalog}
         aria-label="Higgsfield home"
         className="press mb-4 flex size-11 items-center justify-center rounded-[var(--radius-control)] text-white transition-colors hover:bg-hf-surface-3"
       >
@@ -70,7 +77,7 @@ export function SideRail() {
                   aria-expanded={catalogOpen}
                   aria-controls="create-catalog"
                   data-active={active || undefined}
-                  onClick={() => setCatalogOpen((prev) => !prev)}
+                  onClick={toggleCatalog}
                   className={`${ITEM} ${catalogOpen ? "bg-hf-surface-4 text-white" : tone}`}
                 >
                   {marker}
@@ -85,6 +92,9 @@ export function SideRail() {
             <li key={section.key} className="group relative">
               <Link
                 href={section.href}
+                // Also covers clicking the section you are already on, where
+                // the route does not change
+                onClick={closeCatalog}
                 aria-current={pathname === section.href ? "page" : undefined}
                 data-active={active || undefined}
                 className={`${ITEM} ${tone}`}
@@ -103,6 +113,7 @@ export function SideRail() {
                     <li key={child.href}>
                       <Link
                         href={child.href}
+                        onClick={closeCatalog}
                         aria-current={pathname === child.href ? "page" : undefined}
                         className={`flex min-h-10 items-center rounded-lg px-3 text-sm transition-colors ${
                           pathname === child.href
@@ -124,6 +135,7 @@ export function SideRail() {
       {/* The one promo that survives: small, in the chrome, never over content */}
       <Link
         href="/pricing"
+        onClick={closeCatalog}
         aria-label="54% off Personal — see plans"
         className="press mt-auto flex w-14 flex-col items-center rounded-[var(--radius-control)] bg-hf-accent/15 px-1 py-2 text-center text-[10px] leading-tight font-semibold text-hf-accent-soft transition-colors hover:bg-hf-accent/25"
       >
@@ -137,7 +149,7 @@ export function SideRail() {
             type="button"
             aria-label="Close catalog"
             tabIndex={-1}
-            onClick={() => setCatalogOpen(false)}
+            onClick={closeCatalog}
             className="fixed inset-0 left-rail z-0 cursor-default bg-black/50"
           />
           <div
@@ -153,7 +165,7 @@ export function SideRail() {
             <p className="mt-1 mb-6 text-sm text-hf-muted">
               Every model, studio and app. Press <kbd className="rounded bg-hf-surface-4 px-1.5 text-xs">⌘K</kbd> to jump by name.
             </p>
-            <CreateCatalog onNavigate={() => setCatalogOpen(false)} />
+            <CreateCatalog onNavigate={closeCatalog} />
           </div>
         </>
       ) : null}

@@ -258,6 +258,52 @@ test("the rail holds five sections and Create opens every model, studio and app"
   await expect(rail.getByRole("button", { name: "Create" })).toBeFocused();
 });
 
+test("following any nav link closes the Create catalog", async ({ page }) => {
+  await page.goto("/explore");
+  const rail = page.getByRole("navigation", { name: "Main" });
+  const catalog = page.getByRole("dialog", { name: "Create" });
+
+  for (const [label, path] of [["Assets", "/assets"], ["Explore", "/explore"], ["Learn", "/academy"], ["Pricing", "/pricing"]]) {
+    await rail.getByRole("button", { name: "Create" }).click();
+    await expect(catalog).toBeVisible();
+    await rail.getByRole("link", { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`), { timeout: 20_000 });
+    await expect(catalog).toHaveCount(0);
+  }
+
+  // The section you are already on: the route does not change, it still closes
+  await rail.getByRole("button", { name: "Create" }).click();
+  await rail.getByRole("link", { name: "Pricing", exact: true }).click();
+  await expect(catalog).toHaveCount(0);
+
+  // A click outside the panel, and Escape
+  await rail.getByRole("button", { name: "Create" }).click();
+  await page.mouse.click(1200, 500);
+  await expect(catalog).toHaveCount(0);
+  await rail.getByRole("button", { name: "Create" }).click();
+  await page.keyboard.press("Escape");
+  await expect(catalog).toHaveCount(0);
+});
+
+test("menus are exclusive and lock the page behind them", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("html[data-palette-ready]")).toHaveCount(1);
+  const rail = page.getByRole("navigation", { name: "Main" });
+
+  await rail.getByRole("button", { name: "Create" }).click();
+  await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
+
+  // Opening the palette closes the catalog instead of stacking on it
+  await page.keyboard.press("Control+k");
+  await expect(page.getByRole("dialog", { name: "Create" })).toHaveCount(0);
+  await expect(page.getByRole("combobox", { name: "Search commands" })).toBeVisible();
+  await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
+
+  // Closing the last overlay gives scrolling back
+  await page.keyboard.press("Escape");
+  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+});
+
 test("secondary pages reveal beside their rail section", async ({ page }) => {
   await page.goto("/");
   const rail = page.getByRole("navigation", { name: "Main" });

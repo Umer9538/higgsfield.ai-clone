@@ -23,7 +23,9 @@ export function HistoryStrip() {
   const recent = assets.slice(0, SHOWN);
 
   return (
-    <div className="mt-2.5 flex h-12 items-center gap-2 overflow-x-auto [scrollbar-width:none]">
+    // Hidden on phones, where the Assets tab is one tap away and the pinned bar
+    // needs to stay short enough to leave the canvas visible.
+    <div className="mt-2.5 hidden h-12 items-center gap-2 overflow-x-auto [scrollbar-width:none] sm:flex">
       <span className="shrink-0 pr-1 text-[11px] font-medium text-hf-dim">Recent</span>
       {recent.length === 0 ? (
         <span className="text-xs text-hf-dim/80">Your generations will line up here.</span>

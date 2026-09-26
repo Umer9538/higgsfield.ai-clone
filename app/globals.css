@@ -184,6 +184,12 @@ body {
   outline: none;
 }
 
+/* The palette's only field always holds focus while it is open, and its ring
+   was clipped by the panel's rounded top edge. The open palette is the cue. */
+[data-palette-input]:focus-visible {
+  outline: none;
+}
+
 /*
  * Sliders show how far along a value is, which is state: the filled track
  * is cyan (set inline per slider), the thumb a white disc with a cyan halo.

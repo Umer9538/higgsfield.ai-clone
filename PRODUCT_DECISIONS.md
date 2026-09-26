@@ -319,9 +319,44 @@ listboxes use proper ARIA roles.
 
 ---
 
+## QA audit of the live site
+
+A scripted browser audit of the production deployment, measuring rather
+than eyeballing: every route at 1440, 1024, 768, 390 and 375 px wide (135
+page loads), then the interactive flows at desktop and phone sizes.
+
+**Clean across all 135 loads:** no horizontal overflow, no element past the
+right edge, no image or video drawn at a distorted aspect ratio, no touch
+target under 44 px on phones, no console errors or failed requests. Every
+one of the first 25 keyboard tab stops on Home shows a visible focus
+indicator. Explore and Assets have working empty states. A generation posts
+to the real API (201) and reports "Synced to cloud"; with the API forced to
+fail it degrades to "Saved on device".
+
+**Found and fixed:**
+
+| # | Defect | Where | Fix |
+|---|---|---|---|
+| 1 | Create catalog stayed open after following a rail link, covering the new page | rail, desktop | Menus now remember the route they were opened on and are only open there, so any navigation closes them by construction — rail links, catalog links, the palette, the back button. Rail links also close it directly, for a click on the page you are already on |
+| 2 | Menus could stack: the palette opened on top of the catalog | all overlays | Opening any menu, sheet or palette closes the others |
+| 3 | The page scrolled behind the studio settings sheet, the palette and the catalog | phone + desktop | One counted scroll lock shared by every overlay, so nested overlays unlock only when the last closes; scrollbar width is padded back so nothing shifts |
+| 4 | Toasts sat on top of the phone tab bar, and would cover the pinned Generate | phones | Toasts appear under the top bar on phones, bottom-centre on desktop |
+| 5 | The palette's focus ring was clipped by its rounded top edge | palette | The palette's single field always holds focus while open, so it no longer draws a ring; the open palette is the cue |
+| 6 | A feed clip opened on a second of black, so its card blinked on every 6-second loop | Home, Explore | Re-cut from the original, starting after the fade-in |
+| 7 | On a 375×667 phone the pinned prompt bar and history strip took ~250 px, covering the page subtitle | studio, phones | History strip hidden on phones (Assets is one tap away) and the bar's top padding halved |
+| 8 | The fourth starting-point chip wrapped onto its own row, half under the tab bar | Home, phones | Chips form one swipeable row on phones |
+
+Checked and not a defect: three dark feed clips (average brightness 9–25
+of 255) are dark footage, matching their posters.
+
+Each fix has a test, and the new tests were first run against the
+unfixed deployment to confirm they fail there — the catalog test found the
+open dialog, the lock tests found the page scrolling, the toast test found
+it 276 px too low.
+
 ## How it is verified
 
-75 Playwright tests run against both the local build and the live
+78 Playwright tests run against both the local build and the live
 deployment: route health, no console errors or failed requests, zero layout
 shift, 44 px touch targets, no horizontal overflow at phone and tablet
 widths, and the interactions above asserting the state actually changes.

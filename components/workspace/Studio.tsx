@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { PanelRightClose, PanelRightOpen, SlidersHorizontal } from "lucide-react";
 import type { Surface } from "@/lib/workspace/types";
 import { HistoryStrip } from "./HistoryStrip";
@@ -18,6 +18,7 @@ import { WorkspaceContent } from "./WorkspaceContent";
 export function Studio({ surface }: { surface: Surface }) {
   const [collapsed, setCollapsed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const closeSheet = useCallback(() => setSheetOpen(false), []);
 
   return (
     <div className="flex lg:h-[calc(100dvh-var(--spacing-header))]">
@@ -64,7 +65,7 @@ export function Studio({ surface }: { surface: Surface }) {
 
         {/* Pinned above the phone tab bar; in normal flow at the foot of the
             fixed-height desktop column. */}
-        <div className="sticky bottom-tabbar z-30 bg-gradient-to-t from-hf-black from-60% to-transparent px-4 pt-6 pb-2 md:bottom-0 lg:static lg:px-6">
+        <div className="sticky bottom-tabbar z-30 bg-gradient-to-t from-hf-black from-60% to-transparent px-4 pt-3 pb-2 sm:pt-6 md:bottom-0 lg:static lg:px-6">
           <div className="mx-auto max-w-4xl">
             <PromptBar surface={surface} />
             <HistoryStrip />
@@ -76,7 +77,7 @@ export function Studio({ surface }: { surface: Surface }) {
         surface={surface}
         collapsed={collapsed}
         sheetOpen={sheetOpen}
-        onCloseSheet={() => setSheetOpen(false)}
+        onCloseSheet={closeSheet}
       />
     </div>
   );

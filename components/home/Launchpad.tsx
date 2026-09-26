@@ -144,9 +144,12 @@ export function Launchpad() {
           </div>
         </form>
 
-        <ul aria-label="Starting points" className="mx-auto mt-4 flex max-w-3xl flex-wrap justify-center gap-2">
+        <ul
+          aria-label="Starting points"
+          className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-auto sm:max-w-3xl sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0"
+        >
           {STARTERS.map((starter) => (
-            <li key={starter.label}>
+            <li key={starter.label} className="shrink-0">
               <button
                 type="button"
                 onClick={() => {

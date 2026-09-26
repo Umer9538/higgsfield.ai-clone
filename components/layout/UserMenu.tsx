@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useExclusiveOverlay, useRouteScopedOpen } from "@/components/ui/overlay";
 import Link from "next/link";
 import { LogOut, Settings, Sparkles, User } from "lucide-react";
 import { useAuth } from "@/lib/auth/context";
@@ -15,22 +16,23 @@ const LINKS = [
 export function UserMenu() {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  const { open, toggle, close } = useRouteScopedOpen();
+  useExclusiveOverlay("account-menu", open, close);
   const wrap = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onClick = (event: MouseEvent) => {
-      if (!wrap.current?.contains(event.target as Node)) setOpen(false);
+      if (!wrap.current?.contains(event.target as Node)) close();
     };
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false);
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && close();
     document.addEventListener("mousedown", onClick);
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("mousedown", onClick);
       document.removeEventListener("keydown", onKey);
     };
-  }, [open]);
+  }, [open, close]);
 
   return (
     <div ref={wrap} className="relative">
@@ -39,7 +41,7 @@ export function UserMenu() {
         aria-label="Account"
         aria-expanded={open}
         aria-haspopup="menu"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={toggle}
         className="flex size-9 items-center justify-center rounded-full bg-hf-surface-4 text-xs font-bold text-hf-accent-soft uppercase ring-2 ring-hf-accent"
       >
         {user?.handle.slice(0, 1) ?? "?"}
@@ -60,7 +62,7 @@ export function UserMenu() {
               key={label}
               href={href}
               role="menuitem"
-              onClick={() => setOpen(false)}
+              onClick={close}
               className="flex min-h-11 items-center gap-2.5 px-3 py-2.5 text-sm text-white transition-colors hover:bg-hf-surface-4"
             >
               <ItemIcon className="size-4 text-hf-dim" aria-hidden strokeWidth={1.75} />
@@ -73,7 +75,7 @@ export function UserMenu() {
             role="menuitem"
             onClick={() => {
               signOut();
-              setOpen(false);
+              close();
               toast("Signed out");
             }}
             className="flex min-h-11 w-full items-center gap-2.5 border-t border-hf-border px-3 py-2.5 text-sm text-white transition-colors hover:bg-hf-surface-4"

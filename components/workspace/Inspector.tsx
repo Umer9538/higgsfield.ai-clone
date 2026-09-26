@@ -9,6 +9,7 @@ import type { IconName, Surface } from "@/lib/workspace/types";
 import { FieldRenderer } from "./FieldRenderer";
 import { Icon } from "./Icon";
 import { dockKey, useField, useWorkspace } from "./state";
+import { useExclusiveOverlay, useScrollLock } from "@/components/ui/overlay";
 
 /**
  * How the output is made, in one column that reads the same in every studio.
@@ -27,6 +28,9 @@ export function Inspector({
   onCloseSheet: () => void;
 }) {
   const sections = inspectorSections(surface);
+  // Only the phone sheet is an overlay; the desktop panel never locks the page
+  useScrollLock(sheetOpen);
+  useExclusiveOverlay("settings-sheet", sheetOpen, onCloseSheet);
   const { values, setValue } = useWorkspace();
   const { toast } = useToast();
 

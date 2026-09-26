@@ -99,8 +99,24 @@ test("mobile: studio settings open as a sheet and Generate stays pinned", async 
     })
     .toBeGreaterThanOrEqual(MOBILE.height - 1);
 
+  // The page behind the sheet stays put
+  await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
+
   await settings.getByRole("button", { name: "Done" }).click();
   await expect(settings).toBeHidden();
+  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+});
+
+test("mobile: toasts appear under the top bar, clear of the tab bar and Generate", async ({ page }) => {
+  await page.setViewportSize(MOBILE);
+  await page.goto("/ai/cinema-studio");
+  await page.getByRole("button", { name: "Add reference" }).click();
+
+  const toast = (await page.locator("[data-toast]").last().boundingBox())!;
+  const generate = (await page.getByRole("button", { name: /^Generate/ }).boundingBox())!;
+  const tabs = (await page.getByRole("navigation", { name: "Sections" }).boundingBox())!;
+  expect(toast.y + toast.height).toBeLessThan(generate.y);
+  expect(toast.y + toast.height).toBeLessThan(tabs.y);
 });
 
 test("mobile: card actions do not depend on hover", async ({ page }) => {

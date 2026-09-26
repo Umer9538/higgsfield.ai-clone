@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { SECTIONS, sectionFor } from "@/lib/nav";
+import { useExclusiveOverlay, useRouteScopedOpen, useScrollLock } from "@/components/ui/overlay";
 import { CreateCatalog } from "./CreateCatalog";
 import { SectionIcon } from "./SectionIcon";
 
@@ -17,21 +18,16 @@ const TAB = "press flex min-h-14 flex-1 flex-col items-center justify-center gap
 export function TabBar() {
   const pathname = usePathname();
   const current = sectionFor(pathname);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const { open: sheetOpen, setOpen: setSheetOpen, close } = useRouteScopedOpen();
+  useExclusiveOverlay("create-sheet", sheetOpen, close);
+  useScrollLock(sheetOpen);
 
   useEffect(() => {
     if (!sheetOpen) return;
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setSheetOpen(false);
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && close();
     document.addEventListener("keydown", onKey);
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previous;
-    };
-  }, [sheetOpen]);
-
-  const close = () => setSheetOpen(false);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [sheetOpen, close]);
   const secondary = SECTIONS.flatMap((section) => section.children ?? []);
 
   return (

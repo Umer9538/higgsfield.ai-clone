@@ -41,7 +41,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4"
+        // Phones: under the top bar, so toasts never sit on the tab bar or the
+        // pinned Generate button. Desktop: bottom centre.
+        className="pointer-events-none fixed inset-x-0 top-[calc(var(--spacing-header)+0.5rem)] z-[100] flex flex-col items-center gap-2 px-4 md:top-auto md:bottom-4"
       >
         {toasts.map((item) => (
           <div
