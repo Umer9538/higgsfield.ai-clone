@@ -8,10 +8,6 @@ import { useToast } from "@/components/ui/Toast";
 import { FeedMedia } from "./FeedMedia";
 
 /**
- * One generation in the feed. Remix normally opens the video studio with the
- * prompt; on the home page `onRemix` loads it into the composer instead.
- */
-/**
  * Saves the card to your favourites in the backend. Visible without hover
  * once saved, so you can see what you kept at a glance.
  */
@@ -52,6 +48,10 @@ function FavoriteButton({ item }: { item: FeedItem }) {
   );
 }
 
+/**
+ * One generation in the feed. Remix normally opens the video studio with the
+ * prompt; on the home page `onRemix` loads it into the composer instead.
+ */
 export function FeedCard({
   item,
   onRemix,

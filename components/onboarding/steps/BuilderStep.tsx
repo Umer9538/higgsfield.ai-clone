@@ -1,32 +1,31 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
 import { ArrowLeft, Sparkles, Wand2 } from "lucide-react";
-import { TAG_GROUPS, buildPrompt, promptParts, surprise, type Medium, type Picks } from "@/lib/onboarding/sandbox";
+import { TAG_GROUPS, promptParts, type Picks, type Tag, type TagGroup } from "@/lib/onboarding/sandbox";
 
-/** Step 2: build the prompt from a subject and tags, with a live preview. */
+/**
+ * Step 2: build the prompt from a subject and tags, with a live preview.
+ * Presentational: it reports intent, and the Sandbox owns the state and
+ * what gets announced.
+ */
 export function BuilderStep({
-  medium,
   subject,
-  setSubject,
-  onSubjectEdited,
   picks,
-  setPicks,
   settings,
   announcement,
-  setAnnouncement,
+  onSubjectChange,
+  onSurprise,
+  onToggleTag,
   onBack,
   onRender,
 }: {
-  medium: Medium;
   subject: string;
-  setSubject: Dispatch<SetStateAction<string>>;
-  onSubjectEdited: () => void;
   picks: Picks;
-  setPicks: Dispatch<SetStateAction<Picks>>;
   settings: [string, string][];
   announcement: string;
-  setAnnouncement: Dispatch<SetStateAction<string>>;
+  onSubjectChange: (value: string) => void;
+  onSurprise: () => void;
+  onToggleTag: (group: TagGroup, tag: Tag) => void;
   onBack: () => void;
   onRender: () => void;
 }) {
@@ -43,21 +42,13 @@ export function BuilderStep({
           <input
             value={subject}
             maxLength={300}
-            onChange={(event) => {
-              setSubject(event.target.value);
-              onSubjectEdited();
-            }}
+            onChange={(event) => onSubjectChange(event.target.value)}
             className="min-h-11 w-full rounded-[var(--radius-control)] border border-hf-border bg-hf-surface-2 px-3 text-sm text-white placeholder:text-hf-dim focus:border-hf-accent/50 focus:outline-none"
           />
         </label>
         <button
           type="button"
-          onClick={() => {
-            const next = surprise(medium);
-            setSubject(next.subject);
-            setPicks(next.picks);
-            setAnnouncement(`Prompt filled: ${buildPrompt(next.subject, next.picks)}`);
-          }}
+          onClick={onSurprise}
           className="press flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-hf-accent/40 bg-hf-accent/10 px-4 text-sm font-medium text-hf-accent-soft hover:bg-hf-accent/20"
         >
           <Sparkles className="size-4" aria-hidden strokeWidth={2} />
@@ -81,10 +72,7 @@ export function BuilderStep({
                     role="radio"
                     aria-checked={on}
                     // Tapping the chosen tag again clears the group
-                    onClick={() => {
-                      setPicks((prev) => ({ ...prev, [group.id]: on ? undefined : tag.id }));
-                      setAnnouncement(on ? `Removed ${tag.label}` : `Added ${tag.label}: ${tag.words}`);
-                    }}
+                    onClick={() => onToggleTag(group, tag)}
                     className={`press flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors sm:min-h-9 ${
                       on
                         ? "border-hf-cyan bg-hf-cyan/15 text-white"

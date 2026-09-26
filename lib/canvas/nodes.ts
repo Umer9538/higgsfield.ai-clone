@@ -1,8 +1,8 @@
-/** The node canvas's model: node types and their parameters, and the starting graph. */
+/** The node canvas's model: node types and their parameters, the starting graph, and the credit estimate shown on output nodes. */
 
-export type NodeTypeId = "text-prompt" | "image-input" | "video-output";
+type NodeTypeId = "text-prompt" | "image-input" | "video-output";
 
-export interface ParamSpec {
+interface ParamSpec {
   key: string;
   label: string;
   kind: "text" | "textarea" | "select";
@@ -67,7 +67,7 @@ export const typeOf = (id: NodeTypeId) => NODE_TYPES.find((t) => t.id === id)!;
  * (45 credits for 5 seconds). Labelled "est." in the UI: it is arithmetic on
  * the pricing config, not a measurement.
  */
-export const CREDITS_PER_SECOND = 9;
+const CREDITS_PER_SECOND = 9;
 export const estimateCredits = (duration: string) => Math.round((parseInt(duration, 10) || 5) * CREDITS_PER_SECOND);
 
 export const INITIAL: CanvasNode[] = [

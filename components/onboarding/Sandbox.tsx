@@ -12,6 +12,7 @@ import {
   mediumById,
   presetSettings,
   studioUrl,
+  surprise,
   type MediumId,
   type Picks,
   type SandboxAnswers,
@@ -136,15 +137,26 @@ export function Sandbox() {
 
             {step === 1 && medium ? (
               <BuilderStep
-                medium={medium}
                 subject={subject}
-                setSubject={setSubject}
-                onSubjectEdited={() => setSubjectEdited(true)}
                 picks={picks}
-                setPicks={setPicks}
                 settings={settings}
                 announcement={announcement}
-                setAnnouncement={setAnnouncement}
+                onSubjectChange={(value) => {
+                  setSubject(value);
+                  setSubjectEdited(true);
+                }}
+                onSurprise={() => {
+                  const next = surprise(medium);
+                  setSubject(next.subject);
+                  setPicks(next.picks);
+                  setAnnouncement(`Prompt filled: ${buildPrompt(next.subject, next.picks)}`);
+                }}
+                onToggleTag={(group, tag) => {
+                  // Tapping the chosen tag again clears the group
+                  const on = picks[group.id] === tag.id;
+                  setPicks((prev) => ({ ...prev, [group.id]: on ? undefined : tag.id }));
+                  setAnnouncement(on ? `Removed ${tag.label}` : `Added ${tag.label}: ${tag.words}`);
+                }}
                 onBack={() => go(0)}
                 onRender={() => go(2)}
               />

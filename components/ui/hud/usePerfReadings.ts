@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export interface Readings {
+interface Readings {
   fps: number;
   frameMs: number;
   worstMs: number;

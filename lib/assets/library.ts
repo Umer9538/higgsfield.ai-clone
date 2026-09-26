@@ -37,7 +37,7 @@ export function toAsset(item: RemoteGeneration): Asset {
 /** One record, however many stores it appears in: the backend id when known. */
 export const identity = (asset: Asset) => asset.remoteId ?? asset.id;
 
-export const HIDDEN_KEY = "hf.hiddenAssets";
+const HIDDEN_KEY = "hf.hiddenAssets";
 export function readHidden(): string[] {
   try {
     return JSON.parse(window.localStorage.getItem(HIDDEN_KEY) ?? "[]") as string[];

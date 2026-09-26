@@ -43,7 +43,7 @@ export function NodeCard({
   const hasIn = inputs > 0;
   return (
     <div
-            ref={nodeRef}
+      ref={nodeRef}
       data-node={node.id}
       onPointerDown={onPress}
       className={`absolute w-52 rounded-2xl border bg-hf-surface-2 transition-shadow ${
